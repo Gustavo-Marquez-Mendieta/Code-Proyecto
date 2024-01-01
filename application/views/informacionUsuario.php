@@ -134,9 +134,20 @@
                 <div class="col-md-12">
                     <br>
                     <h2 class="titulo">"Configuracion de mi cuenta"</h2>
+                    <?php if ($this->session->flashdata('error')): ?>
+                        <div class="alert alert-danger">
+                            <?php echo $this->session->flashdata('error'); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($this->session->flashdata('success')): ?>
+                        <div class="alert alert-success">
+                            <?php echo $this->session->flashdata('success'); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-6">
-                    <form action="<?php echo site_url('Welcome/actualizarCuenta'); ?>" method="post">
+                    <form action="<?php echo site_url('Welcome/actualizar'); ?>" method="post">
 
                         <label>Nombre:</label>
                         <input type="text" name="nombre" value="<?php echo set_value('nombre', $usuario->nombre); ?>"
@@ -146,7 +157,7 @@
                             value="<?php echo set_value('primerApellido', $usuario->primerApellido); ?>" required><br>
                         <label>Segundo Apellido:</label>
                         <input type="text" name="segundoApellido"
-                            value="<?php echo set_value('segundoApellido', $usuario->segundoApellido); ?>" required><br>
+                            value="<?php echo set_value('segundoApellido', $usuario->segundoApellido); ?>"><br>
                         <label>Correo Electronico:</label>
                         <input type="text" name="nombre_usuario"
                             value="<?php echo set_value('nombre_usuario', $usuario->usuario); ?>" required><br>

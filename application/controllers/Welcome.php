@@ -338,49 +338,115 @@ class Welcome extends CI_Controller
 		$this->load->model('Reservas_model');
 		$this->load->model('Reserva_detalle_model');
 		$this->load->library('email');
-
-		// Obtener el ID del usuario logueado
 		$usuario_id = $this->session->userdata('usuario_id');
 
-		// Cambiar el estado de la reserva a "cancelado" y actualizar el usuario que realizó la acción
-		$this->Reservas_model->update_estado_reserva($reserva_id, 'Cancelado', $usuario_id);
+		// Obtener los detalles de la reserva antes de cancelarla
+		$detalles = $this->Reservas_model->get_detalles_reserva($reserva_id);
 
-		// Obtener los detalles de la reserva y el correo electrónico del usuario
-		$reserva = $this->Reservas_model->get_reserva_con_usuario_by_id($reserva_id);
+		// Iniciar transacción
+		$this->db->trans_start();
 
-		if ($reserva) {
-			// Configuración del correo electrónico
-			$config = array(
-				'protocol' => 'smtp',
-				'smtp_host' => 'smtp.gmail.com',
-				'smtp_port' => 587,
-				'smtp_user' => 'marquez.gustavo.1296@gmail.com',
-				'smtp_pass' => 'mhjp nbfq xqhj hiys',
-				'mailtype' => 'html',
-				'charset' => 'utf-8',
-				'wordwrap' => TRUE,
-				'newline' => "\r\n",
-				'smtp_crypto' => 'tls'
-			);
-			$this->email->initialize($config);
+		try {
+			// Variable para rastrear si todas las actualizaciones fueron exitosas
+			$actualizaciones_exitosas = true;
 
-			$this->email->from('tu_email@gmail.com', 'El Detalle Eventos');
-			$this->email->to($reserva->email);
-			$this->email->subject('Cancelación de Solicitud');
+			// Actualizar stocks para cada detalle
+			foreach ($detalles as $detalle) {
+				// Actualizar stock de vajilla
+				if (!empty($detalle->vajilla_id)) {
+					// Primero verificamos el stock actual
+					$vajilla_actual = $this->db->get_where('Vajilla', ['vajilla_id' => $detalle->vajilla_id])->row();
+					if ($vajilla_actual) {
+						// Actualizamos el stock_cajas
+						$this->db->set('stock_cajas', 'stock_cajas + ' . (int) $detalle->cantidad, FALSE);
+						$this->db->where('vajilla_id', $detalle->vajilla_id);
+						$actualizado = $this->db->update('Vajilla');
 
-			// Construir el mensaje de cancelación
-			$mensaje = "<p>Lamentamos informarte que tu solicitud no ha sido aceptada.</p>";
-			$mensaje .= "<p>No se pudo aceptar tu solicitud. Si tienes preguntas, por favor contáctanos.</p>";
+						if (!$actualizado) {
+							$actualizaciones_exitosas = false;
+							log_message('error', 'Error al actualizar stock de vajilla ID: ' . $detalle->vajilla_id);
+						}
+					}
+				}
 
-			$this->email->message($mensaje);
+				// Actualizar stock de mantelería
+				if (!empty($detalle->manteleria_id)) {
+					// Primero verificamos el stock actual
+					$manteleria_actual = $this->db->get_where('Manteleria', ['manteleria_id' => $detalle->manteleria_id])->row();
+					if ($manteleria_actual) {
+						// Actualizamos el stock
+						$this->db->set('stock', 'stock + ' . (int) $detalle->cantidad, FALSE);
+						$this->db->where('manteleria_id', $detalle->manteleria_id);
+						$actualizado = $this->db->update('Manteleria');
 
-			if ($this->email->send()) {
-				$this->session->set_flashdata('success', 'Solicitud cancelada y notificación enviada al correo.');
-			} else {
-				$this->session->set_flashdata('error', 'Solicitud cancelada pero no se pudo enviar el correo: ' . $this->email->print_debugger());
+						if (!$actualizado) {
+							$actualizaciones_exitosas = false;
+							log_message('error', 'Error al actualizar stock de mantelería ID: ' . $detalle->manteleria_id);
+						}
+					}
+				}
 			}
-		} else {
-			$this->session->set_flashdata('error', 'No se pudo encontrar la reserva.');
+
+			if ($actualizaciones_exitosas) {
+				// Actualizar estado de la reserva
+				$this->Reservas_model->update_estado_reserva($reserva_id, 'Cancelado', $usuario_id);
+
+				// Obtener datos de la reserva para el correo
+				$reserva = $this->Reservas_model->get_reserva_con_usuario_by_id($reserva_id);
+
+				if ($reserva) {
+					// Configuración del correo
+					$config = array(
+						'protocol' => 'smtp',
+						'smtp_host' => 'smtp.gmail.com',
+						'smtp_port' => 587,
+						'smtp_user' => 'marquez.gustavo.1296@gmail.com',
+						'smtp_pass' => 'mhjp nbfq xqhj hiys',
+						'mailtype' => 'html',
+						'charset' => 'utf-8',
+						'wordwrap' => TRUE,
+						'newline' => "\r\n",
+						'smtp_crypto' => 'tls'
+					);
+
+					$this->email->initialize($config);
+					$this->email->from('tu_email@gmail.com', 'El Detalle Eventos');
+					$this->email->to($reserva->email);
+					$this->email->subject('Cancelación de Solicitud');
+
+					// Crear mensaje detallado
+					$mensaje = "<p>Lamentamos informarte que tu solicitud ha sido cancelada.</p>";
+					$mensaje .= "<p>Detalles de la cancelación:</p>";
+					$mensaje .= "<ul>";
+					$mensaje .= "<li>Número de Reserva: " . $reserva_id . "</li>";
+					$mensaje .= "<li>Fecha de Cancelación: " . date('Y-m-d H:i:s') . "</li>";
+					$mensaje .= "<li>Tipo de Evento: " . $reserva->tipo_evento . "</li>";
+					$mensaje .= "<li>Fecha del Evento: " . $reserva->fecha_reserva . "</li>";
+					$mensaje .= "</ul>";
+					$mensaje .= "<p>Si tienes alguna pregunta, por favor contáctanos.</p>";
+
+					$this->email->message($mensaje);
+
+					if ($this->email->send()) {
+						$this->db->trans_commit();
+						$this->session->set_flashdata('success', 'Solicitud cancelada correctamente. Se ha actualizado el inventario y se ha enviado la notificación por correo.');
+					} else {
+						$this->db->trans_rollback();
+						$this->session->set_flashdata('error', 'Error al enviar el correo de notificación.');
+					}
+				} else {
+					$this->db->trans_rollback();
+					$this->session->set_flashdata('error', 'No se encontró la información de la reserva.');
+				}
+			} else {
+				$this->db->trans_rollback();
+				$this->session->set_flashdata('error', 'Error al actualizar el inventario.');
+			}
+
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+			$this->session->set_flashdata('error', 'Error al procesar la cancelación: ' . $e->getMessage());
+			log_message('error', 'Error en cancelar_solicitud: ' . $e->getMessage());
 		}
 
 		redirect('Welcome/solicitudes');
@@ -404,43 +470,23 @@ class Welcome extends CI_Controller
 	public function recoger_vajilla($reserva_id)
 	{
 		$nuevo_estado = 'Vajilla Recogida';
-
-		// Actualizar el estado de la reserva
 		$this->Reservas_model->update_estado_recogida_vajilla($reserva_id, $nuevo_estado, $this->session->userdata('usuario_id'));
-
-		// Obtener los detalles de la reserva
 		$detalles = $this->Reservas_model->get_detalles_reserva($reserva_id);
-
-		echo "<pre>";
-		print_r($detalles);
-		echo "</pre>";
-
 		foreach ($detalles as $detalle) {
-			// Verificar si tiene vajilla asignada
 			if (!empty($detalle->vajilla_id)) {
 				echo "Actualizando stock de vajilla ID: " . $detalle->vajilla_id . " Cantidad: " . $detalle->cantidad . "<br>";
-
-				// Sumar la cantidad al stock de la Vajilla
 				$this->db->set('stock_cajas', 'stock_cajas + ' . (int) $detalle->cantidad, FALSE);
 				$this->db->where('vajilla_id', $detalle->vajilla_id);
 				$this->db->update('Vajilla');
 			}
-
-			// Verificar si tiene mantelería asignada
 			if (!empty($detalle->manteleria_id)) {
 				echo "Actualizando stock de mantelería ID: " . $detalle->manteleria_id . " Cantidad: " . $detalle->cantidad . "<br>";
-
-				// Sumar la cantidad al stock de la Mantelería
 				$this->db->set('stock', 'stock + ' . (int) $detalle->cantidad, FALSE);
 				$this->db->where('manteleria_id', $detalle->manteleria_id);
 				$this->db->update('Manteleria');
 			}
 		}
-
-		// Detener ejecución para revisar salida
 		die();
-
-		// Redirigir a la página de solicitudes
 		redirect('Welcome/solicitudes');
 	}
 
@@ -558,8 +604,15 @@ class Welcome extends CI_Controller
 
 	public function adminUser()
 	{
-		$this->check_session_and_load_view('administrador/adminUser', true);
+		// Crear el array de datos
+		$data = array(
+			'nombre' => $this->session->userdata('nombre')
+		);
+
+		// Llamar a check_session_and_load_view con los parámetros correctos
+		$this->check_session_and_load_view('administrador/adminUser', $data, true);
 	}
+
 
 	public function registro()
 	{
@@ -999,22 +1052,23 @@ class Welcome extends CI_Controller
 		$this->load->model('Usuario_model');
 		$this->load->library('email');
 
-		$contraseña_actual = $this->input->post('contraseña_actual');
-		$nueva_contraseña = $this->input->post('nueva_contraseña');
+		// Corregido el nombre del campo para que coincida con el formulario
+		$contrasena_actual = $this->input->post('contrasena_actual');
+		$nueva_contrasena = $this->input->post('nueva_contrasena');
 
 		$usuario = $this->Usuario_model->get_usuario_by_id($usuario_id);
 
-		if (password_verify($contraseña_actual, $usuario->password)) {
+		if (password_verify($contrasena_actual, $usuario->password)) {
 			$data = array(
 				'nombre' => $this->input->post('nombre'),
 				'primerApellido' => $this->input->post('primerApellido'),
 				'segundoApellido' => $this->input->post('segundoApellido'),
-				'usuario' => $this->input->post('usuario'),
-				'celular' => $this->input->post('celular')
+				'usuario' => $this->input->post('nombre_usuario'), // Corregido para coincidir con el formulario
+				'celular' => $this->input->post('telefono')  // Corregido para coincidir con el formulario
 			);
 
-			if (!empty($nueva_contraseña)) {
-				$data['password'] = password_hash($nueva_contraseña, PASSWORD_BCRYPT);
+			if (!empty($nueva_contrasena)) {
+				$data['password'] = password_hash($nueva_contrasena, PASSWORD_BCRYPT);
 
 				$config = array(
 					'protocol' => 'smtp',
@@ -1031,9 +1085,9 @@ class Welcome extends CI_Controller
 				$this->email->initialize($config);
 
 				$this->email->from('tu_email@gmail.com', 'El Detalle Eventos');
-				$this->email->to($usuario->usuario); // Suponiendo que el email del usuario es su nombre de usuario
+				$this->email->to($usuario->usuario);
 				$this->email->subject('Cambio de Contraseña');
-				$this->email->message('Tu contraseña ha sido cambiada exitosamente. La nueva contraseña es: ' . $nueva_contraseña);
+				$this->email->message('Tu contraseña ha sido cambiada exitosamente. La nueva contraseña es: ' . $nueva_contrasena);
 
 				if ($this->email->send()) {
 					$this->session->set_flashdata('success', 'Contraseña actualizada y notificación enviada a tu correo.');
@@ -1042,18 +1096,13 @@ class Welcome extends CI_Controller
 				}
 			}
 
-			// Actualizar el usuario en la base de datos
 			$this->Usuario_model->actualizar_usuario($usuario_id, $data);
-
-			// Redirigir a la página de configuración
 			redirect('Welcome/configuracion');
 		} else {
-			// Si la contraseña actual no es válida, mostrar un mensaje de error
 			$this->session->set_flashdata('error', 'Contraseña actual no válida.');
 			redirect('Welcome/configuracion');
 		}
 	}
-
 	public function validarCorreo()
 	{
 		$email = $this->input->post('usuario');
@@ -1204,7 +1253,86 @@ class Welcome extends CI_Controller
 
 		$this->load->view('welcome_message', $data);
 	}
+	public function actualizarCuenta()
+	{
+		// Verificar si el usuario está logueado
+		$usuario_id = $this->session->userdata('usuario_id');
+		if (!$usuario_id) {
+			redirect('Welcome/index');
+			return;
+		}
 
+		$this->load->model('Usuario_model');
+		$this->load->library('email');
+
+		// Obtener datos del formulario
+		$contrasena_actual = $this->input->post('contrasena_actual');
+		$nueva_contrasena = $this->input->post('nueva_contrasena');
+
+		// Obtener usuario actual
+		$usuario = $this->Usuario_model->get_usuario_by_id($usuario_id);
+
+		// Verificar contraseña actual
+		if (password_verify($contrasena_actual, $usuario->password)) {
+			// Preparar datos para actualizar
+			$data = array(
+				'nombre' => $this->input->post('nombre'),
+				'primerApellido' => $this->input->post('primerApellido'),
+				'segundoApellido' => $this->input->post('segundoApellido'),
+				'usuario' => $this->input->post('nombre_usuario'),
+				'celular' => $this->input->post('telefono')
+			);
+
+			// Si se proporcionó una nueva contraseña, actualizarla
+			if (!empty($nueva_contrasena)) {
+				$data['password'] = password_hash($nueva_contrasena, PASSWORD_BCRYPT);
+
+				// Configuración del correo electrónico
+				$config = array(
+					'protocol' => 'smtp',
+					'smtp_host' => 'smtp.gmail.com',
+					'smtp_port' => 587,
+					'smtp_user' => 'marquez.gustavo.1296@gmail.com',
+					'smtp_pass' => 'mhjp nbfq xqhj hiys',
+					'mailtype' => 'html',
+					'charset' => 'utf-8',
+					'wordwrap' => TRUE,
+					'newline' => "\r\n",
+					'smtp_crypto' => 'tls'
+				);
+				$this->email->initialize($config);
+
+				// Preparar y enviar el correo
+				$this->email->from('tu_email@gmail.com', 'El Detalle Eventos');
+				$this->email->to($usuario->usuario);
+				$this->email->subject('Cambio de Contraseña');
+				$this->email->message('Tu contraseña ha sido cambiada exitosamente. La nueva contraseña es: ' . $nueva_contrasena);
+
+				// Intentar enviar el correo
+				if ($this->email->send()) {
+					$this->session->set_flashdata('success', 'Contraseña actualizada y notificación enviada a tu correo.');
+				} else {
+					$this->session->set_flashdata('error', 'Contraseña actualizada pero no se pudo enviar el correo: ' . $this->email->print_debugger());
+				}
+			}
+
+			// Actualizar datos del usuario
+			$resultado = $this->Usuario_model->actualizar_usuario($usuario_id, $data);
+
+			if ($resultado) {
+				// Actualizar datos de sesión
+				$this->session->set_userdata('nombre', $data['nombre']);
+				$this->session->set_flashdata('success', 'Datos actualizados correctamente.');
+			} else {
+				$this->session->set_flashdata('error', 'Error al actualizar los datos.');
+			}
+
+			redirect('Welcome/AdminConfiguracion');
+		} else {
+			$this->session->set_flashdata('error', 'Contraseña actual no válida.');
+			redirect('Welcome/AdminConfiguracion');
+		}
+	}
 	public function editUser($usuario_id)
 	{
 		$this->load->model('Usuario_model');
@@ -1345,39 +1473,69 @@ class Welcome extends CI_Controller
 		$nueva_cantidad = $this->input->post('cantidad');
 
 		if ($nueva_cantidad > 0) {
-			// Obtén el detalle usando el detalle_id
 			$detalle = $this->Reserva_detalle_model->get_detalle_by_id($detalle_id);
 
 			if ($detalle) {
-				// Actualiza la cantidad del detalle
-				$this->Reserva_detalle_model->actualizar_cantidad($detalle_id, $nueva_cantidad);
+				// Calcular la diferencia entre la nueva cantidad y la anterior
+				$diferencia = $nueva_cantidad - $detalle->cantidad;
 
-				// Calcula el precio total del detalle
-				$precio_total_detalle = $nueva_cantidad * $detalle->precio;
+				// Iniciar transacción
+				$this->db->trans_start();
 
-				// Obtén el reserva_id y garzones de la reserva asociada
-				$reserva_id = $detalle->reserva_id;
-				$reserva = $this->Reservas_model->get_reserva_by_id($reserva_id); // Asegúrate de tener este método en el modelo
-				$garzones = isset($reserva->garzones) ? $reserva->garzones : 0; // Obtén la cantidad de garzones
+				try {
+					// Actualizar stock según el tipo de elemento
+					if (!empty($detalle->vajilla_id)) {
+						// Es un elemento de vajilla
+						$vajilla = $this->db->get_where('Vajilla', ['vajilla_id' => $detalle->vajilla_id])->row();
+						if ($vajilla) {
+							// Restar la diferencia del stock
+							$this->db->set('stock_cajas', "stock_cajas - $diferencia", FALSE);
+							$this->db->where('vajilla_id', $detalle->vajilla_id);
+							$this->db->update('Vajilla');
+						}
+					}
 
-				// Calcula el nuevo monto total incluyendo el costo de los garzones
-				$monto_total = $this->Reservas_model->calcular_monto_total($reserva_id, $garzones);
+					if (!empty($detalle->manteleria_id)) {
+						$manteleria = $this->db->get_where('Manteleria', ['manteleria_id' => $detalle->manteleria_id])->row();
+						if ($manteleria) {
+							// Restar la diferencia del stock
+							$this->db->set('stock', "stock - $diferencia", FALSE);
+							$this->db->where('manteleria_id', $detalle->manteleria_id);
+							$this->db->update('Manteleria');
+						}
+					}
 
-				// Actualiza el monto total en la reserva
-				$this->Reservas_model->actualizar_monto_total($reserva_id, $monto_total);
+					// Actualizar la cantidad en el detalle
+					$this->Reserva_detalle_model->actualizar_cantidad($detalle_id, $nueva_cantidad);
 
-				// Mensaje de éxito
-				$this->session->set_flashdata('success', 'Cantidad actualizada correctamente.');
+					// Calcular el precio total del detalle
+					$precio_total_detalle = $nueva_cantidad * $detalle->precio;
+
+					// Obtener reserva_id y garzones
+					$reserva_id = $detalle->reserva_id;
+					$reserva = $this->Reservas_model->get_reserva_by_id($reserva_id);
+					$garzones = isset($reserva->garzones) ? $reserva->garzones : 0;
+
+					// Calcular nuevo monto total
+					$monto_total = $this->Reservas_model->calcular_monto_total($reserva_id, $garzones);
+
+					// Actualizar monto total
+					$this->Reservas_model->actualizar_monto_total($reserva_id, $monto_total);
+
+					$this->db->trans_commit();
+					$this->session->set_flashdata('success', 'Cantidad actualizada correctamente.');
+				} catch (Exception $e) {
+					$this->db->trans_rollback();
+					$this->session->set_flashdata('error', 'Error al actualizar la cantidad: ' . $e->getMessage());
+				}
 			} else {
-				// Mensaje de error si no se encuentra el detalle
 				$this->session->set_flashdata('error', 'Detalle no encontrado.');
 			}
 		} else {
-			// Mensaje de error si la cantidad no es válida
 			$this->session->set_flashdata('error', 'La cantidad debe ser mayor a 0.');
 		}
 
-		// Redirige a la página de detalles de la reserva
+		// Redirigir a la página de detalles
 		redirect('Welcome/detalles/' . $detalle->reserva_id);
 	}
 

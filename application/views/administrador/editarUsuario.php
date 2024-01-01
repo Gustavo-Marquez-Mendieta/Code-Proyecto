@@ -142,7 +142,7 @@
                         <img src="../../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                
+
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -192,51 +192,52 @@
                             <label for="nombre">Nombre:</label>
                             <input type="text" id="nombre" name="nombre" class="form-control"
                                 value="<?php echo set_value('nombre', $usuario->nombre); ?>" required
-                                style="color:white">
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                         </div>
 
                         <div class="form-group">
                             <label for="primerApellido">Primer Apellido:</label>
                             <input type="text" id="primerApellido" name="primerApellido" class="form-control"
                                 value="<?php echo set_value('primerApellido', $usuario->primerApellido); ?>" required
-                                style="color:white">
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                         </div>
 
                         <div class="form-group">
                             <label for="segundoApellido">Segundo Apellido:</label>
                             <input type="text" id="segundoApellido" name="segundoApellido" class="form-control"
                                 value="<?php echo set_value('segundoApellido', $usuario->segundoApellido); ?>" required
-                                style="color:white">
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                         </div>
 
                         <div class="form-group">
                             <label for="usuario">Usuario:</label>
                             <input type="text" id="usuario" name="usuario" class="form-control"
                                 value="<?php echo set_value('usuario', $usuario->usuario); ?>" required
-                                style="color:white">
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                         </div>
 
                         <div class="form-group">
                             <label for="celular">Celular:</label>
                             <input type="text" id="celular" name="celular" class="form-control"
                                 value="<?php echo set_value('celular', $usuario->celular); ?>" required
-                                style="color:white">
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                         </div>
 
                         <div class="form-group">
                             <label for="estado">Estado:</label>
-                            <select id="estado" name="estado" class="form-control" required style="color:white">
+                            <select id="estado" name="estado" class="form-control" required
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                                 <option value="1" <?php echo $usuario->estado ? 'selected' : ''; ?>>Activo</option>
                                 <option value="0" <?php echo !$usuario->estado ? 'selected' : ''; ?>>Inactivo</option>
                             </select>
                         </div>
+
                         <div class="form-group">
                             <label for="rol">Rol:</label>
-                            <select id="rol" name="rol" class="form-control" required style="color:white">
+                            <select id="rol" name="rol" class="form-control" required
+                                style="color:white; background-color: rgba(0, 0, 0, 0.5); border: 1px solid #6c757d;">
                                 <option value="cliente" <?php echo $usuario->rol == 'cliente' ? 'selected' : ''; ?>>
                                     Cliente</option>
-                                <option value="empleado" <?php echo $usuario->rol == 'empleado' ? 'selected' : ''; ?>>
-                                    Empleado</option>
                                 <option value="administrador" <?php echo $usuario->rol == 'administrador' ? 'selected' : ''; ?>>Administrador</option>
                             </select>
                         </div>
@@ -247,6 +248,59 @@
             </div>
         </div>
     </section>
+    <style>
+        /* Estilos para los inputs y selects */
+        .form-control {
+            color: white !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            border: none !important;
+            /* Removemos los bordes */
+            border-radius: 0 !important;
+            /* Quitamos el redondeo */
+            padding: 8px !important;
+            width: 100% !important;
+            outline: none !important;
+            /* Quitamos el outline al hacer focus */
+        }
+
+        .form-control:focus {
+            background-color: rgba(0, 0, 0, 0.7) !important;
+            color: white !important;
+            box-shadow: none !important;
+            /* Quitamos la sombra al hacer focus */
+        }
+
+        .form-control option {
+            background-color: #343a40;
+            color: white;
+            border: none;
+        }
+
+        /* Estilos para las etiquetas */
+        label {
+            color: white;
+            margin-top: 15px;
+            display: block;
+        }
+
+        /* Estilo para el botón */
+        .btn-primary {
+            margin-top: 20px;
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* Espacio entre los grupos de formulario */
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
 
     <!-- Vendor JS Files -->
     <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>

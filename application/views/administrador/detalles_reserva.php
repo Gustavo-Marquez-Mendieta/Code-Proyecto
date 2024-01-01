@@ -215,6 +215,7 @@
                     <p style="color:white"><strong>Estado de Evento:</strong> <?= $reserva->estado_pago; ?></p>
                     <p style="color:white"><strong>Cantidad de Garzones:</strong> <?= $reserva->garzones; ?></p>
                     <p style="color:white"><strong>Total:</strong> <?= $reserva->monto_total; ?> Bs.</p>
+
                     <h3 style="color:white">Detalles</h3>
                     <table class="table table-bordered">
                         <thead>
@@ -263,22 +264,21 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6">No hay detalles disponibles</td>
+                                    <td colspan="7">No hay detalles disponibles</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
-
                     </table>
 
                     <br><br>
                     <a href="<?php echo site_url('Welcome/solicitudes'); ?>" class="btn btn-primary"
                         style="color:white">Volver a Solicitudes</a>
+
                     <?php if ($reserva->estado_pago == 'Pendiente'): ?>
                         <a href="<?php echo site_url('Welcome/aprobar_solicitud/' . $reserva->reserva_id); ?>"
                             class="btn btn-success" style="color:white">Aprobar Solicitud</a>
                         <a href="<?php echo site_url('Welcome/cancelar_solicitud/' . $reserva->reserva_id); ?>"
                             class="btn btn-success" style="color:white">Cancelar Solicitud</a>
-
                     <?php elseif ($reserva->estado_pago == 'aprobado-esperando adelanto'): ?>
                         <a href="<?php echo site_url('Welcome/recibir_adelanto/' . $reserva->reserva_id); ?>"
                             class="btn btn-info" style="color:white">Adelanto Recibido</a>
@@ -288,6 +288,9 @@
                             class="btn btn-warning" style="color:white">
                             Entregar Vajilla
                         </a>
+                        <?php if ($reserva->garzones == 0): ?>
+                            <p style="color:yellow; margin-top:10px;">Advertencia: No hay garzones asignados a esta reserva.</p>
+                        <?php endif; ?>
                     <?php elseif ($reserva->estado_pago == 'Vajilla Entregada'): ?>
                         <form action="<?= site_url('Welcome/guardar_detalles_recogida/' . $reserva->reserva_id); ?>"
                             method="post" style="margin-top: 20px;">
@@ -298,99 +301,78 @@
                             <button type="submit" class="btn btn-primary" style="color:white">Agregar detalles y recoger
                                 vagilla</button>
                         </form>
-
                     <?php elseif ($reserva->estado_pago == 'Vajilla Recogida'): ?>
                         <a href="<?php echo site_url('Welcome/terminar_evento/' . $reserva->reserva_id); ?>"
                             class="btn btn-danger" style="color:white">Terminar Evento</a>
                     <?php endif; ?>
                 </div>
+
                 <?php if (!in_array($reserva->estado_pago, $ocultarElementos)): ?>
-                    <?php if (!in_array($reserva->estado_pago, $ocultarElementos) && $reserva->garzones > 0): ?>
-                        <div class="col-md-4">
-                            <form>
-                                <h3 style="color:white">Garzones para el Evento</h3>
-                                <!-- Verifica si hay garzones disponibles para asignar -->
-                                <table id="garzonesTable" class="table table-bordered">
+                    <div class="col-md-4">
+                        <form>
+                            <h3 style="color:white">Gestión de Garzones</h3>
+
+                            <!-- Selector de garzones -->
+                            <div class="form-group">
+                                <label for="garzonSelect" style="color:white;">Seleccionar Garzón:</label>
+                                <select id="garzonSelect" class="form-control" style="background-color:white">
+                                    <?php foreach ($empleados as $empleado): ?>
+                                        <option value="<?= $empleado->empleado_id; ?>"
+                                            data-nombre="<?= htmlspecialchars($empleado->nombre); ?>"
+                                            data-apellido-paterno="<?= htmlspecialchars($empleado->apellido_paterno); ?>"
+                                            data-apellido-materno="<?= htmlspecialchars($empleado->apellido_materno); ?>"
+                                            data-celular="<?= htmlspecialchars($empleado->celular); ?>">
+                                            <?= htmlspecialchars($empleado->nombre . ' ' . $empleado->apellido_paterno . ' ' . $empleado->apellido_materno); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" id="agregarGarzonBtn" class="btn btn-info mt-2"
+                                    style="color:white">Agregar Garzón</button>
+                            </div>
+
+                            <!-- Tabla de garzones asignados -->
+                            <h3 style="color:white;">Garzones Asignados para esta Fiesta</h3>
+                            <?php if (!empty($garzones_asignados)): ?>
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Id Garzon</th>
+                                            <th>ID</th>
                                             <th>Nombre</th>
                                             <th>Apellido Paterno</th>
                                             <th>Apellido Materno</th>
                                             <th>Celular</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="garzonesTableBody">
-
-                                        <tr></tr>
+                                    <tbody>
+                                        <?php foreach ($garzones_asignados as $garzon): ?>
+                                            <tr>
+                                                <td><?= $garzon->empleado_id; ?></td>
+                                                <td><?= htmlspecialchars($garzon->nombre); ?></td>
+                                                <td><?= htmlspecialchars($garzon->apellido_paterno); ?></td>
+                                                <td><?= htmlspecialchars($garzon->apellido_materno); ?></td>
+                                                <td><?= htmlspecialchars($garzon->celular); ?></td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-sm quitar-garzon"
+                                                        data-empleado-id="<?= $garzon->empleado_id; ?>"
+                                                        data-reserva-id="<?= $reserva->reserva_id; ?>"
+                                                        style="color:white">Quitar</button>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
-
-                                <div class="form-group">
-                                    <label for="garzonSelect" style="color:white;">Seleccionar Garzón:</label>
-                                    <select id="garzonSelect" class="form-control" style="background-color:white">
-                                        <?php foreach ($empleados as $empleado): ?>
-                                            <option value="<?= $empleado->empleado_id; ?>"
-                                                data-nombre="<?= htmlspecialchars($empleado->nombre); ?>"
-                                                data-apellido-paterno="<?= htmlspecialchars($empleado->apellido_paterno); ?>"
-                                                data-apellido-materno="<?= htmlspecialchars($empleado->apellido_materno); ?>"
-                                                data-celular="<?= htmlspecialchars($empleado->celular); ?>">
-                                                <?= htmlspecialchars($empleado->nombre . ' ' . $empleado->apellido_paterno . ' ' . $empleado->apellido_materno); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <button type="button" id="agregarGarzonBtn" class="btn btn-info" style="color:white">Agregar
-                                        a la lista</button>
-                                    <button type="button" id="guardarGarzonesBtn" class="btn btn-success"
-                                        style="color:white">Agregar Garzones al Evento</button>
-                                </div>
-
-                                <!-- Tabla de garzones asignados -->
-                                <h3 style="color:white;">Garzones Asignados para esta Fiesta</h3>
-                                <?php if (!empty($garzones_asignados)): ?>
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>ID Garzón</th>
-                                                <th>Nombre</th>
-                                                <th>Apellido Paterno</th>
-                                                <th>Apellido Materno</th>
-                                                <th>Celular</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($garzones_asignados as $garzon): ?>
-                                                <tr>
-                                                    <td><?= $garzon->empleado_id; ?></td>
-                                                    <td><?= htmlspecialchars($garzon->nombre); ?></td>
-                                                    <td><?= htmlspecialchars($garzon->apellido_paterno); ?></td>
-                                                    <td><?= htmlspecialchars($garzon->apellido_materno); ?></td>
-                                                    <td><?= htmlspecialchars($garzon->celular); ?></td>
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm quitar-garzon"
-                                                            data-empleado-id="<?= $garzon->empleado_id; ?>"
-                                                            data-reserva-id="<?= $reserva->reserva_id; ?>"
-                                                            style="color:white">Quitar</button>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                <?php else: ?>
-                                    <p style="color:white;">No hay garzones asignados a esta reserva.</p>
-                                <?php endif; ?>
-                            </form>
-                        </div>
-                    <?php endif; ?>
+                            <?php else: ?>
+                                <p style="color:white;">No hay garzones asignados a esta reserva.</p>
+                            <?php endif; ?>
+                        </form>
+                    </div>
                 <?php endif; ?>
-
-
             </div>
         </div>
     </section>
 
-    <!--====== Scripts -->
+    <!--====== Scripts ======-->
     <script src="./js/jquery-3.1.1.min.js"></script>
     <script src="./js/sweetalert2.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
@@ -403,59 +385,159 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .custom-icon {
+            width: 80px;
+            height: 80px;
+            margin: auto;
+            position: relative;
+            box-sizing: content-box;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estilo para el check */
+        .check-circle {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #4BB543;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .check-circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 60px;
+            border-right: 4px solid #4BB543;
+            border-bottom: 4px solid #4BB543;
+            transform: translate(-50%, -70%) rotate(45deg);
+        }
+
+        /* Estilo para la señal de advertencia */
+        .warning-sign {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #FFA500;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #FFA500;
+            font-weight: bold;
+        }
+
+        /* Estilo para la X de error */
+        .error-sign {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #DC3545;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #DC3545;
+            font-weight: bold;
+        }
+
+        /* Ajustes generales del popup */
+        .swal2-popup {
+            padding: 1em !important;
+        }
+
+        .swal2-icon {
+            border: none !important;
+            background: none !important;
+        }
+    </style>
     <script>
-        const garzonesSeleccionados = [];
-        const maxGarzones = <?= $reserva->garzones ?>;
-        const garzonesActuales = <?= !empty($garzones_asignados) ? count($garzones_asignados) : 0 ?>;
+        document.addEventListener('DOMContentLoaded', function () {
+            const maxGarzones = <?= $reserva->garzones ?>;
+            const garzonesActuales = <?= !empty($garzones_asignados) ? count($garzones_asignados) : 0 ?>;
+            const btnEntregarVajilla = document.getElementById('btnEntregarVajilla');
 
-        document.getElementById('agregarGarzonBtn').addEventListener('click', function () {
-            if (garzonesSeleccionados.length + garzonesActuales >= maxGarzones) {
-                alert(`No se pueden agregar más garzones. El límite requerido es ${maxGarzones}.`);
-                return;
-            }
+            function showActionAlert(title, text = '', icon = 'success', redirectUrl = null) {
+                let iconHtml;
+                let iconColor;
 
-            const garzonSelect = document.getElementById('garzonSelect');
-            const garzonId = garzonSelect.value;
-            const garzonNombre = garzonSelect.options[garzonSelect.selectedIndex].dataset.nombre;
-            const garzonApellidoPaterno = garzonSelect.options[garzonSelect.selectedIndex].dataset.apellidoPaterno;
-            const garzonApellidoMaterno = garzonSelect.options[garzonSelect.selectedIndex].dataset.apellidoMaterno;
-            const garzonCelular = garzonSelect.options[garzonSelect.selectedIndex].dataset.celular;
-
-            if (!garzonesSeleccionados.includes(garzonId)) {
-                // Agregar a la tabla
-                const row = `<tr>
-                    <td>${garzonId}</td>
-                    <td>${garzonNombre}</td>
-                    <td>${garzonApellidoPaterno}</td>
-                    <td>${garzonApellidoMaterno}</td>
-                    <td>${garzonCelular}</td>
-                 </tr>`;
-                document.getElementById('garzonesTableBody').innerHTML += row;
-
-                // Agregar a la lista de seleccionados
-                garzonesSeleccionados.push(garzonId);
-
-                // Actualizar contador visual si existe
-                const garzonesFaltantes = maxGarzones - (garzonesSeleccionados.length + garzonesActuales);
-                if (garzonesFaltantes === 0) {
-                    alert('Ultimo garzon agregado segun la cantidad requerida del evento.');
+                switch (icon) {
+                    case 'success':
+                        iconHtml = '<div class="custom-icon"><div class="check-circle"></div></div>';
+                        iconColor = '#4BB543';
+                        break;
+                    case 'warning':
+                        iconHtml = '<div class="custom-icon"><div class="warning-sign">!</div></div>';
+                        iconColor = '#FFA500';
+                        break;
+                    case 'error':
+                        iconHtml = '<div class="custom-icon"><div class="error-sign">×</div></div>';
+                        iconColor = '#DC3545';
+                        break;
                 }
-            } else {
-                alert('El garzón ya está en la lista.');
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    backdrop: false,
+                    color: '#ffffff',
+                    width: 'auto',
+                    padding: '1em',
+                    iconHtml: iconHtml,
+                    customClass: {
+                        popup: 'custom-alert-class',
+                        icon: 'custom-icon-class'
+                    }
+                }).then(() => {
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                    }
+                });
             }
-        });
 
-        document.getElementById('guardarGarzonesBtn').addEventListener('click', function () {
-            const reservaId = <?= $reserva->reserva_id; ?>;
+            // Ocultar elementos si no se requieren garzones
+            if (maxGarzones === 0) {
+                const garzonSelect = document.getElementById('garzonSelect');
+                const agregarGarzonBtn = document.getElementById('agregarGarzonBtn');
 
-            // Verificar si la cantidad total no excede el límite
-            if (garzonesSeleccionados.length + garzonesActuales > maxGarzones) {
-                alert(`Solo se pueden asignar ${maxGarzones} garzones en total.`);
-                return;
+                if (garzonSelect) garzonSelect.style.display = 'none';
+                if (agregarGarzonBtn) agregarGarzonBtn.style.display = 'none';
+
+                const mensaje = document.createElement('p');
+                mensaje.style.color = 'white';
+                mensaje.textContent = 'No se requieren garzones para este evento';
+                if (garzonSelect && garzonSelect.parentNode) {
+                    garzonSelect.parentNode.appendChild(mensaje);
+                }
             }
 
-            if (garzonesSeleccionados.length > 0) {
-                // Enviar los datos al servidor con AJAX
+            // Agregar garzón
+            document.getElementById('agregarGarzonBtn')?.addEventListener('click', function () {
+                if (maxGarzones === 0) {
+                    showActionAlert('Información', 'No se requieren garzones para este evento', 'warning');
+                    return;
+                }
+
+                if (garzonesActuales >= maxGarzones) {
+                    showActionAlert('Límite Alcanzado', `No se pueden agregar más garzones. El límite requerido es ${maxGarzones}.`, 'warning');
+                    return;
+                }
+
+                const garzonSelect = document.getElementById('garzonSelect');
+                const garzonId = garzonSelect.value;
+                const reservaId = <?= $reserva->reserva_id; ?>;
+
                 fetch('<?= site_url('Welcome/agregar_garzones_evento'); ?>', {
                     method: 'POST',
                     headers: {
@@ -464,101 +546,139 @@
                     },
                     body: JSON.stringify({
                         reserva_id: reservaId,
-                        garzones: garzonesSeleccionados
+                        garzones: [garzonId]
                     })
-                }).then(response => response.json())
+                })
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success && data.exists) {
-                            alert('Uno o más garzones ya están asignados a esta reserva.');
-                            location.reload();
+                            showActionAlert('Información', 'El garzón ya está asignado a esta reserva.', 'warning');
                         } else if (data.success && !data.exists) {
-                            alert('Garzones agregados correctamente al evento.');
-                            location.reload();
+                            showActionAlert('¡Éxito!', 'Garzón agregado correctamente al evento.', 'success');
+                            setTimeout(() => location.reload(), 1000);
                         } else {
-                            alert('Error al agregar los garzones.');
+                            showActionAlert('Error', 'Error al agregar el garzón.', 'error');
                         }
                     });
-            } else {
-                alert('No has seleccionado ningún garzón.');
-            }
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const btnEntregarVajilla = document.getElementById('btnEntregarVajilla');
+            });
 
+            // Entregar vajilla
             if (btnEntregarVajilla) {
                 btnEntregarVajilla.addEventListener('click', function (e) {
                     e.preventDefault();
-
-                    // Obtener los valores directamente del dataset del botón
-                    const garzonesRequeridos = parseInt(maxGarzones); // Usar la constante global
-                    const garzonesAsignados = parseInt(garzonesActuales); // Usar la constante global
                     const urlEntrega = this.dataset.url;
 
-                    // Lógica simplificada para determinar si se puede entregar
-                    if (garzonesRequeridos === 0) {
-                        // Si no requiere garzones, entregar directamente
-                        Swal.fire({
-                            title: 'Vajilla Entregada',
-                            icon: 'success',
-                            timer: 3000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
-                        }).then(() => {
-                            window.location.href = urlEntrega;
-                        });
-                    } else if (garzonesAsignados < garzonesRequeridos) {
-                        // Si faltan garzones por asignar
-                        Swal.fire({
-                            title: '¡Atención!',
-                            text: `No se puede entregar la vajilla. Faltan garzones por asignar. 
-                           Se requieren ${garzonesRequeridos} garzones y solo hay ${garzonesAsignados} asignados.`,
-                            icon: 'warning',
-                            timer: 3000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
-                        });
+                    if (maxGarzones === 0) {
+                        showActionAlert('Vajilla Entregada', 'La vajilla fue entregada correctamente', 'success');
+                        setTimeout(() => window.location.href = urlEntrega, 2000);
+                    } else if (garzonesActuales < maxGarzones) {
+                        showActionAlert('¡Atención!',
+                            `No se puede entregar la vajilla. Faltan garzones por asignar. Se requieren ${maxGarzones} garzones y solo hay ${garzonesActuales} asignados.`,
+                            'warning'
+                        );
                     } else {
-                        // Si todos los garzones están asignados
-                        Swal.fire({
-                            title: 'Vajilla Entregada',
-                            icon: 'success',
-                            timer: 3000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
-                        }).then(() => {
-                            window.location.href = urlEntrega;
-                        });
+                        showActionAlert('Vajilla Entregada', 'La vajilla fue entregada correctamente', 'success');
+                        setTimeout(() => window.location.href = urlEntrega, 2000);
                     }
                 });
             }
-        });
-        $(document).ready(function () {
+
+            // Quitar garzón
             $('.quitar-garzon').on('click', function () {
                 var empleado_id = $(this).data('empleado-id');
                 var reserva_id = $(this).data('reserva-id');
-                var row = $('#garzon_row_' + empleado_id);
 
-                if (confirm('¿Está seguro de que desea quitar este garzón?')) {
-                    $.ajax({
-                        url: '<?= site_url('Welcome/quitar_garzon'); ?>',
-                        type: 'POST',
-                        data: { empleado_id: empleado_id, reserva_id: reserva_id },
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.status === 'success') {
-                                row.remove();
-                                alert(response.message);
-                                window.location.reload();
-                            } else {
-                                alert(response.message);
-                            }
-                        },
-                        error: function () {
-                            alert('Ocurrió un error al intentar quitar al garzón.');
+                $.ajax({
+                    url: '<?= site_url('Welcome/quitar_garzon'); ?>',
+                    type: 'POST',
+                    data: { empleado_id: empleado_id, reserva_id: reserva_id },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            showActionAlert('¡Éxito!', 'Garzón eliminado correctamente', 'success');
+                            setTimeout(() => window.location.reload(), 2000);
+                        } else {
+                            showActionAlert('Error', response.message, 'error');
                         }
-                    });
-                }
+                    },
+                    error: function () {
+                        showActionAlert('Error', 'Ocurrió un error al intentar quitar al garzón.', 'error');
+                    }
+                });
             });
+
+            // Recoger Vajilla - Versión corregida
+            const formRecogerVajilla = document.querySelector('form[action*="guardar_detalles_recogida"]');
+            if (formRecogerVajilla) {
+                formRecogerVajilla.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Importante: previene el envío normal del formulario
+                    const formData = new FormData(this);
+                    const url = this.action;
+
+                    // Deshabilitar el botón para evitar doble envío
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    if (submitButton) submitButton.disabled = true;
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            showActionAlert('¡Vajilla Recogida!', 'La vajilla ha sido recogida exitosamente', 'success');
+                            setTimeout(() => {
+                                window.location.href = '<?= site_url('Welcome/solicitudes'); ?>';
+                            }, 2000);
+                        })
+                        .catch(error => {
+                            showActionAlert('Error', 'Ocurrió un error al recoger la vajilla', 'error');
+                            if (submitButton) submitButton.disabled = false;
+                        });
+                });
+            }
+
+            // Aprobar Solicitud
+            const btnAprobarSolicitud = document.querySelector('a[href*="aprobar_solicitud"]');
+            if (btnAprobarSolicitud) {
+                btnAprobarSolicitud.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    showActionAlert('¡Solicitud Aprobada!', 'La solicitud ha sido aprobada exitosamente', 'success');
+                    setTimeout(() => window.location.href = url, 2000);
+                });
+            }
+
+            // Cancelar Solicitud
+            const btnCancelarSolicitud = document.querySelector('a[href*="cancelar_solicitud"]');
+            if (btnCancelarSolicitud) {
+                btnCancelarSolicitud.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    showActionAlert('Solicitud Cancelada', 'La solicitud ha sido cancelada', 'success');
+                    setTimeout(() => window.location.href = url, 2000);
+                });
+            }
+
+            // Recibir Adelanto
+            const btnRecibirAdelanto = document.querySelector('a[href*="recibir_adelanto"]');
+            if (btnRecibirAdelanto) {
+                btnRecibirAdelanto.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    showActionAlert('¡Adelanto Registrado!', 'El adelanto ha sido registrado correctamente', 'success');
+                    setTimeout(() => window.location.href = url, 2000);
+                });
+            }
+
+            // Terminar Evento
+            const btnTerminarEvento = document.querySelector('a[href*="terminar_evento"]');
+            if (btnTerminarEvento) {
+                btnTerminarEvento.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    showActionAlert('¡Evento Terminado!', 'El evento ha sido terminado exitosamente', 'success');
+                    setTimeout(() => window.location.href = url, 2000);
+                });
+            }
         });
     </script>
 </body>
