@@ -24,21 +24,12 @@
 	@import url('./theme-pastel-brown.css');
 */
 #inicio{
-background-image: url(../assets/img/fona.jpg);
+background-image: url(../img/fondologin.jpg);
 background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: 100% 100%;
 }
-.frase {
-	font-size: 40px;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 20px;
-  background-image: linear-gradient(45deg, #FF6B6B, #87CEEB); /* Degradado de coral a celeste */
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  }
+
 /*============ Fonts */
 @font-face {
     font-family: 'RobotoCondensedLight';
@@ -96,7 +87,7 @@ body, html{
 /*============ LogIn*/
 .login-container{
 	height: 100%;
-	background-image: url(../assets/img/login.jpg);
+	background-image: url(../img/fondologin.jpg);
 }
 .logInForm{
 	position: absolute;
@@ -130,7 +121,7 @@ body, html{
 .dashboard-sideBar{
 	left: 0;
 	z-index: 2;
-	background-image: url('../assets/img/sideBar.png');
+	background-image: url(../img/sideBar.png);
 	border-right: 1px solid rgba(255, 255, 255, .7);
 	overflow: hidden;
 }

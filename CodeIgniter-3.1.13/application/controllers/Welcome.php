@@ -4,15 +4,20 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Welcome extends CI_Controller
 {
 
-	public function inicio()
+	public function user()
 	{
 		$this->load->view('inicio');
+	}
+	public function adminn()
+	{
+		$this->load->view('admin');
 	}
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->model('login_model');
+		$this->load->library('session');
 	}
 	public function index()
 	{
@@ -62,17 +67,51 @@ class Welcome extends CI_Controller
 		}
 	}
 	public function validarusuariobd()
-    {
-        $user = $_POST['email'];
-        $password = $_POST['password'];
+	{
+		$user = $_POST['email'];
+		$password = $_POST['password'];
 
-        if ($this->login_model->validarusuario($user, $password)) {
+		if ($this->login_model->validarusuario($user, $password)) {
+			// Recuperar el nombre completo del usuario desde la base de datos
+			$nombre_completo = $this->login_model->obtenerNombreCompleto($user);
 
-            redirect('Welcome/inicio');
+			// Configurar la sesión
+			$this->session->set_userdata('nombre', $nombre_completo);
+
+			if ($user === 'Gustavo@gmail.com') {
+				redirect('Welcome/admin');
+			} else {
+				redirect('Welcome/inicio');
+			}
+		} else {
+			$data['error'] = 'Usuario o contraseña incorrecta';
+			$this->load->view('index', $data);
+		}
+	}
+
+	public function admin()
+	{
+		// Verifica si la sesión está activa
+		if ($this->session->userdata('nombre')) {
+			$data['nombre'] = $this->session->userdata('nombre');
+			$this->load->view('admin', $data);
+		} else {
+			redirect('welcome?message'); // Redirige al inicio de sesión si no hay sesión activa
+		}
+	}
+	public function inicio() {
+        if ($this->session->userdata('nombre')) {
+            $data['nombre'] = $this->session->userdata('nombre');
+            $this->load->view('inicio', $data);
         } else {
-
-            $data['error'] = 'Usuario o contraseña incorrecta';
-            $this->load->view('login', $data);
+            redirect('welcome_message');
         }
     }
+	public function cerrarsesion()
+	{
+		// Destruir la sesión
+		$this->session->sess_destroy();
+		// Redirigir a la página de inicio de sesión
+		redirect('Welcome/index'); // Ajusta la ruta según tu configuración
+	}
 }

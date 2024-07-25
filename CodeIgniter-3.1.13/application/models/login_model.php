@@ -29,21 +29,26 @@ class Login_model extends CI_Model {
     {
         return $this->db->insert('usuarios', $data);
     }
-    public function validarusuario($usuario, $password)
-    {
-        // Buscar el usuario en la base de datos
-        $this->db->where('usuario', $usuario);
-        $query = $this->db->get('usuarios');
+    public function validarusuario($user, $password) {
+        $this->db->where('usuario', $user);
+        $query = $this->db->get('Usuarios');  // Asegúrate de que la tabla se llama 'Usuarios'
 
         if ($query->num_rows() == 1) {
-            $usuario_db = $query->row();
-
-            // Verificar la contraseña
-            if (password_verify($password, $usuario_db->password)) {
+            $row = $query->row();
+            if (password_verify($password, $row->password)) {
                 return true;
             }
         }
-
         return false;
+    }
+
+    public function obtenerNombreCompleto($user) {
+        $this->db->where('usuario', $user);
+        $query = $this->db->get('Usuarios');
+        if ($query->num_rows() == 1) {
+            $row = $query->row();
+            return $row->nombre;
+        }
+        return null;
     }
 }
