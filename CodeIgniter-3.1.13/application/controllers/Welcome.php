@@ -3,15 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Welcome extends CI_Controller
 {
-
-	public function user()
-	{
-		$this->load->view('inicio');
-	}
-	public function adminn()
-	{
-		$this->load->view('admin');
-	}
 	public function __construct()
 	{
 		parent::__construct();
@@ -19,14 +10,52 @@ class Welcome extends CI_Controller
 		$this->load->model('login_model');
 		$this->load->library('session');
 	}
+
 	public function index()
 	{
 		$this->load->view('welcome_message');
 	}
+
+	public function user()
+	{
+		$this->load->view('inicio');
+	}
+
+	public function adminn()
+	{
+		$this->load->view('admin');
+	}
+
 	public function registro()
 	{
 		$this->load->view('registrarse');
 	}
+
+	public function vajilla()
+	{
+		$this->check_session_and_load_view('vajilla');
+	}
+
+	public function manteleria()
+	{
+		$this->check_session_and_load_view('manteleria');
+	}
+
+	public function bebidas()
+	{
+		$this->check_session_and_load_view('bebidas');
+	}
+
+	public function informacionUsuario()
+	{
+		$this->check_session_and_load_view('informacionUsuario');
+	}
+
+	public function configuracion()
+	{
+		$this->check_session_and_load_view('configuracion');
+	}
+
 	public function registrarusuariobd()
 	{
 		$data['nombre'] = $this->input->post('nombre_completo');
@@ -66,16 +95,14 @@ class Welcome extends CI_Controller
 			$this->load->view('registrarse', $data);
 		}
 	}
+
 	public function validarusuariobd()
 	{
-		$user = $_POST['email'];
-		$password = $_POST['password'];
+		$user = $this->input->post('email');
+		$password = $this->input->post('password');
 
 		if ($this->login_model->validarusuario($user, $password)) {
-			// Recuperar el nombre completo del usuario desde la base de datos
 			$nombre_completo = $this->login_model->obtenerNombreCompleto($user);
-
-			// Configurar la sesión
 			$this->session->set_userdata('nombre', $nombre_completo);
 
 			if ($user === 'Gustavo@gmail.com') {
@@ -91,27 +118,27 @@ class Welcome extends CI_Controller
 
 	public function admin()
 	{
-		// Verifica si la sesión está activa
-		if ($this->session->userdata('nombre')) {
-			$data['nombre'] = $this->session->userdata('nombre');
-			$this->load->view('admin', $data);
-		} else {
-			redirect('welcome?message'); // Redirige al inicio de sesión si no hay sesión activa
-		}
+		$this->check_session_and_load_view('admin');
 	}
-	public function inicio() {
-        if ($this->session->userdata('nombre')) {
-            $data['nombre'] = $this->session->userdata('nombre');
-            $this->load->view('inicio', $data);
-        } else {
-            redirect('welcome_message');
-        }
-    }
+
+	public function inicio()
+	{
+		$this->check_session_and_load_view('inicio');
+	}
+
 	public function cerrarsesion()
 	{
-		// Destruir la sesión
 		$this->session->sess_destroy();
-		// Redirigir a la página de inicio de sesión
-		redirect('Welcome/index'); // Ajusta la ruta según tu configuración
+		redirect('Welcome/index');
+	}
+
+	private function check_session_and_load_view($view)
+	{
+		if ($this->session->userdata('nombre')) {
+			$data['nombre'] = $this->session->userdata('nombre');
+			$this->load->view($view, $data);
+		} else {
+			redirect('Welcome/index');
+		}
 	}
 }
