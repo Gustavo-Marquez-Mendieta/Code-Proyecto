@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/card.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -117,7 +116,7 @@
         <div class="full-box dashboard-sideBar-ct">
             <!--SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
-                EL DETALLE <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
+                ADMINISTRADOR <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
             <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
@@ -133,18 +132,13 @@
 
                 <ul class="full-box list-unstyled text-center">
                     <li>
-                        <a href="<?php echo site_url('Welcome/inicio'); ?>" title="Inicio" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/admin'); ?>" title="Inicio" class="btn-user">
                             <img src="../../assets/img/hogar.png">
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?php echo site_url('Welcome/configuracion'); ?>" title="Configuracion">
-                            <img src="../../assets/img/configuracion-de-usuario.png">
                         </a>
                     </li>
                     <li>
@@ -157,17 +151,17 @@
             <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
-                    <a href="<?php echo site_url('Welcome/vajilla'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminVajilla'); ?>">
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/manteleria'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería y Decoración
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/bebidas'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminBebidas'); ?>">
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
@@ -181,29 +175,46 @@
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"VAJILLA"</h1>
+                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
+                    <h1 class="frase">"Agregar Vajilla"</h1>
                 </div>
-                <div class="col-md-6">
-                    <?php if (!empty($vajillas)) : ?>
-                        <?php foreach ($vajillas as $vajilla) : ?>
-                            <div class="card">
-                                <img src="<?php echo base_url('assets/img/' . $vajilla['imagen']); ?>" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?php echo $vajilla['nombre']; ?></h5>
-                                    <p class="card-text">Tipo: <?php echo $vajilla['tipo']; ?></p>
-                                    <p class="card-text">Precio: $<?php echo $vajilla['precio']; ?></p>
-                                </div>
+                <div class="col-md-10">
+                    <!-- Sección del formulario para agregar nuevo producto -->
+                    <div class="col-md-6">
+                        <?php if (isset($error)) : ?>
+                            <div class="alert alert-danger">
+                                <?php echo $error; ?>
                             </div>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <p>No hay vajillas disponibles.</p>
-                    <?php endif; ?>
+                        <?php endif; ?>
+
+                        <form action="<?php echo site_url('Welcome/agregarVajilla'); ?>" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipo">Tipo</label>
+                                <select class="form-control" id="tipo" name="tipo" required>
+                                    <option value="">Selecciona un tipo</option>
+                                    <option value="Copa">Copa</option>
+                                    <option value="Plato">Plato</option>
+                                    <option value="Cubierto">Cubierto</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="precio">Precio</label>
+                                <input type="number" class="form-control" id="precio" name="precio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="imagen">Imagen</label>
+                                <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Agregar Vajilla</button>
+                            <a href="<?php echo site_url('Welcome/CrudVajilla'); ?>" class="btn btn-primary">Ver Vajilla</a>
+                        </form>
+                    </div>
+
                 </div>
-
-                <div class="col-md-6">
-
-                </div>
-
             </div>
         </div>
     </section>

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/card.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -18,7 +18,6 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
-
     <style>
         /* Estilos adicionales que puedas necesitar */
         .dashboard-sideBar {
@@ -117,7 +116,7 @@
         <div class="full-box dashboard-sideBar-ct">
             <!--SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
-                EL DETALLE <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
+                ADMINISTRADOR <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
             <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
@@ -133,18 +132,13 @@
 
                 <ul class="full-box list-unstyled text-center">
                     <li>
-                        <a href="<?php echo site_url('Welcome/inicio'); ?>" title="Inicio" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/admin'); ?>" title="Inicio" class="btn-user">
                             <img src="../../assets/img/hogar.png">
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?php echo site_url('Welcome/configuracion'); ?>" title="Configuracion">
-                            <img src="../../assets/img/configuracion-de-usuario.png">
                         </a>
                     </li>
                     <li>
@@ -157,17 +151,17 @@
             <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
-                    <a href="<?php echo site_url('Welcome/vajilla'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminVajilla'); ?>">
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/manteleria'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería y Decoración
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/bebidas'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminBebidas'); ?>">
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
@@ -181,29 +175,40 @@
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"VAJILLA"</h1>
+                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
                 </div>
-                <div class="col-md-6">
-                    <?php if (!empty($vajillas)) : ?>
-                        <?php foreach ($vajillas as $vajilla) : ?>
-                            <div class="card">
-                                <img src="<?php echo base_url('assets/img/' . $vajilla['imagen']); ?>" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?php echo $vajilla['nombre']; ?></h5>
-                                    <p class="card-text">Tipo: <?php echo $vajilla['tipo']; ?></p>
-                                    <p class="card-text">Precio: $<?php echo $vajilla['precio']; ?></p>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <p>No hay vajillas disponibles.</p>
-                    <?php endif; ?>
+                <div class="col-md-10">
+                    <h2 style="color: white;">Lista de Usuarios</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Usuario</th>
+                                <th>Celular</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (isset($usuarios)) { ?>
+                                <?php foreach ($usuarios as $usuario) : ?>
+                                    <tr>
+                                        <td><?php echo $usuario->usuario_id; ?></td>
+                                        <td><?php echo $usuario->nombre; ?></td>
+                                        <td><?php echo $usuario->usuario; ?></td>
+                                        <td><?php echo $usuario->celular; ?></td>
+                                        <td>
+                                            <a href="<?php echo site_url('Welcome/eliminarUsuario/' . $usuario->usuario_id); ?>" class="btn btn-danger">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="4">No hay usuarios disponibles</td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="col-md-6">
-
-                </div>
-
             </div>
         </div>
     </section>

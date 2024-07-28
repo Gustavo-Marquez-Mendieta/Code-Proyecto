@@ -8,10 +8,9 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/card.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-    <!-- Vendor CSS Files -->
     <link href="<?php echo base_url(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/icofont/icofont.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
@@ -20,9 +19,7 @@
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
 
     <style>
-        /* Estilos adicionales que puedas necesitar */
         .dashboard-sideBar {
-            /* Estilos de la barra lateral */
             left: 0;
             z-index: 2;
             background-image: url('../../assets/img/copa.jpg');
@@ -35,7 +32,6 @@
         }
 
         .dashboard-sideBar a {
-            /* Estilos de los enlaces en la barra lateral */
             display: block;
             padding: 10px 20px;
             color: white;
@@ -43,18 +39,15 @@
         }
 
         .dashboard-sideBar a:hover {
-            /* Estilos para el estado hover de los enlaces */
             background-color: #555;
         }
 
         .dashboard-sideBar .btn-sideBar-SubMenu {
-            /* Estilos para los enlaces del submenú */
             padding-left: 30px;
             position: relative;
         }
 
         .dashboard-sideBar .btn-sideBar-SubMenu::after {
-            /* Estilos para la flecha del submenú */
             content: "\f0d7";
             font-family: "Material Icons";
             position: absolute;
@@ -62,24 +55,17 @@
         }
 
         .dashboard-contentPage {
-            /* Estilos para el contenido principal */
             margin-left: 250px;
             padding: 20px;
             position: relative;
-            /* Añadido */
             z-index: 1;
-            /* Añadido */
         }
 
-        /* Estilos para las imágenes en los enlaces */
         .dashboard-sideBar img {
             width: 24px;
-            /* Ajusta el tamaño según tus necesidades */
             height: 24px;
             margin-right: 10px;
-            /* Espacio entre la imagen y el texto */
             vertical-align: middle;
-            /* Alineación vertical */
         }
 
         .frase {
@@ -87,9 +73,7 @@
             font-weight: bold;
             margin-top: 20px;
             margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
             background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -100,51 +84,44 @@
             font-weight: bold;
             margin-top: 20px;
             margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
             background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            margin: 5px;
         }
     </style>
 </head>
 
 <body>
-    <!-- SideBar -->
     <section class="full-box cover dashboard-sideBar">
         <div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
         <div class="full-box dashboard-sideBar-ct">
-            <!--SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
-                EL DETALLE <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
+                ADMINISTRADOR <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
-            <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
-                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
-
+                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon">
                     <figcaption class="text-center text-titles">
                         <?php if (isset($nombre)) : ?>
                             <h3> <?= $nombre; ?></h3>
                         <?php endif; ?>
                     </figcaption>
                 </figure>
-
                 <ul class="full-box list-unstyled text-center">
                     <li>
-                        <a href="<?php echo site_url('Welcome/inicio'); ?>" title="Inicio" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/admin'); ?>" title="Inicio" class="btn-user">
                             <img src="../../assets/img/hogar.png">
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?php echo site_url('Welcome/configuracion'); ?>" title="Configuracion">
-                            <img src="../../assets/img/configuracion-de-usuario.png">
                         </a>
                     </li>
                     <li>
@@ -154,20 +131,19 @@
                     </li>
                 </ul>
             </div>
-            <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
-                    <a href="<?php echo site_url('Welcome/vajilla'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminVajilla'); ?>">
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/manteleria'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería y Decoración
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/bebidas'); ?>">
+                    <a href="<?php echo site_url('Welcome/adminBebidas'); ?>">
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
@@ -175,47 +151,60 @@
         </div>
     </section>
 
-    <!-- Content page -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"VAJILLA"</h1>
+                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
+                    <h1 class="frase">"Lista de Vajilla"</h1>
                 </div>
-                <div class="col-md-6">
-                    <?php if (!empty($vajillas)) : ?>
-                        <?php foreach ($vajillas as $vajilla) : ?>
-                            <div class="card">
-                                <img src="<?php echo base_url('assets/img/' . $vajilla['imagen']); ?>" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?php echo $vajilla['nombre']; ?></h5>
-                                    <p class="card-text">Tipo: <?php echo $vajilla['tipo']; ?></p>
-                                    <p class="card-text">Precio: $<?php echo $vajilla['precio']; ?></p>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <p>No hay vajillas disponibles.</p>
-                    <?php endif; ?>
+                <div class="col-md-10">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Precio</th>
+                                <th>Imagen</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($vajilla)) : ?>
+                                <?php foreach ($vajilla as $item) : ?>
+                                    <tr>
+                                        <td><?= $item['vajilla_id']; ?></td>
+                                        <td><?= $item['nombre']; ?></td>
+                                        <td><?= $item['tipo']; ?></td>
+                                        <td><?= $item['precio']; ?></td>
+                                        <td><img src="<?= base_url('./assets/img/' . $item['imagen']); ?>" alt="<?= $item['nombre']; ?>" width="50"></td>
+                                        <td>
+                                            <a href="<?= site_url('Welcome/editarVajilla/' . $item['vajilla_id']); ?>" class="btn btn-primary btn-edit">Editar</a>
+                                            <a href="<?= site_url('Welcome/deleteVajilla/' . $item['vajilla_id']); ?>" class="btn btn-danger btn-delete" onclick="return confirm('¿Estás seguro de eliminar este elemento?');">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <tr>
+                                    <td colspan="6">No hay datos disponibles.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="col-md-6">
-
-                </div>
-
             </div>
         </div>
     </section>
 
-    <!--====== Scripts -->
-    <script src="./js/jquery-3.1.1.min.js"></script>
-    <script src="./js/sweetalert2.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/material.min.js"></script>
-    <script src="./js/ripples.min.js"></script>
-    <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/jquery-3.1.1.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/sweetalert2.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/bootstrap.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
     <script>
         $.material.init();
     </script>
