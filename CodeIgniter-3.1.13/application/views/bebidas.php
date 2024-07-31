@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/card.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -93,6 +94,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .titulo {
             font-size: 60px;
             font-weight: bold;
@@ -181,21 +183,24 @@
                     <br>
                     <h1 class="titulo">"BEBIDAS"</h1>
                 </div>
-                <div class="col-md-6">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <h1 class="frase">"La mejor opcion para tus acontecimientos con alto rendimiento y experiencia"</h1>
+                <div class="col-md-8">
+                    <?php foreach ($productos as $row) { ?>
+                        <div class="col-6 col-md-3 mt-5 text-center Products">
+                            <div class="card" style="max-height: 400px !important; min-height: 400px !important;">
+                                <div>
+                                    <img class="card-img-top" src="<?php echo base_url('./assets/img/' . $row['imagen']); ?>" alt="<?php echo $row['nombre']; ?>" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title card_title"><?php echo $row['nombre']; ?></h5>
+                                </div>
+                                <a href="<?php echo site_url('decoracion/detalle/' . $row['bebida_id']); ?>" class="red_button btn_puntos" title="Ver <?php echo $row['nombre']; ?>">
+                                    Ingredientes
+                                    <i class="bi bi-arrow-right-circle"></i>
+                                </a>
 
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="col-md-6">
 

@@ -11,7 +11,7 @@ class Decoracion_model extends CI_Model
     public function get_all_decoraciones()
     {
         $query = $this->db->get('Decoraciones');
-        return $query->result_array();
+        return $query->result_array(); // Devuelve los resultados como un array asociativo
     }
 
     // Obtener una decoración por ID
@@ -40,9 +40,5 @@ class Decoracion_model extends CI_Model
     {
         return $this->db->insert('Decoraciones', $data);
     }
-    public function get_all_products()
-    {
-        $query = $this->db->get('Decoraciones');
-        return $query->result();
-    }
+    
 }

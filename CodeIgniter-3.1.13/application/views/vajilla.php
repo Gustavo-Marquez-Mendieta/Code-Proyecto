@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/cards.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/card.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -185,34 +185,38 @@
                 </div>
                 <div class="col-md-6">
                     <?php foreach ($productos as $row) { ?>
-                        <div class="col-6 col-md-3 mt-5 text-center Products">
-                            <div class="card" style="max-height: 400px !important; min-height: 400px !important;">
+                        <div class="col-12 col-md-4 mt-5 text-center Products">
+                            <div class="card">
                                 <div>
                                     <img class="card-img-top" src="<?php echo base_url('./assets/img/' . $row->imagen); ?>" alt="<?php echo $row->nombre; ?>" style="max-width: 200px; max-height: 200px; object-fit: cover;">
                                 </div>
                                 <div class="card-body text-center">
                                     <h5 class="card-title card_title"><?php echo $row->nombre; ?></h5>
-                                    <?php
-                                    $isEven = $row->vajilla_id % 2 == 0;
-
-                                    for ($i = 1; $i <= 5; $i++) {
-                                        echo '<span><i class="bi bi-star-fill" style="padding: 0px 2px; color:' . ($isEven ? '#ffb90c' : ($i <= 3 ? '#ffb90c' : '')) . ';"></i></span>';
-                                    }
-                                    ?>
-                                    <hr>
-                                    <p class="card-text p_puntos ">
+                                    <p class="card-text p_puntos">
                                         Bs. <?php echo $row->precio; ?>
                                     </p>
+                                    <div class="quantity-container">
+                                        <h6>Cantidad Cajas</h6>
+                                        <div class="quantity-controls">
+                                            <button class="btn btn-decrease">-</button>
+                                            <span class="quantity">0</span>
+                                            <button class="btn btn-increase">+</button>
+                                        </div>
+                                    </div>
+                                    <a href="<?php echo site_url('vajilla/detalle/' . $row->vajilla_id); ?>" class="red_button btn_puntos" title="Ver <?php echo $row->nombre; ?>">
+                                        Agregar al Servicio
+                                        <i class="bi bi-arrow-right-circle"></i>
+                                    </a>
                                 </div>
-                                <a href="<?php echo site_url('vajilla/detalle/' . $row->vajilla_id); ?>" class="red_button btn_puntos" title="Ver <?php echo $row->nombre; ?>">
-                                    Ver Producto
-                                    <i class="bi bi-arrow-right-circle"></i>
-                                </a>
                             </div>
                         </div>
                     <?php } ?>
-
                 </div>
+
+
+
+
+
 
 
                 <div class="col-md-6">
@@ -234,6 +238,25 @@
     <script>
         $.material.init();
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.btn-increase').click(function() {
+                var quantitySpan = $(this).siblings('.quantity');
+                var currentQuantity = parseInt(quantitySpan.text());
+                quantitySpan.text(currentQuantity + 1);
+            });
+
+            $('.btn-decrease').click(function() {
+                var quantitySpan = $(this).siblings('.quantity');
+                var currentQuantity = parseInt(quantitySpan.text());
+                if (currentQuantity > 0) {
+                    quantitySpan.text(currentQuantity - 1);
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

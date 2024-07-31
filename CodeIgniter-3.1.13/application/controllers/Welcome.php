@@ -44,12 +44,15 @@ class Welcome extends CI_Controller
 
 	public function adminManteleria()
 	{
-		// Lógica para obtener las decoraciones de la base de datos
 		$data['decoraciones'] = $this->Decoracion_model->get_all_decoraciones();
 
-		// Cargar la vista con los datos
-		$this->load->view('adminManteleria', $data);
+		if (empty($data['decoraciones'])) {
+			$data['error'] = 'No se encontraron decoraciones.';
+		}
+
+		$this->load->view('manteleria', $data);
 	}
+
 
 	public function adminBebidas()
 	{
@@ -68,23 +71,26 @@ class Welcome extends CI_Controller
 		$this->load->view('registrarse');
 	}
 
-	public function vajilla() {
+	public function vajilla()
+	{
 		$this->load->model('Vajilla_model');
 		$data['productos'] = $this->Vajilla_model->get_all_products(); // Asegúrate de que esta función exista en tu modelo
 		$this->load->view('vajilla', $data);
 	}
-	
+
 
 	public function manteleria()
 	{
 		$this->load->model('Decoracion_model');
-		$data['productos'] = $this->Decoracion_model->get_all_products();
+		$data['productos'] = $this->Decoracion_model->get_all_decoraciones(); // Asegúrate de que esta función exista en tu modelo
 		$this->load->view('manteleria', $data);
 	}
 
 	public function bebidas()
 	{
-		$this->check_session_and_load_view('bebidas');
+		$this->load->model('Bebida_model');
+		$data['productos'] = $this->Bebida_model->get_all_bebidas(); // Asegúrate de que esta función exista en tu modelo
+		$this->load->view('bebidas', $data);
 	}
 
 	public function informacionUsuario()
@@ -459,11 +465,4 @@ class Welcome extends CI_Controller
 		$this->Bebida_model->delete_bebida($id);
 		redirect('Welcome/adminBebidas');
 	}
-	public function adminBebidass()
-	{
-		$data['bebidas'] = $this->Bebida_model->get_all_bebidas();
-		$data['nombre'] = $this->session->userdata('nombre'); // Asegúrate de tener el nombre del usuario en sesión
-		$this->load->view('CrudBebidas', $data);
-	}
-	
 }

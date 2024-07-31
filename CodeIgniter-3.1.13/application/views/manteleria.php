@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/card.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -183,8 +184,33 @@
                     <h1 class="titulo">"MANTELERIA"</h1>
                 </div>
                 <div class="col-md-6">
-                    <!--Aqui los cards -->
+                    <?php foreach ($productos as $row) { ?>
+                        <div class="col-12 col-md-4 mt-5 text-center Products">
+                            <div class="card" style="max-height: 400px !important; min-height: 400px !important;">
+                                <div>
+                                    <img class="card-img-top" src="<?php echo base_url('./assets/img/' . $row['imagen']); ?>" alt="<?php echo $row['plan']; ?>" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                </div>
+                                <div class="card-body text-center">
+                                 
+                                    <h5 class="card-title card_title"><?php echo $row['tipo']; ?></h5>
+                                    <p class="card-text p_puntos">
+                                        <?php echo $row['plan']; ?>
+                                    </p>
+                                    <p class="card-text p_puntos">
+                                        Bs. <?php echo $row['precio']; ?>
+                                    </p>
+                                    
+
+                                </div>
+                                <a href="<?php echo site_url('decoracion/detalle/' . $row['decoracion_id']); ?>" class="red_button btn_puntos" title="Ver <?php echo $row['plan']; ?>">
+                                    Agregar al Servicio
+                                    <i class="bi bi-arrow-right-circle"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
+
 
 
                 <div class="col-md-6">
