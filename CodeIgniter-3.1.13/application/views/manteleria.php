@@ -93,6 +93,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .titulo {
             font-size: 60px;
             font-weight: bold;
@@ -182,21 +183,10 @@
                     <h1 class="titulo">"MANTELERIA"</h1>
                 </div>
                 <div class="col-md-6">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <h1 class="frase">"La mejor opcion para tus acontecimientos con alto rendimiento y experiencia"</h1>
-
+                    <!--Aqui los cards -->
                 </div>
+
+
                 <div class="col-md-6">
 
                 </div>

@@ -9,28 +9,57 @@ class Vajilla_model extends CI_Model
         $this->load->database();
     }
 
-    public function get_all_vajilla()
-    {
+    /**
+     * Obtiene todos los elementos de la tabla Vajilla.
+     *
+     * @return array Un array asociativo de elementos de vajilla.
+     */
+    public function get_all_products() {
         $query = $this->db->get('Vajilla');
-        return $query->result_array(); // Asegúrate de que devuelve un array asociativo
+        return $query->result();
     }
 
+    /**
+     * Inserta un nuevo elemento en la tabla Vajilla.
+     *
+     * @param array $data Los datos del nuevo elemento.
+     * @return bool TRUE si se insertó correctamente, FALSE en caso contrario.
+     */
     public function insert_vajilla($data)
     {
         return $this->db->insert('Vajilla', $data);
     }
 
+    /**
+     * Obtiene un elemento específico de la tabla Vajilla por su ID.
+     *
+     * @param int $id El ID del elemento.
+     * @return array Un array asociativo con los datos del elemento.
+     */
     public function get_vajilla_by_id($id)
     {
-        $query = $this->db->get_where('vajilla', array('vajilla_id' => $id));
-        return $query->row_array(); // Devolver una fila como un array asociativo
+        $query = $this->db->get_where('Vajilla', array('vajilla_id' => $id));
+        return $query->row_array(); // Devuelve una fila como un array asociativo
     }
+
+    /**
+     * Actualiza un elemento existente en la tabla Vajilla.
+     *
+     * @param int $id El ID del elemento a actualizar.
+     * @param array $data Los nuevos datos del elemento.
+     * @return bool TRUE si se actualizó correctamente, FALSE en caso contrario.
+     */
     public function update_vajilla($id, $data)
     {
         $this->db->where('vajilla_id', $id);
         return $this->db->update('Vajilla', $data);
     }
 
+    /**
+     * Actualiza un elemento existente en la tabla Vajilla y maneja la carga de imágenes.
+     *
+     * @return void
+     */
     public function updateVajilla()
     {
         $id = $this->input->post('id');
@@ -53,16 +82,22 @@ class Vajilla_model extends CI_Model
 
         $data = array(
             'nombre' => $this->input->post('nombre'),
-            'descripcion' => $this->input->post('descripcion'),
+            'tipo' => $this->input->post('tipo'),
             'precio' => $this->input->post('precio'),
             'imagen' => $imagen
         );
 
-        $this->Vajilla_model->update_vajilla($id, $data);
+        $this->update_vajilla($id, $data);
         $this->session->set_flashdata('success', 'Producto actualizado correctamente.');
         redirect('Welcome/CrudVajilla');
     }
 
+    /**
+     * Elimina un elemento de la tabla Vajilla por su ID.
+     *
+     * @param int $id El ID del elemento a eliminar.
+     * @return bool TRUE si se eliminó correctamente, FALSE en caso contrario.
+     */
     public function delete_vajilla($id)
     {
         $this->db->where('vajilla_id', $id);

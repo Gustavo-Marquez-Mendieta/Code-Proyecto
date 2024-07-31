@@ -3,6 +3,7 @@ class Decoracion_model extends CI_Model
 {
     public function __construct()
     {
+        parent::__construct();
         $this->load->database(); // Cargar la base de datos
     }
 
@@ -38,5 +39,10 @@ class Decoracion_model extends CI_Model
     public function insert_decoracion($data)
     {
         return $this->db->insert('Decoraciones', $data);
+    }
+    public function get_all_products()
+    {
+        $query = $this->db->get('Decoraciones');
+        return $query->result();
     }
 }

@@ -68,14 +68,18 @@ class Welcome extends CI_Controller
 		$this->load->view('registrarse');
 	}
 
-	public function vajilla()
-	{
-		$this->check_session_and_load_view('vajilla');
+	public function vajilla() {
+		$this->load->model('Vajilla_model');
+		$data['productos'] = $this->Vajilla_model->get_all_products(); // Asegúrate de que esta función exista en tu modelo
+		$this->load->view('vajilla', $data);
 	}
+	
 
 	public function manteleria()
 	{
-		$this->check_session_and_load_view('manteleria');
+		$this->load->model('Decoracion_model');
+		$data['productos'] = $this->Decoracion_model->get_all_products();
+		$this->load->view('manteleria', $data);
 	}
 
 	public function bebidas()
@@ -246,7 +250,7 @@ class Welcome extends CI_Controller
 	}
 	public function updateVajilla()
 	{
-		$id = $this->input->post('vajilla_id');
+		$id = $this->input->post('vajilla_id'); // Asegúrate de que este nombre coincida con el nombre en tu formulario
 
 		// Configuración de la carga de imágenes
 		$config['upload_path'] = './assets/img/';
@@ -285,6 +289,7 @@ class Welcome extends CI_Controller
 
 		redirect('Welcome/CrudVajilla');
 	}
+
 
 
 	public function deleteVajilla($id)
@@ -450,14 +455,15 @@ class Welcome extends CI_Controller
 		redirect('Welcome/adminBebidass');
 	}
 	public function deleteBebida($id)
-    {
-        $this->Bebida_model->delete_bebida($id);
-        redirect('Welcome/adminBebidas');
-    }
+	{
+		$this->Bebida_model->delete_bebida($id);
+		redirect('Welcome/adminBebidas');
+	}
 	public function adminBebidass()
-    {
-        $data['bebidas'] = $this->Bebida_model->get_all_bebidas();
-        $data['nombre'] = $this->session->userdata('nombre'); // Asegúrate de tener el nombre del usuario en sesión
-        $this->load->view('CrudBebidas', $data);
-    }
+	{
+		$data['bebidas'] = $this->Bebida_model->get_all_bebidas();
+		$data['nombre'] = $this->session->userdata('nombre'); // Asegúrate de tener el nombre del usuario en sesión
+		$this->load->view('CrudBebidas', $data);
+	}
+	
 }

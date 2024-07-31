@@ -1,0 +1,60 @@
+/* Estilo para las cards de productos */
+.Products {
+    margin-bottom: 30px; /* Espacio debajo de cada card */
+}
+
+.card {
+    border: none;
+    border-radius: 15px; /* Bordes redondeados */
+    overflow: hidden; /* Asegura que el contenido no se salga del contorno de la card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Efectos de transición */
+}
+
+.card:hover {
+    transform: scale(1.05); /* Aumenta el tamaño de la card al pasar el ratón */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el ratón */
+}
+
+.card-img-top {
+    width: 100%;
+    height: 200px; /* Altura fija para las imágenes */
+    object-fit: cover; /* Ajusta la imagen para cubrir el área de la imagen */
+    border-bottom: 1px solid #ddd; /* Línea divisoria entre la imagen y el contenido */
+}
+
+.card-body {
+    padding: 20px; /* Espacio dentro del cuerpo de la card */
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 16px;
+    color: #333;
+}
+
+.red_button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #FF6B6B; /* Color de fondo del botón */
+    border: none;
+    border-radius: 5px; /* Bordes redondeados del botón */
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.red_button:hover {
+    background-color: #FF4D4D; /* Color de fondo al pasar el ratón */
+}
+
+.bi-star-fill {
+    font-size: 18px; /* Tamaño del ícono de estrella */
+}
