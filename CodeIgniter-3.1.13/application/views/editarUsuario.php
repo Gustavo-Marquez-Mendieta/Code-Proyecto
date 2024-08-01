@@ -18,13 +18,12 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+
     <style>
-        /* Estilos adicionales que puedas necesitar */
         .dashboard-sideBar {
-            /* Estilos de la barra lateral */
             left: 0;
             z-index: 2;
-            background-image: url('../../assets/img/copa.jpg');
+            background-image: url('<?php echo base_url(); ?>assets/img/copa.jpg');
             background-color: #333;
             color: white;
             width: 250px;
@@ -34,7 +33,6 @@
         }
 
         .dashboard-sideBar a {
-            /* Estilos de los enlaces en la barra lateral */
             display: block;
             padding: 10px 20px;
             color: white;
@@ -42,18 +40,15 @@
         }
 
         .dashboard-sideBar a:hover {
-            /* Estilos para el estado hover de los enlaces */
             background-color: #555;
         }
 
         .dashboard-sideBar .btn-sideBar-SubMenu {
-            /* Estilos para los enlaces del submenú */
             padding-left: 30px;
             position: relative;
         }
 
         .dashboard-sideBar .btn-sideBar-SubMenu::after {
-            /* Estilos para la flecha del submenú */
             content: "\f0d7";
             font-family: "Material Icons";
             position: absolute;
@@ -61,24 +56,17 @@
         }
 
         .dashboard-contentPage {
-            /* Estilos para el contenido principal */
             margin-left: 250px;
             padding: 20px;
             position: relative;
-            /* Añadido */
             z-index: 1;
-            /* Añadido */
         }
 
-        /* Estilos para las imágenes en los enlaces */
         .dashboard-sideBar img {
             width: 24px;
-            /* Ajusta el tamaño según tus necesidades */
             height: 24px;
             margin-right: 10px;
-            /* Espacio entre la imagen y el texto */
             vertical-align: middle;
-            /* Alineación vertical */
         }
 
         .frase {
@@ -86,9 +74,7 @@
             font-weight: bold;
             margin-top: 20px;
             margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
             background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -99,9 +85,7 @@
             font-weight: bold;
             margin-top: 20px;
             margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
             background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -114,36 +98,34 @@
     <section class="full-box cover dashboard-sideBar">
         <div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
         <div class="full-box dashboard-sideBar-ct">
-            <!--SideBar Title -->
+            <!-- SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
                 ADMINISTRADOR <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
             <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
-                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
-
+                    <img src="<?php echo base_url(); ?>assets/img/StudetMaleAvatar.png" alt="UserIcon">
                     <figcaption class="text-center text-titles">
                         <?php if (isset($nombre)) : ?>
                             <h3> <?= $nombre; ?></h3>
                         <?php endif; ?>
                     </figcaption>
                 </figure>
-
                 <ul class="full-box list-unstyled text-center">
                     <li>
                         <a href="<?php echo site_url('Welcome/admin'); ?>" title="Inicio" class="btn-user">
-                            <img src="../../assets/img/hogar.png">
+                            <img src="<?php echo base_url(); ?>assets/img/hogar.png">
                         </a>
                     </li>
                     <li>
                         <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Informacion" class="btn-user">
-                            <img src="../../assets/img/avatar (1).png">
+                            <img src="<?php echo base_url(); ?>assets/img/avatar (1).png">
                         </a>
                     </li>
                     <li>
                         <a href="<?php echo site_url('Welcome/cerrarsesion'); ?>" title="Salir del sistema" class="btn-exit-system">
-                            <img src="../../assets/img/cerrar-sesion.png">
+                            <img src="<?php echo base_url(); ?>assets/img/cerrar-sesion.png">
                         </a>
                     </li>
                 </ul>
@@ -152,17 +134,17 @@
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
                     <a href="<?php echo site_url('Welcome/adminVajilla'); ?>">
-                        <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
+                        <img src="<?php echo base_url(); ?>assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería y Decoración
+                        <img src="<?php echo base_url(); ?>assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería y Decoración
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/adminBebidas'); ?>">
-                        <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
+                        <img src="<?php echo base_url(); ?>assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
             </ul>
@@ -177,68 +159,62 @@
                     <br>
                     <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
                 </div>
-                <div class="col-md-10">
-                    <h2 style="color: white;">Lista de Usuarios</h2>
-                    <?php if ($this->session->flashdata('success')) : ?>
-                        <p><?php echo $this->session->flashdata('success'); ?></p>
-                    <?php endif; ?>
-
-                    <?php if ($this->session->flashdata('error')) : ?>
-                        <p><?php echo $this->session->flashdata('error'); ?></p>
-                    <?php endif; ?>
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Primer Apellido</th>
-                                <th>Segundo Apellido</th>
-                                <th>Usuario</th>
-                                <th>Celular</th>
-                                <th>Estado</th>
-                                <th>Fecha de Creación</th>
-                                <th>Fecha de Actualización</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($usuarios as $usuario) : ?>
-                                <tr>
-                                    <td><?php echo $usuario->usuario_id; ?></td>
-                                    <td><?php echo $usuario->nombre; ?></td>
-                                    <td><?php echo $usuario->primerApellido; ?></td>
-                                    <td><?php echo $usuario->segundoApellido; ?></td>
-                                    <td><?php echo $usuario->usuario; ?></td>
-                                    <td class="celular"><?php echo $usuario->celular; ?></td>
-                                    <td><?php echo $usuario->estado ? 'Activo' : 'Inactivo'; ?></td>
-                                    <td><?php echo $usuario->fechaCreacionUsuario; ?></td>
-                                    <td><?php echo $usuario->fechaActualizacionUsuario; ?></td>
-                                    <td>
-                                        <a href="<?php echo site_url('Welcome/editUser/' . $usuario->usuario_id); ?>" class="btn btn-primary btn-edit">Editar</a>
-                                        <a href="<?php echo site_url('Welcome/eliminarUsuario/' . $usuario->usuario_id); ?>" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <div class="col-md-1">
+                    <br>
                 </div>
+                <div class="col-md-6">
+                    <form action="<?php echo site_url('Welcome/updateUser'); ?>" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="usuario_id" value="<?php echo $usuario->usuario_id; ?>">
 
+                        <div class="form-group">
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" value="<?php echo set_value('nombre', $usuario->nombre); ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="primerApellido">Primer Apellido:</label>
+                            <input type="text" id="primerApellido" name="primerApellido" class="form-control" value="<?php echo set_value('primerApellido', $usuario->primerApellido); ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="segundoApellido">Segundo Apellido:</label>
+                            <input type="text" id="segundoApellido" name="segundoApellido" class="form-control" value="<?php echo set_value('segundoApellido', $usuario->segundoApellido); ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usuario">Usuario:</label>
+                            <input type="text" id="usuario" name="usuario" class="form-control" value="<?php echo set_value('usuario', $usuario->usuario); ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="celular">Celular:</label>
+                            <input type="text" id="celular" name="celular" class="form-control" value="<?php echo set_value('celular', $usuario->celular); ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado:</label>
+                            <select id="estado" name="estado" class="form-control" required>
+                                <option value="1" <?php echo $usuario->estado ? 'selected' : ''; ?>>Activo</option>
+                                <option value="0" <?php echo !$usuario->estado ? 'selected' : ''; ?>>Inactivo</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
 
-    <!--====== Scripts -->
-    <script src="./js/jquery-3.1.1.min.js"></script>
-    <script src="./js/sweetalert2.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/material.min.js"></script>
-    <script src="./js/ripples.min.js"></script>
-    <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
-    <script src="./js/main.js"></script>
-    <script>
-        $.material.init();
-    </script>
+    <!-- Vendor JS Files -->
+    <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/php-email-form/validate.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/venobox/venobox.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/aos/aos.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
 </body>
 
 </html>

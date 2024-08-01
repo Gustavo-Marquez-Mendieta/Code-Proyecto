@@ -33,4 +33,17 @@ class Usuario_model extends CI_Model
         $this->db->where('vajilla_id', $producto_id);
         return $this->db->update('Vajilla', $data);
     }
+    
+    public function getUserById($usuario_id)
+    {
+        $query = $this->db->get_where('Usuarios', array('usuario_id' => $usuario_id));
+        return $query->row();
+    }
+
+  
+    public function updateUser($usuario_id, $data)
+    {
+        $this->db->where('usuario_id', $usuario_id);
+        return $this->db->update('Usuarios', $data);
+    }
 }

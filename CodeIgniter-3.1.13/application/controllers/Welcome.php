@@ -45,12 +45,7 @@ class Welcome extends CI_Controller
 	public function adminManteleria()
 	{
 		$data['decoraciones'] = $this->Decoracion_model->get_all_decoraciones();
-
-		if (empty($data['decoraciones'])) {
-			$data['error'] = 'No se encontraron decoraciones.';
-		}
-
-		$this->load->view('manteleria', $data);
+		$this->load->view('adminManteleria', $data);
 	}
 
 
@@ -59,6 +54,12 @@ class Welcome extends CI_Controller
 		$data['bebidas'] = $this->Bebida_model->get_all_bebidas();
 		$data['nombre'] = $this->session->userdata('nombre'); // Asegúrate de tener el nombre del usuario en sesión
 		$this->load->view('adminBebidas', $data);
+	}
+	public function adminBebidass()
+	{
+		$data['bebidas'] = $this->Bebida_model->get_all_bebidas();
+		$data['nombre'] = $this->session->userdata('nombre'); // Asegúrate de tener el nombre del usuario en sesión
+		$this->load->view('CrudBebidas', $data);
 	}
 
 	public function adminUser()
@@ -119,10 +120,15 @@ class Welcome extends CI_Controller
 	public function registrarusuariobd()
 	{
 		$data = array(
-			'nombre' => $this->input->post('nombre_completo'),
+			'nombre' => $this->input->post('nombre'),
+			'primerApellido' => $this->input->post('primerApellido'),
+			'segundoApellido' => $this->input->post('segundoApellido'),
 			'usuario' => $this->input->post('usuario'),
 			'password' => password_hash($this->input->post('password'), PASSWORD_BCRYPT),
-			'celular' => $this->input->post('numero_celular')
+			'celular' => $this->input->post('celular'),
+			'estado' => 1,
+			'fechaCreacionUsuario' => date('Y-m-d H:i:s'),
+			'fechaActualizacionUsuario' => null
 		);
 
 		if (empty($data['nombre']) || empty($data['usuario']) || empty($data['password']) || empty($data['celular'])) {
@@ -132,13 +138,13 @@ class Welcome extends CI_Controller
 		}
 
 		if ($this->login_model->existeUsuarioPorNombre($data['nombre'])) {
-			$data['error'] = 'El nombre de nombre ya está registrado';
+			$data['error'] = 'El nombre ya está registrado';
 			$this->load->view('registrarse', $data);
 			return;
 		}
 
 		if ($this->login_model->existeUsuarioPorCorreo($data['usuario'])) {
-			$data['error'] = 'El correo usuario ya está registrado';
+			$data['error'] = 'El correo ya está registrado';
 			$this->load->view('registrarse', $data);
 			return;
 		}
@@ -157,6 +163,44 @@ class Welcome extends CI_Controller
 			$this->load->view('registrarse', $data);
 		}
 	}
+	public function editUser($usuario_id)
+	{
+		$this->load->model('Usuario_model');
+
+		$data['usuario'] = $this->Usuario_model->getUserById($usuario_id);
+
+		if (!$data['usuario']) {
+			show_404();
+		}
+
+		$this->load->view('editarUsuario', $data);
+	}
+
+	// Método para actualizar el usuario
+	public function updateUser()
+	{
+		$this->load->model('Usuario_model');
+
+		$usuario_id = $this->input->post('usuario_id');
+		$data = array(
+			'nombre' => $this->input->post('nombre'),
+			'primerApellido' => $this->input->post('primerApellido'),
+			'segundoApellido' => $this->input->post('segundoApellido'),
+			'usuario' => $this->input->post('usuario'),
+			'celular' => $this->input->post('celular'),
+			'estado' => $this->input->post('estado')
+		);
+
+		$result = $this->Usuario_model->updateUser($usuario_id, $data);
+
+		if ($result) {
+			$this->session->set_flashdata('success', 'Usuario actualizado correctamente');
+		} else {
+			$this->session->set_flashdata('error', 'Error al actualizar el usuario');
+		}
+
+		redirect('Welcome/adminUser');
+	}
 
 	public function validarusuariobd()
 	{
@@ -167,14 +211,14 @@ class Welcome extends CI_Controller
 			$nombre_completo = $this->login_model->obtenerNombreCompleto($user);
 			$this->session->set_userdata('nombre', $nombre_completo);
 
-			if ($user === 'Gustavo@gmail.com') {
+			if ($user === 'gustavo@gmail.com') {
 				redirect('Welcome/admin');
 			} else {
 				redirect('Welcome/inicio');
 			}
 		} else {
 			$data['error'] = 'Usuario o contraseña incorrecta';
-			$this->load->view('index', $data);
+			$this->load->view('welcome_message', $data);
 		}
 	}
 
@@ -431,7 +475,7 @@ class Welcome extends CI_Controller
 				'imagen' => $imagen
 			);
 
-			if ($this->Bebida_model->insertar_bebida($data)) {
+			if ($this->Bebida_model->insert_bebida($data)) {
 				// Redirigir o mostrar un mensaje de éxito
 				redirect('Welcome/adminBebidas');
 			} else {

@@ -60,19 +60,27 @@
             <form action="<?php echo site_url('Welcome/registrarusuariobd'); ?>" method="POST" id="login-form">
                 <div class="input-box">
                     <label for="usuario">Usuario:</label>
-                    <input type="email" name="usuario" id="usuario" placeholder="Introduce tu nombre de usuario" />
+                    <input type="email" name="usuario" id="usuario" placeholder="Introduce tu correo electrónico" required />
                 </div>
                 <div class="input-box">
                     <label for="password">Contraseña:</label>
-                    <input type="password" name="password" id="password" placeholder="Introduce tu contraseña" />
+                    <input type="password" name="password" id="password" placeholder="Introduce tu contraseña" required />
                 </div>
                 <div class="input-box">
-                    <label for="nombre_completo">Nombre Completo:</label>
-                    <input type="text" name="nombre_completo" id="nombre_completo" placeholder="Introduce tu nombre completo" />
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" name="nombre" id="nombre" placeholder="Introduce tu nombre" required />
                 </div>
                 <div class="input-box">
-                    <label for="numero_celular">Celular:</label>
-                    <input type="number" name="numero_celular" id="numero_celular" placeholder="Introduce tu numero de Celular" />
+                    <label for="primerApellido">Primer Apellido:</label>
+                    <input type="text" name="primerApellido" id="primerApellido" placeholder="Introduce tu primer apellido" required />
+                </div>
+                <div class="input-box">
+                    <label for="segundoApellido">Segundo Apellido:</label>
+                    <input type="text" name="segundoApellido" id="segundoApellido" placeholder="Introduce tu segundo apellido" />
+                </div>
+                <div class="input-box">
+                    <label for="celular">Celular:</label>
+                    <input type="text" name="celular" id="celular" placeholder="Introduce tu número de celular" required />
                 </div>
                 <button type="submit" form="login-form" value="Submit" class="boton">Registrar</button>
             </form>

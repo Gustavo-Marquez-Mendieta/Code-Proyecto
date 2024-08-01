@@ -115,12 +115,12 @@
         <div class="full-box dashboard-sideBar-ct">
             <!--SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
-                EL DETALLE <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
+                ADMINISTRADOR <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
             <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
-                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
+                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon">
 
                     <figcaption class="text-center text-titles">
                         <?php if (isset($nombre)) : ?>
@@ -136,7 +136,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Usuarios" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
@@ -174,7 +174,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
+                    <h1 class="titulo">"Bienvenido Administrador"</h1>
                 </div>
                 <div class="col-md-6">
                     <br>
@@ -189,7 +189,7 @@
                     <br>
                     <br>
                     <br>
-                    <h1 class="frase">"La mejor opcion para tus acontecimientos con alto rendimiento y experiencia"</h1>
+                    <h1 class="frase">"Es Hora de Mejorar Nuestro Servicio"</h1>
 
                 </div>
                 <div class="col-md-6">

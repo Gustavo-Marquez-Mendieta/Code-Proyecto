@@ -29,9 +29,10 @@ class Login_model extends CI_Model {
     {
         return $this->db->insert('usuarios', $data);
     }
+
     public function validarusuario($user, $password) {
         $this->db->where('usuario', $user);
-        $query = $this->db->get('Usuarios');  // Asegúrate de que la tabla se llama 'Usuarios'
+        $query = $this->db->get('Usuarios');
 
         if ($query->num_rows() == 1) {
             $row = $query->row();
@@ -52,3 +53,4 @@ class Login_model extends CI_Model {
         return null;
     }
 }
+

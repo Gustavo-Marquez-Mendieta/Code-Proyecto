@@ -18,6 +18,11 @@ class Vajilla_model extends CI_Model
         $query = $this->db->get('Vajilla');
         return $query->result();
     }
+    public function get_all_vajilla()
+    {
+        $query = $this->db->get('Vajilla');
+        return $query->result_array(); // Devuelve los resultados como un array asociativo
+    }
 
     /**
      * Inserta un nuevo elemento en la tabla Vajilla.

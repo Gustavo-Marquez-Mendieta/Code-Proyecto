@@ -72,6 +72,9 @@
         <div class="container">
             <h2>Iniciar Sesión</h2>
             <hr>
+            <?php if (isset($error)) : ?>
+                <div class="error-message"><?php echo $error; ?></div>
+            <?php endif; ?>
             <form action="<?php echo site_url('Welcome/validarusuariobd'); ?>" method="POST" id="login-form">
                 <div class="input-box">
                     <label for="email">Email:</label>
