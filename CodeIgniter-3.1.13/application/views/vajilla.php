@@ -123,10 +123,9 @@
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
                     <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
-
                     <figcaption class="text-center text-titles">
                         <?php if (isset($nombre)) : ?>
-                            <h3> <?= $nombre; ?></h3>
+                            <h3><?php echo htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?></h3>
                         <?php endif; ?>
                     </figcaption>
                 </figure>
@@ -154,6 +153,7 @@
                     </li>
                 </ul>
             </div>
+
             <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>

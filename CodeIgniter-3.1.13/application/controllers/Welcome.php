@@ -75,14 +75,23 @@ class Welcome extends CI_Controller
 	{
 		$this->load->model('Vajilla_model');
 		$data['productos'] = $this->Vajilla_model->get_all_products(); // Asegúrate de que esta función exista en tu modelo
+
+		// Obtener el nombre del usuario desde la sesión
+		$data['nombre'] = $this->session->userdata('nombre'); // Cambia 'nombre' por el nombre de la variable en tu sesión
+
 		$this->load->view('vajilla', $data);
 	}
+
 
 
 	public function manteleria()
 	{
 		$this->load->model('Decoracion_model');
 		$data['productos'] = $this->Decoracion_model->get_all_decoraciones(); // Asegúrate de que esta función exista en tu modelo
+
+		// Obtener el nombre del usuario desde la sesión
+		$data['nombre'] = $this->session->userdata('nombre'); // Cambia 'nombre' por el nombre de la variable en tu sesión
+
 		$this->load->view('manteleria', $data);
 	}
 
@@ -90,6 +99,10 @@ class Welcome extends CI_Controller
 	{
 		$this->load->model('Bebida_model');
 		$data['productos'] = $this->Bebida_model->get_all_bebidas(); // Asegúrate de que esta función exista en tu modelo
+
+		// Obtener el nombre del usuario desde la sesión
+		$data['nombre'] = $this->session->userdata('nombre'); // Cambia 'nombre' por el nombre de la variable en tu sesión
+
 		$this->load->view('bebidas', $data);
 	}
 

@@ -123,10 +123,9 @@
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
                     <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
-
                     <figcaption class="text-center text-titles">
                         <?php if (isset($nombre)) : ?>
-                            <h3> <?= $nombre; ?></h3>
+                            <h3><?php echo htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?></h3>
                         <?php endif; ?>
                     </figcaption>
                 </figure>
@@ -154,6 +153,7 @@
                     </li>
                 </ul>
             </div>
+
             <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
@@ -191,7 +191,7 @@
                                     <img class="card-img-top" src="<?php echo base_url('./assets/img/' . $row['imagen']); ?>" alt="<?php echo $row['plan']; ?>" style="max-width: 200px; max-height: 200px; object-fit: cover;">
                                 </div>
                                 <div class="card-body text-center">
-                                 
+
                                     <h5 class="card-title card_title"><?php echo $row['tipo']; ?></h5>
                                     <p class="card-text p_puntos">
                                         <?php echo $row['plan']; ?>
@@ -199,7 +199,7 @@
                                     <p class="card-text p_puntos">
                                         Bs. <?php echo $row['precio']; ?>
                                     </p>
-                                    
+
 
                                 </div>
                                 <a href="<?php echo site_url('decoracion/detalle/' . $row['decoracion_id']); ?>" class="red_button btn_puntos" title="Ver <?php echo $row['plan']; ?>">
