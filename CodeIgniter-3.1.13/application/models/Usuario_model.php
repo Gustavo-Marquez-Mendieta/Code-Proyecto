@@ -21,7 +21,9 @@ class Usuario_model extends CI_Model
     }
     public function eliminar_usuario($usuario_id)
     {
-        return $this->db->delete('Usuarios', array('usuario_id' => $usuario_id));
+        $data = array('estado' => 0);
+        $this->db->where('usuario_id', $usuario_id);
+        return $this->db->update('Usuarios', $data);
     }
     public function eliminar_producto($producto_id)
     {
