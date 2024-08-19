@@ -93,6 +93,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .titulo {
             font-size: 60px;
             font-weight: bold;
@@ -136,15 +137,16 @@
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/configuracion'); ?>" title="Configuracion">
-                            <img src="../../assets/img/configuracion-de-usuario.png">
+                        <a href="<?php echo site_url('welcome/configuracion'); ?>" title="Configuracion">
+                            <img src="<?php echo base_url('assets/img/configuracion-de-usuario.png'); ?>">
                         </a>
                     </li>
+
                     <li>
                         <a href="<?php echo site_url('Welcome/cerrarsesion'); ?>" title="Salir del sistema" class="btn-exit-system">
                             <img src="../../assets/img/cerrar-sesion.png">

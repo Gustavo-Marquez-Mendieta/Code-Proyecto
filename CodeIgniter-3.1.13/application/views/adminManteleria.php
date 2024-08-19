@@ -126,6 +126,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="<?php echo site_url('Welcome/configuracion'); ?>" title="Configuracion">
+                            <img src="../../assets/img/configuracion-de-usuario.png">
+                        </a>
+                    </li>
+                    <li>
                         <a href="<?php echo site_url('Welcome/cerrarsesion'); ?>" title="Salir del sistema" class="btn-exit-system">
                             <img src="../../assets/img/cerrar-sesion.png">
                         </a>

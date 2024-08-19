@@ -63,10 +63,6 @@
                     <input type="email" name="usuario" id="usuario" placeholder="Introduce tu correo electrónico" required />
                 </div>
                 <div class="input-box">
-                    <label for="password">Contraseña:</label>
-                    <input type="password" name="password" id="password" placeholder="Introduce tu contraseña" required />
-                </div>
-                <div class="input-box">
                     <label for="nombre">Nombre:</label>
                     <input type="text" name="nombre" id="nombre" placeholder="Introduce tu nombre" required />
                 </div>

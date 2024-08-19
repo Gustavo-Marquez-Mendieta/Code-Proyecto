@@ -93,6 +93,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .titulo {
             font-size: 60px;
             font-weight: bold;
@@ -109,6 +110,7 @@
 </head>
 
 <body>
+    
     <!-- SideBar -->
     <section class="full-box cover dashboard-sideBar">
         <div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
@@ -182,26 +184,43 @@
                     <h1 class="titulo">"MIS RESERVAS"</h1>
                 </div>
                 <div class="col-md-6">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <h1 class="frase">"La mejor opcion para tus acontecimientos con alto rendimiento y experiencia"</h1>
-
+                    <<?php if ($this->session->flashdata('error')): ?>
+                        <div class="alert alert-danger">
+                        <?php echo $this->session->flashdata('error'); ?>
                 </div>
-                <div class="col-md-6">
+            <?php endif; ?>
+            <form action="<?php echo site_url('Welcome/actualizar'); ?>" method="post">
+                <label for="nombre">Nombre:</label>
+                <input type="text" name="nombre" value="<?php echo $usuario->nombre; ?>"><br>
 
-                </div>
+                <label for="primerApellido">Primer Apellido:</label>
+                <input type="text" name="primerApellido" value="<?php echo $usuario->primerApellido; ?>"><br>
+
+                <label for="segundoApellido">Segundo Apellido:</label>
+                <input type="text" name="segundoApellido" value="<?php echo $usuario->segundoApellido; ?>"><br>
+
+                <label for="usuario">Email:</label>
+                <input type="email" name="usuario" value="<?php echo $usuario->usuario; ?>"><br>
+
+                <label for="celular">Celular:</label>
+                <input type="text" name="celular" value="<?php echo $usuario->celular; ?>"><br>
+
+                <label for="contraseña_actual">Contraseña Actual:</label>
+                <input type="password" name="contraseña_actual" required><br>
+
+                <label for="nueva_contraseña">Nueva Contraseña:</label>
+                <input type="password" name="nueva_contraseña"><br>
+
+                <input type="submit" value="Actualizar">
+            </form>
+
 
             </div>
+            <div class="col-md-6">
+
+            </div>
+
+        </div>
         </div>
     </section>
 

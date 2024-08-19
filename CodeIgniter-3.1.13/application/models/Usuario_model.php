@@ -19,6 +19,26 @@ class Usuario_model extends CI_Model
         $query = $this->db->get('Usuarios');
         return $query->result();
     }
+    public function get_usuario($id)
+    {
+        $query = $this->db->get_where('usuarios', array('usuario_id' => $id));
+        return $query->row(); // Asegúrate de que devuelve un objeto
+    }
+    public function get_usuario_by_id($usuario_id)
+    {
+        $this->db->where('usuario_id', $usuario_id);
+        $query = $this->db->get('Usuarios');
+        return $query->row(); // Devuelve una sola fila como un objeto
+    }
+
+
+    public function actualizar_usuario($usuario_id, $data)
+    {
+        $this->db->where('usuario_id', $usuario_id);
+        return $this->db->update('usuarios', $data);
+    }
+
+
     public function eliminar_usuario($usuario_id)
     {
         $data = array('estado' => 0);
@@ -35,14 +55,14 @@ class Usuario_model extends CI_Model
         $this->db->where('vajilla_id', $producto_id);
         return $this->db->update('Vajilla', $data);
     }
-    
+
     public function getUserById($usuario_id)
     {
         $query = $this->db->get_where('Usuarios', array('usuario_id' => $usuario_id));
         return $query->row();
     }
 
-  
+
     public function updateUser($usuario_id, $data)
     {
         $this->db->where('usuario_id', $usuario_id);

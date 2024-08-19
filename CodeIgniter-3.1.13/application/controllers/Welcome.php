@@ -114,31 +114,113 @@ class Welcome extends CI_Controller
 
 	public function configuracion()
 	{
-		$this->check_session_and_load_view('configuracion');
+		$usuario_id = $this->session->userdata('usuario_id');
+
+		if ($usuario_id) {
+			$this->load->model('Usuario_model');
+			$data['usuario'] = $this->Usuario_model->get_usuario_by_id($usuario_id);
+
+			if ($data['usuario']) {
+				$this->load->view('informacionUsuario', $data);
+			} else {
+				redirect('Welcome/error');
+			}
+		} else {
+			redirect('Welcome/index');
+		}
 	}
+
+	public function actualizar()
+	{
+		$usuario_id = $this->session->userdata('usuario_id');
+		$this->load->model('Usuario_model');
+		$this->load->library('email');
+
+		// Obtener la contraseña actual y nueva de la solicitud
+		$contraseña_actual = $this->input->post('contraseña_actual');
+		$nueva_contraseña = $this->input->post('nueva_contraseña');
+
+		// Obtener los datos actuales del usuario
+		$usuario = $this->Usuario_model->get_usuario_by_id($usuario_id);
+
+		// Verificar si la contraseña actual ingresada es correcta
+		if (password_verify($contraseña_actual, $usuario->password)) {
+			// Si la contraseña es correcta, actualizar los datos del usuario
+			$data = array(
+				'nombre' => $this->input->post('nombre'),
+				'primerApellido' => $this->input->post('primerApellido'),
+				'segundoApellido' => $this->input->post('segundoApellido'),
+				'usuario' => $this->input->post('usuario'),
+				'celular' => $this->input->post('celular')
+			);
+
+			// Si se ingresó una nueva contraseña, agregarla a los datos a actualizar
+			if (!empty($nueva_contraseña)) {
+				$data['password'] = password_hash($nueva_contraseña, PASSWORD_BCRYPT);
+
+				// Configuración del correo
+				$config = array(
+					'protocol' => 'smtp',
+					'smtp_host' => 'smtp.gmail.com',
+					'smtp_port' => 587,
+					'smtp_user' => 'marquez.gustavo.1296@gmail.com',
+					'smtp_pass' => 'mhjp nbfq xqhj hiys',
+					'mailtype' => 'html',
+					'charset' => 'utf-8',
+					'wordwrap' => TRUE,
+					'newline' => "\r\n",
+					'smtp_crypto' => 'tls'
+				);
+				$this->email->initialize($config);
+
+				// Enviar correo electrónico
+				$this->email->from('tu_email@gmail.com', 'El Detalle Eventos');
+				$this->email->to($usuario->usuario); // Suponiendo que el email del usuario es su nombre de usuario
+				$this->email->subject('Cambio de Contraseña');
+				$this->email->message('Tu contraseña ha sido cambiada exitosamente. La nueva contraseña es: ' . $nueva_contraseña);
+
+				if ($this->email->send()) {
+					$this->session->set_flashdata('success', 'Contraseña actualizada y notificación enviada a tu correo.');
+				} else {
+					$this->session->set_flashdata('error', 'Contraseña actualizada pero no se pudo enviar el correo: ' . $this->email->print_debugger());
+				}
+			}
+
+			// Actualizar el usuario en la base de datos
+			$this->Usuario_model->actualizar_usuario($usuario_id, $data);
+
+			// Redirigir a la página de configuración
+			redirect('Welcome/configuracion');
+		} else {
+			// Si la contraseña actual no es válida, mostrar un mensaje de error
+			$this->session->set_flashdata('error', 'Contraseña actual no válida.');
+			redirect('Welcome/configuracion');
+		}
+	}
+
+
+
 
 	public function registrarusuariobd()
 	{
+
+		$password = bin2hex(random_bytes(8));
+
 		$data = array(
 			'nombre' => $this->input->post('nombre'),
 			'primerApellido' => $this->input->post('primerApellido'),
 			'segundoApellido' => $this->input->post('segundoApellido'),
 			'usuario' => $this->input->post('usuario'),
-			'password' => password_hash($this->input->post('password'), PASSWORD_BCRYPT),
+			'password' => password_hash($password, PASSWORD_BCRYPT), // Almacena la contraseña cifrada
 			'celular' => $this->input->post('celular'),
-			'estado' => 1,
+			'estado' => 0, // Estado de verificación pendiente
 			'fechaCreacionUsuario' => date('Y-m-d H:i:s'),
 			'fechaActualizacionUsuario' => null
 		);
 
-		if (empty($data['nombre']) || empty($data['usuario']) || empty($data['password']) || empty($data['celular'])) {
-			$data['error'] = 'Todos los campos son obligatorios';
-			$this->load->view('registrarse', $data);
-			return;
-		}
 
-		if ($this->login_model->existeUsuarioPorNombre($data['nombre'])) {
-			$data['error'] = 'El nombre ya está registrado';
+		if (empty($data['nombre']) || empty($data['usuario']) || empty($data['celular'])) {
+			$data['error'] = 'Todos los campos son obligatorios';
 			$this->load->view('registrarse', $data);
 			return;
 		}
@@ -149,20 +231,37 @@ class Welcome extends CI_Controller
 			return;
 		}
 
-		if ($this->login_model->existeUsuarioPorCelular($data['celular'])) {
-			$data['error'] = 'El número de celular ya está registrado';
-			$this->load->view('registrarse', $data);
-			return;
+		$this->login_model->agregarusuario($data);
+
+
+		$config = array(
+			'protocol' => 'smtp',
+			'smtp_host' => 'smtp.gmail.com',
+			'smtp_port' => 587, // El puerto 587 es compatible con STARTTLS
+			'smtp_user' => 'marquez.gustavo.1296@gmail.com',
+			'smtp_pass' => 'mhjp nbfq xqhj hiys', // Llave de correo electrónico
+			'mailtype' => 'html',
+			'charset' => 'utf-8',
+			'wordwrap' => TRUE,
+			'newline' => "\r\n", // IMPORTANTE: Necesario para SMTP
+			'smtp_crypto' => 'tls' // Utiliza STARTTLS para la conexión segura
+		);
+
+		$this->load->library('email', $config);
+		$this->email->from('tu_email@gmail.com', 'Gustavo Marquez');
+		$this->email->to($data['usuario']);
+		$this->email->subject('Tu Contraseña');
+		$this->email->message('Tu cuenta ha sido creada. Tu contraseña es: ' . $password);
+
+		if ($this->email->send()) {
+			$data['success'] = 'Se envio su contraseña a' . $data['usuario'];
+		} else {
+			$data['error'] = 'Correo no enviado: ' . $this->email->print_debugger();
 		}
 
-		if ($this->login_model->agregarusuario($data)) {
-			$data['success'] = 'Usuario registrado correctamente';
-			$this->load->view('welcome_message', $data);
-		} else {
-			$data['error'] = 'Error al registrar el usuario';
-			$this->load->view('registrarse', $data);
-		}
+		$this->load->view('welcome_message', $data);
 	}
+
 	public function editUser($usuario_id)
 	{
 		$this->load->model('Usuario_model');
@@ -208,8 +307,9 @@ class Welcome extends CI_Controller
 		$password = $this->input->post('password');
 
 		if ($this->login_model->validarusuario($user, $password)) {
-			$nombre_completo = $this->login_model->obtenerNombreCompleto($user);
-			$this->session->set_userdata('nombre', $nombre_completo);
+			$usuario = $this->login_model->obtenerUsuarioPorEmail($user);
+			$this->session->set_userdata('usuario_id', $usuario->usuario_id);
+			$this->session->set_userdata('nombre', $usuario->nombre . ' ' . $usuario->primerApellido);
 
 			if ($user === 'gustavo@gmail.com') {
 				redirect('Welcome/admin');
@@ -221,6 +321,7 @@ class Welcome extends CI_Controller
 			$this->load->view('welcome_message', $data);
 		}
 	}
+
 
 	public function admin()
 	{

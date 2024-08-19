@@ -93,6 +93,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .titulo {
             font-size: 60px;
             font-weight: bold;
@@ -138,6 +139,11 @@
                     <li>
                         <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Usuarios" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo site_url(''); ?>" title="Configuracion">
+                            <img src="../../assets/img/configuracion-de-usuario.png">
                         </a>
                     </li>
                     <li>
