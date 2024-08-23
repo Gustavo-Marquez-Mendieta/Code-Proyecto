@@ -137,7 +137,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="#" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
@@ -171,6 +171,11 @@
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/carrito'); ?>">
+                        <img src="../../assets/img/carrito-de-compras.png" alt="Carrito"> Carrito
+                    </a>
+                </li>
             </ul>
         </div>
     </section>
@@ -183,7 +188,7 @@
                     <br>
                     <h1 class="titulo">"MANTELERIA"</h1>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-10">
                     <?php foreach ($productos as $row) { ?>
                         <div class="col-12 col-md-4 mt-5 text-center Products">
                             <div class="card" style="max-height: 400px !important; min-height: 400px !important;">
@@ -202,10 +207,11 @@
 
 
                                 </div>
-                                <a href="<?php echo site_url('decoracion/detalle/' . $row['decoracion_id']); ?>" class="red_button btn_puntos" title="Ver <?php echo $row['plan']; ?>">
+                                <a href="<?php echo site_url('Welcome/agregar_al_carrito/' . $row['decoracion_id']); ?>" class="red_button btn_puntos" title="Agregar al carrito">
                                     Agregar al Servicio
                                     <i class="bi bi-arrow-right-circle"></i>
                                 </a>
+
                             </div>
                         </div>
                     <?php } ?>

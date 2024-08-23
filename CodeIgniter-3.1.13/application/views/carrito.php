@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -21,7 +22,6 @@
     <style>
         /* Estilos adicionales que puedas necesitar */
         .dashboard-sideBar {
-            /* Estilos de la barra lateral */
             left: 0;
             z-index: 2;
             background-image: url('../../assets/img/copa.jpg');
@@ -34,7 +34,6 @@
         }
 
         .dashboard-sideBar a {
-            /* Estilos de los enlaces en la barra lateral */
             display: block;
             padding: 10px 20px;
             color: white;
@@ -42,18 +41,15 @@
         }
 
         .dashboard-sideBar a:hover {
-            /* Estilos para el estado hover de los enlaces */
             background-color: #555;
         }
 
         .dashboard-sideBar .btn-sideBar-SubMenu {
-            /* Estilos para los enlaces del submenú */
             padding-left: 30px;
             position: relative;
         }
 
         .dashboard-sideBar .btn-sideBar-SubMenu::after {
-            /* Estilos para la flecha del submenú */
             content: "\f0d7";
             font-family: "Material Icons";
             position: absolute;
@@ -61,24 +57,17 @@
         }
 
         .dashboard-contentPage {
-            /* Estilos para el contenido principal */
             margin-left: 250px;
             padding: 20px;
             position: relative;
-            /* Añadido */
             z-index: 1;
-            /* Añadido */
         }
 
-        /* Estilos para las imágenes en los enlaces */
         .dashboard-sideBar img {
             width: 24px;
-            /* Ajusta el tamaño según tus necesidades */
             height: 24px;
             margin-right: 10px;
-            /* Espacio entre la imagen y el texto */
             vertical-align: middle;
-            /* Alineación vertical */
         }
 
         .frase {
@@ -86,9 +75,7 @@
             font-weight: bold;
             margin-top: 20px;
             margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
             background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -99,12 +86,14 @@
             font-weight: bold;
             margin-top: 20px;
             margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
             background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+        }
+
+        .btn-vaciar {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -122,10 +111,9 @@
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
                     <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
-
                     <figcaption class="text-center text-titles">
                         <?php if (isset($nombre)) : ?>
-                            <h3> <?= $nombre; ?></h3>
+                            <h3><?php echo htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?></h3>
                         <?php endif; ?>
                     </figcaption>
                 </figure>
@@ -137,16 +125,15 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('welcome/configuracion'); ?>" title="Configuracion">
-                            <img src="<?php echo base_url('assets/img/configuracion-de-usuario.png'); ?>">
+                        <a href="<?php echo site_url('Welcome/configuracion'); ?>" title="Configuracion">
+                            <img src="../../assets/img/configuracion-de-usuario.png">
                         </a>
                     </li>
-
                     <li>
                         <a href="<?php echo site_url('Welcome/cerrarsesion'); ?>" title="Salir del sistema" class="btn-exit-system">
                             <img src="../../assets/img/cerrar-sesion.png">
@@ -154,6 +141,7 @@
                     </li>
                 </ul>
             </div>
+
             <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
@@ -171,6 +159,11 @@
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/carrito'); ?>">
+                        <img src="../../assets/img/carrito-de-compras.png" alt="Carrito"> Carrito
+                    </a>
+                </li>
             </ul>
         </div>
     </section>
@@ -181,43 +174,66 @@
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
+                    <h1 class="titulo">"EL DETALLE EVENTOS - Carrito"</h1>
                 </div>
-                <div class="col-md-6">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <h1 class="frase">"La mejor opcion para tus acontecimientos con alto rendimiento y experiencia"</h1>
+                <div class="col-md-10">
+                    <h1 class="titulo">Carrito de Compras</h1>
+                    <table class="table">
+                        <tbody>
+                            <?php if (!empty($productos)): ?>
+                                <table class="table carrito-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Total</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($productos as $producto): ?>
+                                            <tr>
+                                            <td><?php echo htmlspecialchars($producto['tipo'] . ' - ' . $producto['plan'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                                <td>Bs. <?php echo number_format($producto['precio'], 2); ?></td>
+                                                <td><?php echo $producto['cantidad']; ?></td>
+                                                <td>Bs. <?php echo number_format($producto['precio'] * $producto['cantidad'], 2); ?></td>
+                                                <td>
+                                                    <a href="<?php echo site_url('Welcome/eliminar_del_carrito/' . $producto['decoracion_id']); ?>" class="btn btn-danger"style="color: white;">Quitar</a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php else: ?>
+                                <p>El carrito está vacío.</p>
+                            <?php endif; ?>
+                    </table>
 
+                    <!-- Botón para vaciar el carrito -->
+                    <form action="<?php echo site_url('Welcome/vaciar_carrito'); ?>" method="post">
+                        <button type="submit" class="btn btn-warning btn-vaciar" style="color: white;">Vaciar Carrito</button>
+                    </form>
                 </div>
-                <div class="col-md-6">
-
-                </div>
-
             </div>
         </div>
+
     </section>
 
-    <!--====== Scripts -->
-    <script src="./js/jquery-3.1.1.min.js"></script>
-    <script src="./js/sweetalert2.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/material.min.js"></script>
-    <script src="./js/ripples.min.js"></script>
-    <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
-    <script src="./js/main.js"></script>
-    <script>
-        $.material.init();
-    </script>
+    <footer class="bg-light text-center py-3">
+        <p>&copy; 2024 Mi Tienda. Todos los derechos reservados.</p>
+    </footer>
+    <!-- Vendor JS Files -->
+    <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/php-email-form/validate.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/counterup/counterup.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/venobox/venobox.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/vendor/aos/aos.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
 </body>
 
 </html>

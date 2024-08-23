@@ -14,6 +14,7 @@ class Welcome extends CI_Controller
 		$this->load->model('Decoracion_model');
 		$this->load->library('form_validation');
 		$this->load->model('Bebida_model');
+		$this->load->model('Productos_model');
 	}
 
 	public function index()
@@ -72,6 +73,7 @@ class Welcome extends CI_Controller
 		$this->load->view('registrarse');
 	}
 
+
 	public function vajilla()
 	{
 		$this->load->model('Vajilla_model');
@@ -83,11 +85,68 @@ class Welcome extends CI_Controller
 		$this->load->view('vajilla', $data);
 	}
 
+	// Controller: Welcome.php
+	public function agregar_al_carrito($producto_id)
+	{
+		$this->load->model('Productos_model');
+		$producto = $this->Productos_model->get_producto_by_id($producto_id);
+
+		if (!$producto) {
+			show_error('Producto no encontrado');
+		}
+
+		$this->load->library('session');
+		$carrito = $this->session->userdata('carrito');
+
+		if (!$carrito) {
+			$carrito = array();
+		}
+
+		if (isset($carrito[$producto['decoracion_id']])) {
+			// Incrementar la cantidad si el producto ya está en el carrito
+			$carrito[$producto['decoracion_id']]['cantidad'] += 1;
+		} else {
+			// Agregar el producto al carrito con una cantidad de 1
+			$producto['cantidad'] = 1;
+			$carrito[$producto['decoracion_id']] = $producto;
+		}
+
+		$this->session->set_userdata('carrito', $carrito);
+
+		redirect('Welcome/carrito');
+	}
+
+
+	public function carrito()
+	{
+		$this->load->library('session');
+		$data['productos'] = $this->session->userdata('carrito');
+
+		$this->load->view('carrito', $data);
+	}
+
+
+
+	public function eliminar_del_carrito($producto_id)
+	{
+		$this->load->model('Productos_model');
+		$this->Productos_model->eliminar_del_carrito($producto_id);
+		redirect('Welcome/carrito');
+	}
+
+
+	public function vaciar_carrito()
+	{
+		$this->load->model('Productos_model');
+		$this->Productos_model->vaciar_carrito();
+		redirect('Welcome/carrito'); // Redirige a la vista del carrito
+	}
 
 
 	public function manteleria()
 	{
 		$this->load->model('Decoracion_model');
+		$this->session->set_userdata('cart', []);
 		$data['productos'] = $this->Decoracion_model->get_all_decoraciones(); // Asegúrate de que esta función exista en tu modelo
 
 		// Obtener el nombre del usuario desde la sesión
@@ -100,7 +159,7 @@ class Welcome extends CI_Controller
 	{
 		$this->load->model('Bebida_model');
 		$data['productos'] = $this->Bebida_model->get_all_bebidas(); // Asegúrate de que esta función exista en tu modelo
-
+		$this->session->set_userdata('cart', []);
 		// Obtener el nombre del usuario desde la sesión
 		$data['nombre'] = $this->session->userdata('nombre'); // Cambia 'nombre' por el nombre de la variable en tu sesión
 

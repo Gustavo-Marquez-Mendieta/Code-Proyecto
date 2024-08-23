@@ -137,7 +137,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="#" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
@@ -169,6 +169,11 @@
                 <li>
                     <a href="<?php echo site_url('Welcome/bebidas'); ?>">
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/carrito'); ?>">
+                        <img src="../../assets/img/carrito-de-compras.png" alt="Carrito"> Carrito
                     </a>
                 </li>
             </ul>

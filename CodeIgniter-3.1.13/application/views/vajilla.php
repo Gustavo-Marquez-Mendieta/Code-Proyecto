@@ -171,6 +171,11 @@
                         <img src="../../assets/img/vino.png" alt="Bebidas"> Bebidas
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/carrito'); ?>">
+                        <img src="../../assets/img/carrito-de-compras.png" alt="Carrito"> Carrito
+                    </a>
+                </li>
             </ul>
         </div>
     </section>

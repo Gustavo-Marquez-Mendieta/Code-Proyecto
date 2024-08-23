@@ -138,7 +138,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo site_url('Welcome/informacionUsuario'); ?>" title="Mi Informacion" class="btn-user">
+                        <a href="#" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
@@ -181,7 +181,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"MIS RESERVAS"</h1>
+                    <h1 class="titulo">"Datos de Usuario"</h1>
                 </div>
                 <div class="col-md-6">
                     <<?php if ($this->session->flashdata('error')): ?>

@@ -91,7 +91,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/adminUser'); ?>" title="Mi Información" class="btn-user">
+                    <a href="#" title="Mi Información" class="btn-user">
                         <img src="../../assets/img/avatar (1).png">
                     </a>
                 </li>
