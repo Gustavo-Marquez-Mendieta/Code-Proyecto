@@ -1,5 +1,6 @@
 <?php
-class Login_model extends CI_Model {
+class Login_model extends CI_Model
+{
 
     public function __construct()
     {
@@ -29,7 +30,8 @@ class Login_model extends CI_Model {
     {
         return $this->db->insert('usuarios', $data);
     }
-    public function validarusuario($user, $password) {
+    public function validarusuario($user, $password)
+    {
         $this->db->where('usuario', $user);
         $query = $this->db->get('Usuarios');  // Asegúrate de que la tabla se llama 'Usuarios'
 
@@ -42,7 +44,8 @@ class Login_model extends CI_Model {
         return false;
     }
 
-    public function obtenerNombreCompleto($user) {
+    public function obtenerNombreCompleto($user)
+    {
         $this->db->where('usuario', $user);
         $query = $this->db->get('Usuarios');
         if ($query->num_rows() == 1) {
@@ -51,4 +54,11 @@ class Login_model extends CI_Model {
         }
         return null;
     }
+    public function obtenerUsuarioPorEmail($email)
+    {
+        $this->db->where('usuario', $email);
+        $query = $this->db->get('usuarios');
+        return $query->row();
+    }
+
 }

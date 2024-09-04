@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/style1.css">
+    <!-- Incluye Font Awesome para el ícono de ojo -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Login con PHP y Sessions</title>
     <style>
         img {
@@ -51,6 +53,7 @@
 
         .input-box {
             margin: 10px 0;
+            position: relative;
         }
 
         .input-box label {
@@ -58,10 +61,31 @@
             margin-bottom: 5px;
         }
 
-        .input-box input {
-            width: 100%;
+        .input-box i {
+            position: absolute;
+            right: 10px;
+            margin-top: 25px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #aaa;
+        }
+        .message {
+            text-align: center;
+            color: green;
+            font-size: 20px;
+            font-family: 'Arial', sans-serif;
+            margin: 20px 0;
             padding: 10px;
-            font-size: 16px;
+            border: 2px solid green;
+            border-radius: 10px;
+            background-color: #d4edda;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -72,6 +96,11 @@
         <div class="container">
             <h2>Iniciar Sesión</h2>
             <hr>
+            <?php if (isset($error)) : ?>
+                <div class="error-message"><?php echo $error; ?></div>
+            <?php elseif (isset($success)) : ?>
+                <div class="message"><?php echo $success; ?></div>
+            <?php endif; ?>
             <form action="<?php echo site_url('Welcome/validarusuariobd'); ?>" method="POST" id="login-form">
                 <div class="input-box">
                     <label for="email">Email:</label>
@@ -80,6 +109,8 @@
                 <div class="input-box">
                     <label for="password">Contraseña:</label>
                     <input type="password" name="password" id="password" placeholder="Introduce tu contraseña" required />
+                    <!-- Ícono de ojo para mostrar/ocultar contraseña -->
+                    <i class="far fa-eye" id="togglePassword"></i>
                 </div>
                 <button type="submit" form="login-form" value="Submit" class="boton">Ingresar</button>
                 <p>
@@ -88,6 +119,24 @@
             </form>
         </div>
     </main>
+
+    <!-- JavaScript para mostrar/ocultar la contraseña -->
+    <script>
+        const togglePassword = document.querySelector("#togglePassword");
+        const password = document.querySelector("#password");
+
+        togglePassword.addEventListener("click", function() {
+            // Alternar el atributo type entre 'password' y 'text'
+            const type = password.getAttribute("type") === "password" ? "text" : "password";
+            password.setAttribute("type", type);
+
+            // Alternar el ícono entre ojo abierto y cerrado
+            this.classList.toggle("fa-eye");
+            this.classList.toggle("fa-eye-slash");
+        });
+    </script>
 </body>
 
 </html>
+
+
