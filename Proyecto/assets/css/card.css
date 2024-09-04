@@ -1,0 +1,87 @@
+/* Estilo general para los cards */
+.Products .card {
+    border: 1px solid #ddd; /* Borde sutil */
+    border-radius: 8px; /* Bordes redondeados */
+    overflow: hidden; /* Para evitar que el contenido se desborde */
+    box-shadow: 0 4px 8px rgba(3, 7, 233, 0.1); /* Sombra suave */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave */
+    display: flex;
+    flex-direction: column; /* Asegurar que el contenido se distribuya verticalmente */
+    height: 450px; /* Incrementar la altura del card */
+}
+
+/* Efecto de hover para los cards */
+.Products .card:hover {
+    transform: translateY(-5px); /* Levantar el card */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
+}
+
+/* Estilo para la imagen del card */
+.card-img-top {
+    width: 100%; /* Imagen ocupa todo el ancho del card */
+    height: 200px; /* Ajusta la altura según sea necesario */
+    object-fit: cover; /* Cubrir sin deformar */
+}
+
+/* Estilo para el cuerpo del card */
+.card-body {
+    padding: 15px; /* Espaciado interno */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Espaciar los elementos en el card */
+    flex-grow: 1; /* Permitir que el cuerpo del card ocupe el espacio restante */
+}
+
+/* Título del card */
+.card-title.card_title {
+    font-size: 1.25rem; /* Tamaño del texto */
+    margin-bottom: 10px; /* Espacio inferior */
+}
+
+/* Texto dentro del card */
+.card-text.p_puntos {
+    font-size: 1rem; /* Tamaño del texto */
+    margin-bottom: 10px; /* Espacio inferior */
+}
+
+/* Contenedor de cantidad */
+.quantity-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px; /* Espacio inferior */
+}
+
+/* Controles de cantidad */
+.quantity-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Botones de aumentar y disminuir */
+.quantity-controls .btn {
+    margin: 5px; /* Espaciado entre los botones */
+}
+
+/* Botón dentro del card */
+.red_button.btn_puntos {
+    display: block; /* Hacer que el botón ocupe todo el ancho */
+    width: calc(100% - 40px); /* Ajustar el ancho del botón */
+    margin: 10px auto 0; /* Espacio automático para centrar */
+    padding: 5px; /* Reducir el espaciado interno */
+    background-color: #e74c3c; /* Color de fondo */
+    color: white; /* Color del texto */
+    text-align: center; /* Centrar el texto */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    text-decoration: none; /* Quitar subrayado */
+    font-size: 0.875rem; /* Tamaño del texto más pequeño */
+}
+
+
+/* Estilo para el botón en hover */
+.red_button.btn_puntos:hover {
+    background-color: #c0392b; /* Color de fondo al pasar el cursor */
+    text-decoration: none; /* Mantener sin subrayado */
+}
