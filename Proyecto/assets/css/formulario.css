@@ -1,0 +1,62 @@
+/* Estilos para el formulario */
+form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+form .form-group {
+    margin-bottom: 15px;
+}
+
+form .form-group label {
+    font-weight: bold;
+    color: #333;
+}
+
+form .form-control {
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+}
+
+form .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+}
+
+form button[type="submit"] {
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para el contenedor de la tabla y el formulario */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.table-container,
+.form-container {
+    flex: 1;
+}
+
+/* Asegúrate de que el formulario y la tabla se ajusten bien en pantallas más pequeñas */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+}
