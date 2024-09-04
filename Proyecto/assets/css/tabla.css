@@ -1,0 +1,67 @@
+/* Estilos para la tabla */
+.table {
+	width: 100%;
+	margin-bottom: 1rem;
+	color: #fff; /* Color del texto de la tabla */
+	background-color: transparent;
+	border-collapse: collapse;
+}
+
+.table th,
+.table td {
+	padding: 15px;
+	text-align: left;
+	border: 1px solid #444; /* Borde delgado y oscuro */
+	border-radius: 8px; /* Radio de borde más pequeño */
+}
+
+.table th {
+	background-color: #ff6b6b; /* Color de fondo del encabezado */
+	color: #fff; /* Color del texto del encabezado */
+	font-weight: bold;
+}
+
+.table td {
+	background-color: #fff; /* Fondo blanco para las celdas */
+	color: #333; /* Color del texto en las celdas */
+}
+
+.table td.celular {
+	text-align: center; /* Centrar el contenido en la columna celular */
+}
+
+.table tbody tr:nth-of-type(odd) {
+	background-color: #f9f9f9; /* Color de fondo de las filas impares */
+}
+
+.table tbody tr:nth-of-type(even) {
+	background-color: #f1f1f1; /* Color de fondo de las filas pares */
+}
+
+.table tbody tr:hover {
+	background-color: #ff6b6b; /* Color de fondo al pasar el mouse */
+	color: #fff; /* Color del texto al pasar el mouse */
+}
+/* Estilos para los botones */
+.btn {
+	display: inline-block;
+	padding: 8px 12px;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	color: rgb(25, 22, 22);
+	border-radius: 4px;
+}
+
+.btn-danger {
+	background-color: #f12506; /* Rojo fuerte para el botón de eliminar */
+	border: 1px solid #c0392b; /* Borde rojo oscuro */
+}
+
+.btn-danger:hover {
+	background-color: #3498db; /* Azul al pasar el mouse */
+	border-color: #e74c3c; /* Borde rojo fuerte al pasar el mouse */
+}

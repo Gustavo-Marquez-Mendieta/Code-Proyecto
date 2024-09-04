@@ -1,0 +1,43 @@
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: rgba(249, 249, 249, 0.105);
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+    display: block;
+    margin-bottom: 6px; 
+    font-weight: bold;
+    color: #ede8e8;
+    font-size: 14px; 
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="password"] {
+    width: 100%;
+    padding: 8px; 
+    margin-bottom: 12px; 
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px; 
+    box-sizing: border-box;
+}
+
+form input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px; 
+    border-radius: 4px;
+    font-size: 14px; 
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover {
+    background-color: #0056b3;
+}
