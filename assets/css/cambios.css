@@ -1,0 +1,81 @@
+body {
+	margin: 0;
+	padding: 0;
+	overflow-x: hidden;
+}
+
+li.user-info {
+	list-style-type: none;
+	padding-left: 0;
+}
+
+.dashboard-sideBar {
+	left: 0;
+	z-index: 2;
+	background-image: url("../../assets/img/copaga.jpg");
+	background-color: #333;
+	color: white;
+	width: 250px;
+	position: fixed;
+	height: 100%;
+	overflow-y: auto;
+}
+
+.dashboard-sideBar a {
+	display: block;
+	padding: 10px 20px;
+	color: white;
+	text-decoration: none;
+}
+
+.dashboard-sideBar a:hover {
+	background-color: #555;
+}
+
+.dashboard-sideBar .btn-sideBar-SubMenu {
+	padding-left: 30px;
+	position: relative;
+}
+
+.dashboard-sideBar .btn-sideBar-SubMenu::after {
+	content: "\f0d7";
+	font-family: "Material Icons";
+	position: absolute;
+	right: 20px;
+}
+
+.dashboard-contentPage {
+	margin-left: 250px;
+	padding: 20px;
+	position: relative;
+	overflow-y: auto;
+}
+
+.dashboard-sideBar img {
+	width: 24px;
+	height: 24px;
+	margin-right: 10px;
+	vertical-align: middle;
+}
+
+.frase {
+	font-size: 40px;
+	font-weight: bold;
+	margin-top: 20px;
+	margin-left: 30px;
+	background-image: linear-gradient(45deg, #ff6b6b, #87ceeb);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.titulo {
+	font-size: 60px;
+	font-weight: bold;
+	margin-top: 20px;
+	margin-left: 30px;
+	background-image: linear-gradient(45deg, #ff6b6b, #87ceeb);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
