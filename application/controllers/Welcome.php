@@ -62,7 +62,112 @@ class Welcome extends CI_Controller
 		$data['nombre'] = $this->session->userdata('nombre');
 		$this->load->view('administrador/solicitudes', $data);
 	}
+	public function reportes()
+	{
+		$data['nombre'] = $this->session->userdata('nombre');
+		$this->load->view('administrador/reportes', $data);
+	}
+	public function tipo_evento()
+	{
+		$data['nombre'] = $this->session->userdata('nombre');
+		$this->load->view('administrador/tipo_evento', $data);
+	}
+	public function reporte_empleado()
+	{
+		$data['nombre'] = $this->session->userdata('nombre');
+		$data['empleados'] = $this->Reservas_model->obtener_empleados();
 
+		// Comprobar si se ha enviado un formulario
+		if ($this->input->post()) {
+			// Si el formulario fue enviado, obtener los datos
+			$empleado_id = $this->input->post('empleado');
+			$fecha_inicio = $this->input->post('fecha_inicio');
+			$fecha_fin = $this->input->post('fecha_fin');
+
+			// Obtener los eventos del empleado en el rango de fechas
+			$data['eventos'] = $this->Reservas_model->obtener_eventos_empleado($empleado_id, $fecha_inicio, $fecha_fin);
+
+			// Obtener el empleado seleccionado para mostrar en el título
+			$data['empleado'] = $this->Reservas_model->obtener_empleado_por_id($empleado_id);
+		} else {
+			$data['eventos'] = null;
+			$data['empleado'] = null;
+		}
+
+		// Cargar la vista del reporte con los datos
+		$this->load->view('administrador/reporte_empleado', $data);
+	}
+	public function reporte_evento()
+	{
+		$data['nombre'] = $this->session->userdata('nombre');
+		// Comprobar si se ha enviado un formulario
+		if ($this->input->post()) {
+			// Si el formulario fue enviado, obtener los datos
+			$tipo_evento = $this->input->post('evento');
+			$fecha_inicio = $this->input->post('fecha_inicio');
+			$fecha_fin = $this->input->post('fecha_fin');
+
+			// Obtener los eventos del tipo seleccionado en el rango de fechas
+			$data['eventos'] = $this->Reservas_model->obtener_eventos_por_tipo($tipo_evento, $fecha_inicio, $fecha_fin);
+		} else {
+			$data['eventos'] = null;
+		}
+
+		// Cargar la vista del reporte con los datos
+		$this->load->view('administrador/tipo_evento', $data);
+	}
+	public function reporte_fechas()
+	{
+		$data['nombre'] = $this->session->userdata('nombre');
+
+		// Comprobar si se ha enviado un formulario
+		if ($this->input->post()) {
+			// Si el formulario fue enviado, obtener los datos
+			$fecha_inicio = $this->input->post('fecha_inicio');
+			$fecha_fin = $this->input->post('fecha_fin');
+
+			// Obtener todas las reservas en el rango de fechas
+			$data['reservas'] = $this->Reservas_model->obtener_reservas_por_fechas($fecha_inicio, $fecha_fin);
+		} else {
+			$data['reservas'] = null;
+		}
+
+		// Cargar la vista del reporte con los datos
+		$this->load->view('administrador/reportes', $data);
+	}
+
+	public function filtrarSolicitudes()
+	{
+		$estado = $this->input->post('estado');
+
+		$this->load->model('Reservas_model');
+		$reservas = $this->Reservas_model->get_reservas_by_estado($estado);
+
+
+		if (!empty($reservas)) {
+			foreach ($reservas as $reserva) {
+				echo '
+					<tr>
+						<td>' . $reserva->usuario_id . '</td>
+						<td>' . $reserva->fecha_reserva . '</td>
+						<td>' . $reserva->tipo_evento . '</td>
+						<td>' . $reserva->dias . '</td>
+						<td>' . $reserva->monto_total . '</td>
+						<td>' . $reserva->estado_pago . '</td>
+						<td>
+							<a href="' . site_url('Welcome/detalles/' . $reserva->reserva_id) . '" class="btn btn-danger" style="color:white">Detalles</a>
+						</td>
+					</tr>
+				';
+			}
+		} else {
+			echo '
+				<tr>
+					<td colspan="7">No hay reservas disponibles para este estado</td>
+				</tr>
+			';
+		}
+	}
 
 
 
@@ -84,7 +189,6 @@ class Welcome extends CI_Controller
 		$detalles = $this->Reserva_detalle_model->get_detalles_by_reserva($reserva_id);
 
 		if ($reserva) {
-			// Configuración del correo
 			$config = array(
 				'protocol' => 'smtp',
 				'smtp_host' => 'smtp.gmail.com',
@@ -116,19 +220,20 @@ class Welcome extends CI_Controller
 			$mensaje .= "<tbody>";
 
 			foreach ($detalles as $detalle) {
-				if ($detalle->vajilla_nombre) {
+				if (isset($detalle->vajilla_nombre)) {
 					$nombre = $detalle->vajilla_nombre;
-					$tipo = $detalle->vajilla_tipo;
-					$precio = $detalle->vajilla_precio;
-				} elseif ($detalle->decoracion_plan) {
-					$nombre = $detalle->decoracion_plan;
-					$tipo = $detalle->decoracion_tipo;
-					$precio = $detalle->decoracion_precio;
+					$tipo = isset($detalle->vajilla_tipo) ? $detalle->vajilla_tipo : 'N/A'; // Avoid undefined error
+					$precio = isset($detalle->vajilla_precio) ? $detalle->vajilla_precio : 0; // Default to 0 if not available
+				} elseif (isset($detalle->manteleria_plan)) {
+					$nombre = $detalle->manteleria_plan;
+					$tipo = isset($detalle->manteleria_tipo) ? $detalle->manteleria_tipo : 'N/A';
+					$precio = isset($detalle->manteleria_precio) ? $detalle->manteleria_precio : 0;
 				} else {
 					$nombre = 'Desconocido';
 					$tipo = 'Desconocido';
 					$precio = 0;
 				}
+
 
 				$total = $precio * $detalle->cantidad;
 				$mensaje .= "<tr>";
@@ -144,7 +249,6 @@ class Welcome extends CI_Controller
 
 			$this->email->message($mensaje);
 
-			// Enviar el correo y manejar el resultado
 			if ($this->email->send()) {
 				$this->session->set_flashdata('success', 'Solicitud aprobada y notificación enviada al correo.');
 			} else {
@@ -154,6 +258,46 @@ class Welcome extends CI_Controller
 			$this->session->set_flashdata('error', 'No se pudo encontrar la reserva.');
 		}
 
+		redirect('Welcome/solicitudes');
+	}
+	public function recibir_adelanto($reserva_id)
+	{
+		$this->Reservas_model->update_estado_reserva($reserva_id, 'En Curso de entrega', $this->session->userdata('usuario_id'));
+		redirect('Welcome/solicitudes');
+	}
+
+
+	public function entregar_vajilla($reserva_id)
+	{
+		$nuevo_estado = 'Vajilla Entregada';
+		$this->Reservas_model->update_estado_entrega_vajilla($reserva_id, $nuevo_estado, $this->session->userdata('usuario_id'));
+		redirect('Welcome/solicitudes');
+	}
+
+
+	public function recoger_vajilla($reserva_id)
+	{
+		$nuevo_estado = 'Vajilla Recogida';
+		$this->Reservas_model->update_estado_recogida_vajilla($reserva_id, $nuevo_estado, $this->session->userdata('usuario_id'));
+		redirect('Welcome/solicitudes');
+	}
+	public function guardar_detalles_recogida($reserva_id)
+	{
+		// Recibir los detalles del formulario
+		$detalles_recogida = $this->input->post('detalles');
+
+		// Definir el nuevo estado
+		$nuevo_estado = 'Vajilla Recogida';
+
+		// Llamar al modelo para actualizar la reserva
+		$this->Reservas_model->update_estado_recogida_vajilla($reserva_id, $nuevo_estado, $detalles_recogida, $this->session->userdata('usuario_id'));
+
+		// Redirigir a la página de solicitudes
+		redirect('Welcome/solicitudes');
+	}
+	public function terminar_evento($reserva_id)
+	{
+		$this->Reservas_model->update_estado_reserva($reserva_id, 'Evento Completado', $this->session->userdata('usuario_id'));
 		redirect('Welcome/solicitudes');
 	}
 	public function guardarGarzones()
@@ -269,9 +413,11 @@ class Welcome extends CI_Controller
 				show_error('Tipo de producto no válido');
 				return;
 		}
+
 		if (!$producto) {
 			show_error('Producto no encontrado');
 		}
+
 		if ($tipo_producto == 'manteleria') {
 			if ($producto['stock'] < $cantidad) {
 				$this->session->set_flashdata('error', 'No hay suficiente stock disponible.');
@@ -279,7 +425,7 @@ class Welcome extends CI_Controller
 				return;
 			}
 			$nuevo_stock = $producto['stock'] - $cantidad;
-			$this->Productos_model->update_stock_manteleria($producto_id, $nuevo_stock); // Asegúrate de tener esta función en el modelo
+			$this->Manteleria_model->update_stock_manteleria($producto_id, $nuevo_stock);
 		} elseif ($tipo_producto == 'vajilla') {
 			if ($producto['stock_cajas'] < $cantidad) {
 				$this->session->set_flashdata('error', 'No hay suficiente stock disponible.');
@@ -287,8 +433,9 @@ class Welcome extends CI_Controller
 				return;
 			}
 			$nuevo_stock = $producto['stock_cajas'] - $cantidad;
-			$this->Productos_model->update_stock_manteleria($producto_id, $nuevo_stock);
+			$this->Productos_model->update_stock_vajilla($producto_id, $nuevo_stock);
 		}
+
 		$carrito = $this->session->userdata('carrito') ?: array();
 		$producto_key = $tipo_producto . '_' . $producto_id;
 
@@ -299,6 +446,7 @@ class Welcome extends CI_Controller
 			$producto['tipo_producto'] = $tipo_producto;
 			$carrito[$producto_key] = $producto;
 		}
+
 		$this->session->set_userdata('carrito', $carrito);
 		redirect('Welcome/carrito');
 	}
@@ -309,7 +457,6 @@ class Welcome extends CI_Controller
 	public function carrito()
 	{
 		$data['carrito'] = $this->session->userdata('carrito') ?: array();
-
 		$total = 0;
 		foreach ($data['carrito'] as $item) {
 			$total += $item['precio'] * $item['cantidad'];
@@ -329,6 +476,7 @@ class Welcome extends CI_Controller
 		$dias = $this->input->post('dias');
 		$evento = $this->input->post('evento');
 		$detalle_evento = $this->input->post('detalle_evento');
+		$monto_total = $this->input->post('monto_total');// Recibir el monto total del formulario
 
 		// Capturamos los valores del radio button y la cantidad de garzones
 		$garzones = $this->input->post('garzones'); // 'si' o 'no'
@@ -348,34 +496,25 @@ class Welcome extends CI_Controller
 			return; // Detenemos la ejecución si las fechas ya están reservadas
 		}
 
-		// Calcula el monto total de la reserva
-		$monto_total = 0;
-		foreach ($carrito as $item) {
-			$monto_total += $item['precio'] * $item['cantidad'];
-		}
-
-		// Si el usuario selecciona "si" en garzones, guardamos la cantidad; si es "no", guardamos "no".
+		// Si el usuario selecciona "si" en garzones, guardamos la cantidad; si es "no", guardamos "Ninguno".
 		if ($garzones === 'si') {
 			$garzones_value = $cantidad_garzones;
 		} else {
-			$garzones_value = 'Ninguno'; // Guardamos 'no' si seleccionó la opción de "no solo vajilla"
+			$garzones_value = 'Ninguno';
 		}
 
-		// Guarda la reserva principal, incluyendo el valor de garzones
+
 		$reserva_id = $this->Reservas_model->guardar_reserva($usuario_id, $fecha_reserva, $evento, $dias, $monto_total, $detalle_evento, $garzones_value);
 
-		// Guarda los detalles de la reserva
 		foreach ($carrito as $item) {
-			$this->Reserva_detalle_model->guardar_detalle($reserva_id, $item['vajilla_id'], $item['decoracion_id'], $item['cantidad'], $item['precio']);
+			$this->Reserva_detalle_model->guardar_detalle($reserva_id, $item['vajilla_id'], $item['manteleria_id'], $item['cantidad'], $item['precio']);
 		}
-
-		// Limpia el carrito después de la reserva
 		$this->session->unset_userdata('carrito');
 
-		// Mensaje de éxito y redireccionamiento
 		$this->session->set_flashdata('success', 'La solicitud del servicio se ha realizado con éxito. Se enviará la confirmación a su correo electrónico.');
 		redirect('Welcome/confirmacion_reserva');
 	}
+
 
 
 
@@ -429,7 +568,7 @@ class Welcome extends CI_Controller
 	{
 		$this->load->model('Manteleria_model');
 		$this->session->set_userdata('cart', []);
-		$data['manteleria'] = $this->Manteleria_model->get_all_manteleria();
+		$data['productos'] = $this->Manteleria_model->get_all_products();
 
 		$data['nombre'] = $this->session->userdata('nombre');
 
@@ -688,16 +827,32 @@ class Welcome extends CI_Controller
 	}
 	public function detalles($reserva_id)
 	{
-		$this->load->model('Reservas_model'); // Carga el modelo de reservas
+		$this->load->model('Reservas_model');
 		$this->load->model('Reserva_detalle_model');
 		$this->load->model('Garzones_reservas_model');
 		$data['nombre'] = $this->session->userdata('nombre');
 		$data['reserva'] = $this->Reservas_model->get_reserva_by_id($reserva_id); // Obtiene la reserva
-		$data['detalles'] = $this->Reserva_detalle_model->get_detalles_by_reserva($reserva_id); // Obtiene los detalles
+		$data['detalles'] = $this->Reserva_detalle_model->get_detalles_by_reserva($reserva_id);
 		$data['empleados'] = $this->Empleado_model->get_all_empleados();
 		$data['garzones_asignados'] = $this->Garzones_reservas_model->obtener_garzones_por_reserva($reserva_id);
-		$this->load->view('administrador/detalles_reserva', $data); // Carga la vista con los datos
+		$this->load->view('administrador/detalles_reserva', $data);
 	}
+	public function eliminar($detalle_id)
+	{
+		// Cargar el modelo correspondiente si aún no lo has hecho
+		$this->load->model('Reserva_detalle_model');
+
+		// Llamar a la función del modelo para eliminar el detalle
+		if ($this->Reserva_detalle_model->eliminar_detalle($detalle_id)) {
+			$this->session->set_flashdata('success', 'Detalle eliminado correctamente.');
+		} else {
+			$this->session->set_flashdata('error', 'Error al eliminar el detalle.');
+		}
+
+		// Redireccionar de vuelta a la página de detalles de la reserva
+		redirect(uri: 'Welcome/detalles/' . $this->input->post('reserva_id'));
+	}
+
 	public function empleados()
 	{
 		$data['empleados'] = $this->Empleado_model->get_all_empleados();
@@ -816,7 +971,7 @@ class Welcome extends CI_Controller
 		} else {
 			$this->session->set_flashdata('error', 'Error al eliminar el usuario.');
 		}
-		redirect('Welcome/adminUser');
+		redirect('Welcome/detalles');
 	}
 
 	public function agregarVajilla()

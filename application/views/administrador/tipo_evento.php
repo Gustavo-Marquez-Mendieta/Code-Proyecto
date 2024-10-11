@@ -193,6 +193,7 @@
                         <img src="../../assets/image/reportes.png" alt="Reportes"> Reportes
                     </a>
                 </li>
+
             </ul>
         </div>
     </section>
@@ -202,49 +203,92 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="titulo">"Empleados"</h1>
-                </div>
-                <div class="col-md-7">
-                    <a href="<?= site_url('Welcome/agregar_empleado'); ?>" class="btn btn-primary"
-                        style="color:white; margin:20px">Agregar Empleado</a>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Apellido Paterno</th>
-                                <th>Apellido Materno</th>
-                                <th>Celular</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($empleados as $empleado): ?>
-                                <tr>
-                                    <td><?= $empleado->empleado_id; ?></td>
-                                    <td><?= $empleado->nombre; ?></td>
-                                    <td><?= $empleado->apellido_paterno; ?></td>
-                                    <td><?= $empleado->apellido_materno; ?></td>
-                                    <td><?= $empleado->celular; ?></td>
-                                    <td>
-                                        <a href="<?= site_url('Welcome/editar_empleado/' . $empleado->empleado_id); ?>"
-                                            class="btn btn-warning btn-sm" style="color:white">Editar</a>
-                                        <a href="<?= site_url('Welcome/eliminar_empleado/' . $empleado->empleado_id); ?>"
-                                            class="btn btn-danger btn-sm" style="color:white">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-
+                    <br>
+                    <h1 class="titulo">Reportes</h1>
+                    <h1 class="titulo">Reporte por Tipo de Evento</h1>
+                    <select name="reportes" id="reportes" style="margin-top: 10px;" onchange="location = this.value;">
+                        <option value="">Seleccione un reporte</option>
+                        <option value="<?php echo site_url('Welcome/reportes'); ?>">Reporte por fecha</option>
+                        <option value="<?php echo site_url('Welcome/tipo_evento'); ?>">Reporte por tipo de evento
+                        </option>
+                        <option value="<?php echo site_url('Welcome/reporte_empleado'); ?>">Reporte de empleados
+                        </option>
+                    </select>
                 </div>
                 <div class="col-md-6">
-
+                    <form action="<?php echo site_url('Welcome/reporte_evento'); ?>" method="post">
+                        <div class="form-group">
+                            <label for="evento">Seleccione un tipo de evento:</label>
+                            <select id="evento" name="evento" class="form-control" required>
+                                <option value="">Selecciona un evento</option>
+                                <option value="Matrimonio">Matrimonio</option>
+                                <option value="Bautizo">Bautizo</option>
+                                <option value="Cumpleaños">Cumpleaños</option>
+                                <option value="15 Años">15 Años</option>
+                                <option value="Fiesta de Santito">Fiesta de Santito</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_inicio">Fecha de inicio:</label>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_fin">Fecha de fin:</label>
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generar Reporte</button>
+                    </form>
                 </div>
-
             </div>
+
+            <?php if (isset($eventos) && !empty($eventos)): ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <br>
+                        <h2 class="titulo">Reporte de Tipo de Evento</h2>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Evento</th>
+                                    <th>Fecha de Reserva</th>
+                                    <th>Días</th>
+                                    <th>Monto Total</th>
+                                    <th>Estado de Pago</th>
+                                    <th>Garzones</th>
+                                    <th>Aprobado Por</th>
+                                    <th>Detalle del Evento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($eventos as $evento): ?>
+                                    <tr>
+                                        <td><?php echo $evento->tipo_evento; ?></td>
+                                        <td><?php echo $evento->fecha_reserva; ?></td>
+                                        <td><?php echo $evento->dias; ?></td>
+                                        <td><?php echo $evento->monto_total; ?> Bs.</td>
+                                        <td><?php echo $evento->estado_pago; ?></td>
+                                        <td><?php echo $evento->garzones; ?></td>
+                                        <td><?php echo $evento->aprobado_por; ?></td>
+                                        <td><?php echo $evento->detalle_evento; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php elseif (isset($eventos)): ?>
+                <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <p>No se encontraron eventos del tipo seleccionado en el rango de fechas especificado.</p>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
+
+
 
     <!--====== Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>

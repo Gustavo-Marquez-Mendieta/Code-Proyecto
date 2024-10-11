@@ -91,6 +91,11 @@
                         <img src="../../assets/image/empleado.png" alt="Bebidas"> Empleados
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/reportes'); ?>">
+                        <img src="../../assets/image/reportes.png" alt="Reportes"> Reportes
+                    </a>
+                </li>
             </ul>
         </div>
     </section>
@@ -125,7 +130,7 @@
                                         <td><?= $item['tipo']; ?></td>
                                         <td><?= $item['precio']; ?> Bs.</td>
                                         <td><?= $item['stock']; ?></td>
-                                        <td><img src="<?= base_url('./assets/image/' . $item['imagen']); ?>"
+                                        <td><img src="<?= base_url('./assets/img/' . $item['imagen']); ?>"
                                                 alt="<?= $item['tipo']; ?>" width="50"></td>
                                         <td>
                                             <a href="<?= site_url('Welcome/editarManteleria/' . $item['manteleria_id']); ?>"

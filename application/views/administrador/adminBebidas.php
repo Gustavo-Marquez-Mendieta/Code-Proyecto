@@ -98,6 +98,11 @@
                         <img src="../../assets/image/empleado.png" alt="Bebidas"> Empleados
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/reportes'); ?>">
+                        <img src="../../assets/image/reportes.png" alt="Reportes"> Reportes
+                    </a>
+                </li>
             </ul>
         </div>
     </section>

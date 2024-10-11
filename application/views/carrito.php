@@ -35,15 +35,12 @@
 </head>
 
 <body>
-    <!-- SideBar -->
     <section class="full-box cover dashboard-sideBar">
         <div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
         <div class="full-box dashboard-sideBar-ct">
-            <!--SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
                 EL DETALLE <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
-            <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
                     <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon">
@@ -80,7 +77,6 @@
                 </ul>
             </div>
 
-            <!-- SideBar Menu -->
             <ul class="list-unstyled full-box dashboard-sideBar-Menu">
                 <li>
                     <a href="<?php echo site_url('Welcome/vajilla'); ?>">
@@ -111,7 +107,6 @@
         </div>
     </section>
 
-    <!-- Content page -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
             <div class="row">
@@ -128,7 +123,10 @@
                         </div>
                     <?php endif; ?>
 
-                    <?php if (!empty($carrito)): ?>
+                    <?php
+                    $total_carrito = 0;
+                    if (!empty($carrito)):
+                        ?>
                         <table class="table">
                             <thead>
                                 <tr>
@@ -163,14 +161,13 @@
                                             <?php endif; ?>
                                         </td>
                                     </tr>
+                                    <?php $total_carrito += $item['precio'] * $item['cantidad']; ?>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
 
-                        <!-- Botón para vaciar carrito -->
                         <a href="<?php echo site_url('Welcome/vaciar_carrito'); ?>" class="btn btn-danger btn-vaciar"
-                            style="color:white">Vaciar
-                            Carrito</a>
+                            style="color:white">Vaciar Carrito</a>
                     <?php else: ?>
                         <p style="color:white">El carrito está vacío.</p>
                     <?php endif; ?>
@@ -205,9 +202,8 @@
                                 placeholder="Escribe aquí la descripción del evento"></textarea>
                         </div>
 
-                        <!-- Radio button para elegir si desea garzones -->
                         <div class="form-group">
-                            <label>¿Desea garzones en su reserva? Costo por garzon 150 Bs.</label>
+                            <label>¿Desea garzones en su reserva? Costo por garzón 150 Bs.</label>
                             <div>
                                 <input type="radio" id="garzones_si" name="garzones" value="si"
                                     onclick="mostrarCantidadGarzones()" required>
@@ -220,25 +216,44 @@
                             </div>
                         </div>
 
-                        <!-- Input para cantidad de garzones, oculto inicialmente -->
                         <div class="form-group" id="cantidad_garzones_div" style="display: none;">
                             <label for="cantidad_garzones">Cantidad de Garzones:</label>
                             <input type="number" id="cantidad_garzones" name="cantidad_garzones" class="form-control"
-                                min="1" placeholder="Ingrese la cantidad de garzones">
+                                min="1" placeholder="Ingrese la cantidad de garzones" oninput="calcularTotal()">
                         </div>
+
+                        <!-- Campo para mostrar el total del servicio -->
+                        <p>Total del Servicio: Bs. <span
+                                id="total_servicio"><?php echo number_format($total_carrito, 2); ?></span></p>
+
+                        <!-- Campo oculto para enviar el total del servicio al controlador -->
+                        <input type="hidden" name="monto_total" id="monto_total" value="<?php echo $total_carrito; ?>">
 
                         <button type="submit" class="btn btn-primary" style="color:white">Confirmar Reserva</button>
                     </form>
 
                     <script>
-                        // Función para mostrar el campo de cantidad de garzones
+                        const costoGarzon = 150;
+                        let totalCarrito = <?php echo $total_carrito; ?>;
+
                         function mostrarCantidadGarzones() {
                             document.getElementById('cantidad_garzones_div').style.display = 'block';
                         }
 
-                        // Función para ocultar el campo de cantidad de garzones
                         function ocultarCantidadGarzones() {
                             document.getElementById('cantidad_garzones_div').style.display = 'none';
+                            document.getElementById('cantidad_garzones').value = '';
+                            calcularTotal();
+                        }
+
+                        function calcularTotal() {
+                            let cantidadGarzones = document.getElementById('cantidad_garzones').value;
+                            let totalGarzones = cantidadGarzones ? cantidadGarzones * costoGarzon : 0;
+                            let totalServicio = totalCarrito + totalGarzones;
+
+                            // Actualiza el valor en el <p> y el campo oculto
+                            document.getElementById('total_servicio').innerText = totalServicio.toFixed(2);
+                            document.getElementById('monto_total').value = totalServicio.toFixed(2); // Actualiza el campo oculto
                         }
                     </script>
                 </div>
@@ -246,7 +261,7 @@
         </div>
     </section>
 
-    <!-- Scripts -->
+
     <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/vendor/owl.carousel/owl.carousel.min.js"></script>

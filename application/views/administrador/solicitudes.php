@@ -168,12 +168,12 @@
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
+                        <img src="../../assets/image/decoracion.png" alt="Decoración"> Decoración
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
+                        <img src="../../assets/img/mesa.png" alt="Mantelería"> Mantelería
                     </a>
                 </li>
                 <li>
@@ -183,12 +183,17 @@
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/solicitudes'); ?>">
-                        <img src="../../assets/image/solicitudes.png" alt="Bebidas"> Solicitudes
+                        <img src="../../assets/image/solicitudes.png" alt="Solicitudes"> Solicitudes
                     </a>
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/empleados'); ?>">
-                        <img src="../../assets/image/empleado.png" alt="Bebidas"> Empleados
+                        <img src="../../assets/image/empleado.png" alt="Empleados"> Empleados
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/reportes'); ?>">
+                        <img src="../../assets/image/reportes.png" alt="Reportes"> Reportes
                     </a>
                 </li>
             </ul>
@@ -205,6 +210,17 @@
                 </div>
                 <div class="col-md-6">
                     <h2 style="color:white">Solicitudes</h2>
+                    <div style="margin-top: 10px; margin-right:550px">
+                        <select name="solicitud_estado" id="solicitud_estado" class="form-control">
+                            <option value="pendiente">Seleccione tipo de estado deseado</option>
+                            <option value="pendiente">pendiente</option>
+                            <option value="aprobado-esperando adelanto">aprobado-esperando adelanto</option>
+                            <option value="En Curso de entrega">En Curso de entrega</option>
+                            <option value="Vajilla Entregada">Vajilla Entregada</option>
+                            <option value="Vajilla Recogida">Vajilla Recogida</option>
+                            <option value="Evento Completado">Evento Completado</option>
+                        </select>
+                    </div>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -217,13 +233,12 @@
                                 <th>Accion</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tabla_solicitudes">
+                            <!-- Aquí se insertarán las filas de la tabla filtrada -->
                             <?php if (!empty($reservas)): ?>
                                 <?php foreach ($reservas as $reserva): ?>
                                     <tr>
                                         <td><?= $reserva->usuario_id; ?></td>
-
-                                        <!-- Puedes hacer un join para obtener el nombre del usuario -->
                                         <td><?= $reserva->fecha_reserva; ?></td>
                                         <td><?= $reserva->tipo_evento; ?></td>
                                         <td><?= $reserva->dias; ?></td>
@@ -232,7 +247,6 @@
                                         <td>
                                             <a href="<?php echo site_url('Welcome/detalles/' . $reserva->reserva_id); ?>"
                                                 class="btn btn-danger" style="color:white">Detalles</a>
-
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -244,14 +258,31 @@
                         </tbody>
                     </table>
                 </div>
-
-                <div class="col-md-6">
-
-                </div>
-
+                <div class="col-md-6"></div>
             </div>
         </div>
     </section>
+
+    <!-- Agregamos el script para manejar el cambio en el select -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#solicitud_estado').change(function () {
+                var estado = $(this).val();
+
+                // Realizamos la petición AJAX
+                $.ajax({
+                    url: '<?php echo site_url("Welcome/filtrarSolicitudes"); ?>',
+                    method: 'POST',
+                    data: { estado: estado },
+                    success: function (response) {
+                        // Actualizamos la tabla con la respuesta del servidor
+                        $('#tabla_solicitudes').html(response);
+                    }
+                });
+            });
+        });
+    </script>
 
     <!--====== Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>

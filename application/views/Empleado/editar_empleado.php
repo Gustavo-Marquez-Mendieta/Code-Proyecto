@@ -9,6 +9,7 @@
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/configuracion.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -188,6 +189,11 @@
                         <img src="../../../assets/image/empleado.png" alt="Bebidas"> Empleados
                     </a>
                 </li>
+                <li>
+                    <a href="<?php echo site_url('Welcome/reportes'); ?>">
+                        <img src="../../../assets/image/reportes.png" alt="Reportes"> Reportes
+                    </a>
+                </li>
             </ul>
         </div>
     </section>
@@ -205,22 +211,22 @@
                         <div class="form-group">
                             <label for="nombre">Nombre</label>
                             <input type="text" name="nombre" class="form-control" value="<?= $empleado->nombre; ?>"
-                                required style="color:white">
+                                required style=" background-color: white">
                         </div>
                         <div class="form-group">
                             <label for="apellido_paterno">Apellido Paterno</label>
                             <input type="text" name="apellido_paterno" class="form-control"
-                                value="<?= $empleado->apellido_paterno; ?>" required style="color:white">
+                                value="<?= $empleado->apellido_paterno; ?>" required style="background-color: white">
                         </div>
                         <div class="form-group">
                             <label for="apellido_materno">Apellido Materno</label>
                             <input type="text" name="apellido_materno" class="form-control"
-                                value="<?= $empleado->apellido_materno; ?>" required style="color:white">
+                                value="<?= $empleado->apellido_materno; ?>" required style="background-color: white">
                         </div>
                         <div class="form-group">
                             <label for="celular">Celular</label>
                             <input type="text" name="celular" class="form-control" value="<?= $empleado->celular; ?>"
-                                required style="color:white">
+                                required style="background-color: white">
                         </div>
                         <button type="submit" class="btn btn-success" style="color:white">Actualizar</button>
                     </form>

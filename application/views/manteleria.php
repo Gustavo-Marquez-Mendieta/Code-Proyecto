@@ -38,14 +38,12 @@
     <section class="full-box cover dashboard-sideBar">
         <div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
         <div class="full-box dashboard-sideBar-ct">
-            <!--SideBar Title -->
             <div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
                 EL DETALLE <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
             </div>
-            <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
-                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
+                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon">
                     <figcaption class="text-center text-titles">
                         <li class="user-info">
                             <h6>Bienvenido</h6>
@@ -56,12 +54,12 @@
 
                 <ul class="full-box list-unstyled text-center">
                     <li>
-                        <a href="<?php echo site_url('Welcome/inicio'); ?>" title="Inicio" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/user'); ?>" title="Inicio" class="btn-user">
                             <img src="../../assets/img/hogar.png">
                         </a>
                     </li>
                     <li>
-                        <a href="#" title="Mis Reservas" class="btn-user">
+                        <a href="#" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
@@ -111,58 +109,54 @@
     </section>
 
     <!-- Content page -->
+    <!-- Content page -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-10">
-                    <h1 class="titulo">"Manteleria"</h1>
-                    <?php foreach ($manteleria as $row) { ?>
+                <div class="col-md-12">
+                    <br>
+                    <h1 class="titulo">"MANTELERÍA"</h1>
+                </div>
+                <div class="col-md-9">
+                    <?php foreach ($productos as $row) { ?>
                         <div class="col-12 col-md-4 mt-5 text-center Products">
                             <div class="card">
-                                <div class="card-image">
-                                    <img class="card-img-top"
-                                        src="<?php echo base_url('./assets/img/' . $row['imagen']); ?>"
-                                        alt="<?php echo $row['nombre']; ?>">
+                                <div>
+                                    <img class="card-img-top" class="image"
+                                        src="<?php echo base_url('./assets/img/' . $row->imagen); ?>"
+                                        alt="<?php echo $row->nombre; ?>"
+                                        style="max-width: 200px; max-height: 200px; object-fit: cover;">
                                 </div>
-                                <div class="card-body">
-                                    <h5 class="card-title"><?php echo $row['nombre']; ?></h5>
-                                    <p class="card-text"><?php echo $row['tipo']; ?></p>
-                                    <p class="card-text">Bs. <?php echo $row['precio']; ?></p>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title card_title"><?php echo $row->nombre; ?></h5>
                                     <p class="card-text p_puntos">
-                                        <span class="stock" style="color:white">Manteles disponibles:
-                                            <span class="available-stock"><?php echo $row['stock']; ?></span>
-                                        </span>
+                                        <?php echo $row->tipo; ?> <br>
+                                        Bs. <?php echo $row->precio; ?><br>
+                                        <span class="stock">Unidades disponibles: <?php echo $row->stock; ?></span>
                                     </p>
                                     <div class="quantity-container">
-                                        <h6>Cantidad Manteles</h6>
+                                        <h6>Cantidad</h6>
                                         <div class="quantity-controls">
-                                            <button class="btn btn-decrease" style="color:white"
-                                                onclick="decreaseQuantity(this, <?php echo $row['stock']; ?>)">-</button>
+                                            <button class="btn btn-decrease" style="color:white">-</button>
                                             <span class="quantity">0</span>
-                                            <button class="btn btn-increase" style="color:white"
-                                                onclick="increaseQuantity(this, <?php echo $row['stock']; ?>)">+</button>
+                                            <button class="btn btn-increase" style="color:white">+</button>
                                         </div>
                                     </div>
-                                </div>
-                                <!-- Enlace para agregar al carrito con la cantidad seleccionada -->
-                                <form
-                                    action="<?php echo site_url('Welcome/agregar_al_carrito/manteleria/' . $row['manteleria_id']); ?>"
-                                    method="post" onsubmit="updateQuantityInput(this)">
-                                    <input type="hidden" name="cantidad" class="input-cantidad" value="0">
-                                    <!-- Este valor será actualizado por JS -->
-                                    <button type="submit" class="btn"
-                                        title="Agregar <?php echo $row['nombre']; ?> al carrito" style="color:white">
+                                    <a href="#" class="red_button btn btn_puntos agregar-carrito" style="color:white"
+                                        data-id="<?php echo $row->manteleria_id; ?>"
+                                        title="Agregar <?php echo $row->nombre; ?> al carrito">
                                         Agregar al Servicio
-                                    </button>
-                                </form>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     <?php } ?>
                 </div>
             </div>
+        </div>
     </section>
 
-    <!--====== Scripts -->
+    <!-- Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>
     <script src="./js/sweetalert2.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
@@ -170,46 +164,49 @@
     <script src="./js/ripples.min.js"></script>
     <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
     <script src="./js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $.material.init();
-        function updateQuantityInput(form) {
-            let quantityElement = form.closest('.card').querySelector('.quantity'); // El span que contiene la cantidad seleccionada
-            let quantityInput = form.querySelector('.input-cantidad'); // El input oculto que enviará el valor
+        $(document).ready(function () {
+            $('.btn-increase').click(function () {
+                var quantitySpan = $(this).siblings('.quantity');
+                var currentQuantity = parseInt(quantitySpan.text());
+                var stockSpan = $(this).closest('.card-body').find('.stock');
 
-            quantityInput.value = parseInt(quantityElement.textContent); // Actualiza el valor del input oculto con la cantidad seleccionada
-        }
-        function increaseQuantity(button, maxStock) {
-            let quantityElement = button.previousElementSibling; // El span que contiene la cantidad seleccionada
-            let stockElement = button.closest('.card-body').querySelector('.available-stock'); // El span que contiene los manteles disponibles
-            let quantityInput = button.closest('.card-body').querySelector('.input-cantidad'); // El input oculto que se enviará en el formulario
+                var currentStock = parseInt(stockSpan.text().split(": ")[1]);
 
-            let quantity = parseInt(quantityElement.textContent); // Cantidad seleccionada actual
-            let availableStock = parseInt(stockElement.textContent); // Manteles disponibles actuales
+                if (currentStock > 0) {
+                    quantitySpan.text(currentQuantity + 1);
+                    stockSpan.text("Unidades disponibles: " + (currentStock - 1));
+                } else {
+                    alert("No hay suficiente stock disponible.");
+                }
+            });
 
-            if (availableStock > 0) {
-                quantityElement.textContent = quantity + 1; // Incrementar la cantidad visualmente
-                stockElement.textContent = availableStock - 1; // Disminuir el stock visualmente
-                quantityInput.value = quantity + 1; // Actualizar el valor del input oculto
-            } else {
-                alert("No hay suficiente stock disponible.");
-            }
-        }
+            $('.btn-decrease').click(function () {
+                var quantitySpan = $(this).siblings('.quantity');
+                var currentQuantity = parseInt(quantitySpan.text());
+                var stockSpan = $(this).closest('.card-body').find('.stock');
 
-        function decreaseQuantity(button, maxStock) {
-            let quantityElement = button.nextElementSibling; // El span que contiene la cantidad seleccionada
-            let stockElement = button.closest('.card-body').querySelector('.available-stock'); // El span que contiene los manteles disponibles
-            let quantityInput = button.closest('.card-body').querySelector('.input-cantidad'); // El input oculto que se enviará en el formulario
+                var currentStock = parseInt(stockSpan.text().split(": ")[1]);
 
-            let quantity = parseInt(quantityElement.textContent); // Cantidad seleccionada actual
-            let availableStock = parseInt(stockElement.textContent); // Manteles disponibles actuales
+                if (currentQuantity > 0) {
+                    quantitySpan.text(currentQuantity - 1);
+                    stockSpan.text("Unidades disponibles: " + (currentStock + 1));
+                }
+            });
 
-            if (quantity > 0) {
-                quantityElement.textContent = quantity - 1; // Disminuir la cantidad visualmente
-                stockElement.textContent = availableStock + 1; // Incrementar el stock visualmente
-                quantityInput.value = quantity - 1; // Actualizar el valor del input oculto
-            }
-        }
+            $('.agregar-carrito').click(function (e) {
+                e.preventDefault();
+                var productId = $(this).data('id');
+                var quantity = parseInt($(this).siblings('.quantity-container').find('.quantity').text());
 
+                if (quantity > 0) {
+                    window.location.href = "<?php echo site_url('Welcome/agregar_al_carrito/manteleria'); ?>/" + productId + "/" + quantity;
+                } else {
+                    alert('Por favor, selecciona una cantidad válida.');
+                }
+            });
+        });
     </script>
 </body>
 
