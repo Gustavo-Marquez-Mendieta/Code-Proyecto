@@ -260,6 +260,59 @@ class Welcome extends CI_Controller
 
 		redirect('Welcome/solicitudes');
 	}
+	public function cancelar_solicitud($reserva_id)
+	{
+		$this->load->model('Reservas_model');
+		$this->load->model('Reserva_detalle_model');
+		$this->load->library('email');
+
+		// Obtener el ID del usuario logueado
+		$usuario_id = $this->session->userdata('usuario_id');
+
+		// Cambiar el estado de la reserva a "cancelado" y actualizar el usuario que realizó la acción
+		$this->Reservas_model->update_estado_reserva($reserva_id, 'Cancelado', $usuario_id);
+
+		// Obtener los detalles de la reserva y el correo electrónico del usuario
+		$reserva = $this->Reservas_model->get_reserva_con_usuario_by_id($reserva_id);
+
+		if ($reserva) {
+			// Configuración del correo electrónico
+			$config = array(
+				'protocol' => 'smtp',
+				'smtp_host' => 'smtp.gmail.com',
+				'smtp_port' => 587,
+				'smtp_user' => 'marquez.gustavo.1296@gmail.com',
+				'smtp_pass' => 'mhjp nbfq xqhj hiys',
+				'mailtype' => 'html',
+				'charset' => 'utf-8',
+				'wordwrap' => TRUE,
+				'newline' => "\r\n",
+				'smtp_crypto' => 'tls'
+			);
+			$this->email->initialize($config);
+
+			$this->email->from('tu_email@gmail.com', 'El Detalle Eventos');
+			$this->email->to($reserva->email);
+			$this->email->subject('Cancelación de Solicitud');
+
+			// Construir el mensaje de cancelación
+			$mensaje = "<p>Lamentamos informarte que tu solicitud no ha sido aceptada.</p>";
+			$mensaje .= "<p>No se pudo aceptar tu solicitud. Si tienes preguntas, por favor contáctanos.</p>";
+
+			$this->email->message($mensaje);
+
+			if ($this->email->send()) {
+				$this->session->set_flashdata('success', 'Solicitud cancelada y notificación enviada al correo.');
+			} else {
+				$this->session->set_flashdata('error', 'Solicitud cancelada pero no se pudo enviar el correo: ' . $this->email->print_debugger());
+			}
+		} else {
+			$this->session->set_flashdata('error', 'No se pudo encontrar la reserva.');
+		}
+
+		redirect('Welcome/solicitudes');
+	}
+
 	public function recibir_adelanto($reserva_id)
 	{
 		$this->Reservas_model->update_estado_reserva($reserva_id, 'En Curso de entrega', $this->session->userdata('usuario_id'));
@@ -278,9 +331,48 @@ class Welcome extends CI_Controller
 	public function recoger_vajilla($reserva_id)
 	{
 		$nuevo_estado = 'Vajilla Recogida';
+
+		// Actualizar el estado de la reserva
 		$this->Reservas_model->update_estado_recogida_vajilla($reserva_id, $nuevo_estado, $this->session->userdata('usuario_id'));
+
+		// Obtener los detalles de la reserva
+		$detalles = $this->Reservas_model->get_detalles_reserva($reserva_id);
+
+		// Depuración: Verificar los detalles
+		echo "<pre>";
+		print_r($detalles);
+		echo "</pre>";
+
+		foreach ($detalles as $detalle) {
+			// Verificar si tiene vajilla asignada
+			if (!empty($detalle->vajilla_id)) {
+				echo "Actualizando stock de vajilla ID: " . $detalle->vajilla_id . " Cantidad: " . $detalle->cantidad . "<br>";
+
+				// Sumar la cantidad al stock de la Vajilla
+				$this->db->set('stock_cajas', 'stock_cajas + ' . (int) $detalle->cantidad, FALSE);
+				$this->db->where('vajilla_id', $detalle->vajilla_id);
+				$this->db->update('Vajilla');
+			}
+
+			// Verificar si tiene mantelería asignada
+			if (!empty($detalle->manteleria_id)) {
+				echo "Actualizando stock de mantelería ID: " . $detalle->manteleria_id . " Cantidad: " . $detalle->cantidad . "<br>";
+
+				// Sumar la cantidad al stock de la Mantelería
+				$this->db->set('stock', 'stock + ' . (int) $detalle->cantidad, FALSE);
+				$this->db->where('manteleria_id', $detalle->manteleria_id);
+				$this->db->update('Manteleria');
+			}
+		}
+
+		// Detener ejecución para revisar salida
+		die();
+
+		// Redirigir a la página de solicitudes
 		redirect('Welcome/solicitudes');
 	}
+
+
 	public function guardar_detalles_recogida($reserva_id)
 	{
 		// Recibir los detalles del formulario
@@ -289,12 +381,35 @@ class Welcome extends CI_Controller
 		// Definir el nuevo estado
 		$nuevo_estado = 'Vajilla Recogida';
 
-		// Llamar al modelo para actualizar la reserva
+		// Llamar al modelo para actualizar el estado de la reserva
 		$this->Reservas_model->update_estado_recogida_vajilla($reserva_id, $nuevo_estado, $detalles_recogida, $this->session->userdata('usuario_id'));
+
+		// Obtener los detalles de la reserva
+		$detalles = $this->Reservas_model->get_detalles_reserva($reserva_id);
+
+		// Actualizar el stock de vajilla y mantelería según corresponda
+		foreach ($detalles as $detalle) {
+			// Verificar si tiene vajilla asignada
+			if (!empty($detalle->vajilla_id)) {
+				// Sumar la cantidad al stock de la Vajilla
+				$this->db->set('stock_cajas', 'stock_cajas + ' . (int) $detalle->cantidad, FALSE);
+				$this->db->where('vajilla_id', $detalle->vajilla_id);
+				$this->db->update('Vajilla');
+			}
+
+			// Verificar si tiene mantelería asignada
+			if (!empty($detalle->manteleria_id)) {
+				// Sumar la cantidad al stock de la Mantelería
+				$this->db->set('stock', 'stock + ' . (int) $detalle->cantidad, FALSE);
+				$this->db->where('manteleria_id', $detalle->manteleria_id);
+				$this->db->update('Manteleria');
+			}
+		}
 
 		// Redirigir a la página de solicitudes
 		redirect('Welcome/solicitudes');
 	}
+
 	public function terminar_evento($reserva_id)
 	{
 		$this->Reservas_model->update_estado_reserva($reserva_id, 'Evento Completado', $this->session->userdata('usuario_id'));

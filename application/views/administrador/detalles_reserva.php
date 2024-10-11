@@ -270,6 +270,7 @@
                             class="btn btn-success" style="color:white">Aprobar Solicitud</a>
                         <a href="<?php echo site_url('Welcome/cancelar_solicitud/' . $reserva->reserva_id); ?>"
                             class="btn btn-success" style="color:white">Cancelar Solicitud</a>
+
                     <?php elseif ($reserva->estado_pago == 'aprobado-esperando adelanto'): ?>
                         <a href="<?php echo site_url('Welcome/recibir_adelanto/' . $reserva->reserva_id); ?>"
                             class="btn btn-info" style="color:white">Adelanto Recibido</a>
@@ -283,93 +284,90 @@
                                 <label for="detalles" style="color:white">Detalles de la Recogida:</label>
                                 <textarea class="form-control" id="detalles" name="detalles" rows="3" required></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary" style="color:white">Guardar Detalles y Cambiar Estado</button>
+                            <button type="submit" class="btn btn-primary" style="color:white">Agregar detalles y recoger
+                                vagilla</button>
                         </form>
 
                     <?php elseif ($reserva->estado_pago == 'Vajilla Recogida'): ?>
                         <a href="<?php echo site_url('Welcome/terminar_evento/' . $reserva->reserva_id); ?>"
                             class="btn btn-danger" style="color:white">Terminar Evento</a>
                     <?php endif; ?>
+                </div>
+                <div class="col-md-4">
+                    <form>
+                        <h3 style="color:white">Garzones para el Evento</h3>
+                        <table id="garzonesTable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id Garzon</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido Paterno</th>
+                                    <th>Apellido Materno</th>
+                                    <th>Celular</th>
+                                </tr>
+                            </thead>
+                            <tbody id="garzonesTableBody">
+                                <tr>
 
-
-                    <div class="col-md-4">
-                        <form>
-                            <h3 style="color:white">Garzones para el Evento</h3>
-                            <table id="garzonesTable" class="table table-bordered">
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="form-group">
+                            <label for="garzonSelect" style="color:white;">Seleccionar Garzón:</label>
+                            <select id="garzonSelect" class="form-control" style="background-color:white">
+                                <?php foreach ($empleados as $empleado): ?>
+                                    <option value="<?= $empleado->empleado_id; ?>"
+                                        data-nombre="<?= htmlspecialchars($empleado->nombre); ?>"
+                                        data-apellido-paterno="<?= htmlspecialchars($empleado->apellido_paterno); ?>"
+                                        data-apellido-materno="<?= htmlspecialchars($empleado->apellido_materno); ?>"
+                                        data-celular="<?= htmlspecialchars($empleado->celular); ?>">
+                                        <?= htmlspecialchars($empleado->nombre); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="button" id="agregarGarzonBtn" class="btn btn-info" style="color:white">Agregar
+                                a
+                                la lista</button>
+                            <button type="button" id="guardarGarzonesBtn" class="btn btn-success"
+                                style="color:white">Agregar
+                                Garzones al Evento</button>
+                        </div>
+                        <h3 style="color:white;">Garzones Asignados para esta Fiesta</h3>
+                        <?php if (!empty($garzones_asignados)): ?>
+                            <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Id Garzon</th>
+                                        <th>ID Garzón</th>
                                         <th>Nombre</th>
                                         <th>Apellido Paterno</th>
                                         <th>Apellido Materno</th>
                                         <th>Celular</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="garzonesTableBody">
-                                    <tr>
-
-                                    </tr>
+                                <tbody>
+                                    <?php foreach ($garzones_asignados as $garzon): ?>
+                                        <tr>
+                                            <td><?= $garzon->empleado_id; ?></td>
+                                            <td><?= htmlspecialchars($garzon->nombre); ?></td>
+                                            <td><?= htmlspecialchars($garzon->apellido_paterno); ?></td>
+                                            <td><?= htmlspecialchars($garzon->apellido_materno); ?></td>
+                                            <td><?= htmlspecialchars($garzon->celular); ?></td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm quitar-garzon"
+                                                    data-empleado-id="<?= $garzon->empleado_id; ?>"
+                                                    data-reserva-id="<?= $reserva->reserva_id; ?>"
+                                                    style="color:white">Quitar</button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
-                            <div class="form-group">
-                                <label for="garzonSelect" style="color:white;">Seleccionar Garzón:</label>
-                                <select id="garzonSelect" class="form-control" style="background-color:white">
-                                    <?php foreach ($empleados as $empleado): ?>
-                                        <option value="<?= $empleado->empleado_id; ?>"
-                                            data-nombre="<?= htmlspecialchars($empleado->nombre); ?>"
-                                            data-apellido-paterno="<?= htmlspecialchars($empleado->apellido_paterno); ?>"
-                                            data-apellido-materno="<?= htmlspecialchars($empleado->apellido_materno); ?>"
-                                            data-celular="<?= htmlspecialchars($empleado->celular); ?>">
-                                            <?= htmlspecialchars($empleado->nombre); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="button" id="agregarGarzonBtn" class="btn btn-info"
-                                    style="color:white">Agregar
-                                    a
-                                    la lista</button>
-                                <button type="button" id="guardarGarzonesBtn" class="btn btn-success"
-                                    style="color:white">Agregar
-                                    Garzones al Evento</button>
-                            </div>
-                            <h3 style="color:white;">Garzones Asignados para esta Fiesta</h3>
-                            <?php if (!empty($garzones_asignados)): ?>
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>ID Garzón</th>
-                                            <th>Nombre</th>
-                                            <th>Apellido Paterno</th>
-                                            <th>Apellido Materno</th>
-                                            <th>Celular</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($garzones_asignados as $garzon): ?>
-                                            <tr>
-                                                <td><?= $garzon->empleado_id; ?></td>
-                                                <td><?= htmlspecialchars($garzon->nombre); ?></td>
-                                                <td><?= htmlspecialchars($garzon->apellido_paterno); ?></td>
-                                                <td><?= htmlspecialchars($garzon->apellido_materno); ?></td>
-                                                <td><?= htmlspecialchars($garzon->celular); ?></td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-sm quitar-garzon"
-                                                        data-empleado-id="<?= $garzon->empleado_id; ?>"
-                                                        data-reserva-id="<?= $reserva->reserva_id; ?>"
-                                                        style="color:white">Quitar</button>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            <?php else: ?>
-                                <p style="color:white;">No hay garzones asignados a esta reserva.</p>
-                            <?php endif; ?>
-                        </form>
-                    </div>
+                        <?php else: ?>
+                            <p style="color:white;">No hay garzones asignados a esta reserva.</p>
+                        <?php endif; ?>
+                    </form>
                 </div>
-
             </div>
         </div>
     </section>

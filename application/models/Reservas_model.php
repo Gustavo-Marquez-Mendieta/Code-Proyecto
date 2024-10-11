@@ -19,6 +19,15 @@ class Reservas_model extends CI_Model
         return $this->db->insert_id(); // Devuelve el ID de la reserva creada
     }
 
+    public function get_detalles_reserva($reserva_id)
+    {
+        $this->db->select('d.detalle_id, d.cantidad, d.vajilla_id, d.manteleria_id, v.nombre AS vajilla_nombre, m.nombre AS manteleria_nombre');
+        $this->db->from('reserva_detalles d');
+        $this->db->join('Vajilla v', 'v.vajilla_id = d.vajilla_id', 'left');
+        $this->db->join('Manteleria m', 'm.manteleria_id = d.manteleria_id', 'left');
+        $this->db->where('d.reserva_id', $reserva_id);
+        return $this->db->get()->result();
+    }
 
 
     public function verificar_disponibilidad_fecha($fecha_reserva, $dias)
