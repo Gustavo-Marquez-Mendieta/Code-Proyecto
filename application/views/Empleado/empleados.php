@@ -5,24 +5,21 @@
     <title>Inicio</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS Files -->
+    <link href="<?php echo base_url(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-    <!-- Vendor CSS Files -->
-    <link href="<?php echo base_url(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/icofont/icofont.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
 
     <style>
-        /* Estilos adicionales que puedas necesitar */
         .dashboard-sideBar {
-            /* Estilos de la barra lateral */
             left: 0;
             z-index: 2;
             background-image: url('../../assets/img/copa.jpg');
@@ -34,84 +31,69 @@
             overflow-y: auto;
         }
 
-        .dashboard-sideBar a {
-            /* Estilos de los enlaces en la barra lateral */
-            display: block;
-            padding: 10px 20px;
+        /* Estilos del modal con mayor especificidad */
+        body .modal {
+            z-index: 9999 !important;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        body .modal-backdrop {
+            z-index: 9998 !important;
+        }
+
+        body .modal-dialog {
+            margin: 1.75rem auto;
+            max-width: 500px;
+        }
+
+        body .modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        body .modal-header {
+            background: linear-gradient(45deg, #FF6B6B, #87CEEB);
             color: white;
-            text-decoration: none;
+            border-radius: 8px 8px 0 0;
+            border-bottom: none;
         }
 
-        .dashboard-sideBar a:hover {
-            /* Estilos para el estado hover de los enlaces */
-            background-color: #555;
+        body .modal-title {
+            color: white;
+            font-weight: bold;
         }
 
-        .dashboard-sideBar .btn-sideBar-SubMenu {
-            /* Estilos para los enlaces del submenú */
-            padding-left: 30px;
-            position: relative;
+        body .modal-body {
+            padding: 20px;
         }
 
-        .dashboard-sideBar .btn-sideBar-SubMenu::after {
-            /* Estilos para la flecha del submenú */
-            content: "\f0d7";
-            font-family: "Material Icons";
-            position: absolute;
-            right: 20px;
+        body .form-group label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
         }
 
+        body .form-control {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+        }
+
+        body .form-control:focus {
+            border-color: #87CEEB;
+            box-shadow: 0 0 0 0.2rem rgba(135, 206, 235, 0.25);
+        }
+
+        /* Resto de tu CSS actual */
         .dashboard-contentPage {
-            /* Estilos para el contenido principal */
             margin-left: 250px;
             padding: 20px;
-            position: relative;
-            /* Añadido */
-            z-index: 1;
-            /* Añadido */
-        }
-
-        /* Estilos para las imágenes en los enlaces */
-        .dashboard-sideBar img {
-            width: 24px;
-            /* Ajusta el tamaño según tus necesidades */
-            height: 24px;
-            margin-right: 10px;
-            /* Espacio entre la imagen y el texto */
-            vertical-align: middle;
-            /* Alineación vertical */
-        }
-
-        .frase {
-            font-size: 40px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
-            background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .titulo {
-            font-size: 60px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-left: 30px;
-            /* Ajusta este valor según sea necesario */
-            background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
-            /* Degradado de coral a celeste */
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
         }
     </style>
 </head>
 
 <body>
-    <!-- SideBar -->
     <section class="full-box cover dashboard-sideBar">
         <div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
         <div class="full-box dashboard-sideBar-ct">
@@ -193,14 +175,12 @@
         </div>
     </section>
 
-    <!-- Content page -->
+    <!-- Contenido principal -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <h1 class="titulo">"Empleados"</h1>
-
-                    <!-- Mostrar el mensaje de éxito si está presente -->
                     <?php if ($this->session->flashdata('success_message')): ?>
                         <div class="alert alert-success">
                             <?= $this->session->flashdata('success_message'); ?>
@@ -232,13 +212,18 @@
                                     <td><?= $empleado->celular; ?></td>
                                     <td>
                                         <?php if ($empleado->estado == 1): ?>
-                                            <!-- Botones de editar y eliminar si el estado es 1 -->
-                                            <a href="<?= site_url('Welcome/editar_empleado/' . $empleado->empleado_id); ?>"
-                                                class="btn btn-warning btn-sm" style="color:white">Editar</a>
+                                            <button type="button" onclick="editarEmpleado(
+                                                    '<?= $empleado->empleado_id; ?>', 
+                                                    '<?= htmlspecialchars($empleado->nombre); ?>', 
+                                                    '<?= htmlspecialchars($empleado->apellido_paterno); ?>', 
+                                                    '<?= htmlspecialchars($empleado->apellido_materno); ?>', 
+                                                    '<?= htmlspecialchars($empleado->celular); ?>'
+                                                )" class="btn btn-success btn-sm" style="color:white">
+                                                Editar
+                                            </button>
                                             <a href="<?= site_url('Welcome/eliminar_empleado/' . $empleado->empleado_id); ?>"
                                                 class="btn btn-danger btn-sm" style="color:white">Eliminar</a>
                                         <?php else: ?>
-                                            <!-- Botón de reactivar si el estado es 0 -->
                                             <a href="<?= site_url('Welcome/reactivar_empleado/' . $empleado->empleado_id); ?>"
                                                 class="btn btn-success btn-sm" style="color:white">Reactivar</a>
                                         <?php endif; ?>
@@ -246,26 +231,128 @@
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
-
                     </table>
-                </div>
-                <div class="col-md-6">
                 </div>
             </div>
         </div>
     </section>
 
+    <div class="modal" id="modalEditarEmpleado" tabindex="-1" role="dialog" aria-labelledby="modalEditarEmpleadoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarEmpleadoLabel">Editar Empleado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarEmpleado">
+                        <input type="hidden" id="empleado_id" name="empleado_id">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido_paterno">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido_materno">Apellido Materno</label>
+                            <input type="text" class="form-control" id="apellido_materno" name="apellido_materno"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="celular">Celular</label>
+                            <input type="text" class="form-control" id="celular" name="celular" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" id="btnGuardarCambios">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!--====== Scripts -->
-    <script src="./js/jquery-3.1.1.min.js"></script>
-    <script src="./js/sweetalert2.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/material.min.js"></script>
-    <script src="./js/ripples.min.js"></script>
-    <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Tus scripts locales -->
+    <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
+
+    <!-- Script para el manejo del modal -->
     <script>
-        $.material.init();
+        $(document).ready(function () {
+            // Verificar que jQuery está cargado
+            console.log('jQuery version:', $.fn.jquery);
+
+            // Función para editar empleado
+            window.editarEmpleado = function (empleado_id, nombre, apellido_paterno, apellido_materno, celular) {
+                console.log('Editando empleado:', empleado_id);
+
+                // Llenar el formulario
+                $('#empleado_id').val(empleado_id);
+                $('#nombre').val(nombre);
+                $('#apellido_paterno').val(apellido_paterno);
+                $('#apellido_materno').val(apellido_materno);
+                $('#celular').val(celular);
+
+                // Mostrar el modal de forma manual
+                $('#modalEditarEmpleado').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true
+                });
+            };
+
+            // Manejador del botón guardar
+            $('#btnGuardarCambios').on('click', function () {
+                var empleado_id = $('#empleado_id').val();
+                var formData = $('#formEditarEmpleado').serialize();
+
+                $.ajax({
+                    url: '<?= site_url('Welcome/actualizar_empleado/') ?>' + empleado_id,
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('#modalEditarEmpleado').modal('hide');
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Empleado actualizado correctamente',
+                            icon: 'success'
+                        }).then(function () {
+                            location.reload();
+                        });
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo actualizar el empleado',
+                            icon: 'error'
+                        });
+                    }
+                });
+            });
+
+            // Test del modal
+            window.testModal = function () {
+                $('#modalEditarEmpleado').modal('show');
+            }
+
+            // Inicializar Material Design si es necesario
+            if (typeof $.material !== 'undefined') {
+                $.material.init();
+            }
+        });
     </script>
 </body>
 

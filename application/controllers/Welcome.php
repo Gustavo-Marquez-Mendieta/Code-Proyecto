@@ -1242,6 +1242,7 @@ class Welcome extends CI_Controller
 	}
 
 	// Actualizar empleado
+	// Modify your controller method to handle AJAX request
 	public function actualizar_empleado($empleado_id)
 	{
 		$data = array(
@@ -1252,6 +1253,14 @@ class Welcome extends CI_Controller
 		);
 
 		$this->Empleado_model->update_empleado($empleado_id, $data);
+
+		// If it's an AJAX request, return JSON response
+		if ($this->input->is_ajax_request()) {
+			echo json_encode(['success' => true]);
+			return;
+		}
+
+		// For non-AJAX requests, redirect as before
 		redirect('Welcome/empleados');
 	}
 
