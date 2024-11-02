@@ -9,6 +9,7 @@
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/cards.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -107,12 +108,14 @@
                 <h5 style="margin-bottom: 15px;">Síguenos en nuestras redes sociales</h5>
                 <ul class="list-unstyled" style="display: flex; justify-content: center; gap: 10px;">
                     <li>
-                        <a href="https://www.facebook.com/people/El-Detalle-Eventos/100063608673458/?mibextid=ZbWKwL" target="_blank" title="Facebook">
+                        <a href="https://www.facebook.com/people/El-Detalle-Eventos/100063608673458/?mibextid=ZbWKwL"
+                            target="_blank" title="Facebook">
                             <i class="fab fa-facebook" style="font-size: 24px; color: #1877f2;"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://www.tiktok.com/@detalle_eventos?is_from_webapp=1&sender_device=pc" target="_blank" title="TikTok">
+                        <a href="https://www.tiktok.com/@detalle_eventos?is_from_webapp=1&sender_device=pc"
+                            target="_blank" title="TikTok">
                             <i class="fab fa-tiktok" style="font-size: 24px; color: #000000;"></i>
                         </a>
                     </li>
@@ -125,27 +128,55 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-10">
-                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
+                    <h1 class="titulo">Mis Eventos</h1>
                 </div>
-                <div class="col-md-12">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <h1 class="frase">"La mejor opcion para tus acontecimientos con alto rendimiento y experiencia"</h1>
 
+                <!-- Sección de Reservas del Usuario -->
+                <div class="col-md-9">
+                    <?php if (!empty($reservas)): ?>
+                        <h3>Reservas Realizadas:</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Fecha de Reserva</th>
+                                    <th>Tipo de Evento</th>
+                                    <th>Días</th>
+                                    <th>Monto Total</th>
+                                    <th>Estado de Pago</th>
+                                    <th>Garzones</th>
+                                    <th>Detalle del Evento</th>
+                                    <th>Detalles</th> <!-- Nueva columna para el botón -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($reservas as $reserva): ?>
+                                    <tr>
+                                        <td><?= $reserva->fecha_reserva; ?></td>
+                                        <td><?= $reserva->tipo_evento; ?></td>
+                                        <td><?= $reserva->dias; ?></td>
+                                        <td>$<?= number_format($reserva->monto_total, 2); ?></td>
+                                        <td><?= $reserva->estado_pago; ?></td>
+                                        <td><?= $reserva->garzones; ?></td>
+                                        <td><?= $reserva->detalle_evento; ?></td>
+                                        <td>
+                                            <a href="<?= site_url('welcome/detalle_evento/' . $reserva->reserva_id); ?>"
+                                                class="btn btn-info">
+                                                Ver Detalles
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No se han encontrado reservas.</p>
+                    <?php endif; ?>
                 </div>
             </div>
-
+        </div>
     </section>
+
+
 
 
     <!--====== Scripts -->

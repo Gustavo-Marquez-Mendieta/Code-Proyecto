@@ -13,6 +13,13 @@ class Vajilla_model extends CI_Model
         $query = $this->db->get('Vajilla');
         return $query->result();
     }
+    public function incrementar_stock_vajilla($vajilla_id, $cantidad)
+    {
+        $this->db->set('stock_cajas', 'stock_cajas + ' . (int) $cantidad, FALSE);
+        $this->db->where('vajilla_id', $vajilla_id);
+        return $this->db->update('Vajilla');
+    }
+
     public function get_all_vajilla()
     {
         $query = $this->db->get('Vajilla');
@@ -85,6 +92,6 @@ class Vajilla_model extends CI_Model
         $this->db->where('vajilla_id', $vajilla_id);
         $this->db->update('Vajilla');
     }
-    
+
 
 }

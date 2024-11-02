@@ -57,38 +57,87 @@
         <div class="container">
             <h2>Registro Nuevo Usuario</h2>
             <hr>
+
+            <?php
+            // Verificar si el email está verificado
+            if (!$this->session->userdata('email_verificado')) {
+                redirect('Welcome/registro');
+                return;
+            }
+            ?>
+
             <form action="<?php echo site_url('Welcome/registrarusuariobd'); ?>" method="POST" id="login-form">
+                <!-- Email verificado (oculto) -->
+                <input type="hidden" name="usuario" value="<?php echo $this->session->userdata('email_temporal'); ?>" />
+
+                <!-- Mostrar el email verificado -->
                 <div class="input-box">
-                    <label for="usuario">Usuario:</label>
-                    <input type="email" name="usuario" id="usuario" placeholder="Introduce tu correo electrónico" required />
+                    <label>Email verificado:</label>
+                    <input type="text" value="<?php echo $this->session->userdata('email_temporal'); ?>"
+                        class="input-readonly" readonly />
                 </div>
+
+                <!-- Campos del formulario -->
                 <div class="input-box">
                     <label for="nombre">Nombre:</label>
                     <input type="text" name="nombre" id="nombre" placeholder="Introduce tu nombre" required />
                 </div>
+
                 <div class="input-box">
                     <label for="primerApellido">Primer Apellido:</label>
-                    <input type="text" name="primerApellido" id="primerApellido" placeholder="Introduce tu primer apellido" required />
+                    <input type="text" name="primerApellido" id="primerApellido"
+                        placeholder="Introduce tu primer apellido" required />
                 </div>
+
                 <div class="input-box">
                     <label for="segundoApellido">Segundo Apellido:</label>
-                    <input type="text" name="segundoApellido" id="segundoApellido" placeholder="Introduce tu segundo apellido" />
+                    <input type="text" name="segundoApellido" id="segundoApellido"
+                        placeholder="Introduce tu segundo apellido" />
                 </div>
+
                 <div class="input-box">
                     <label for="celular">Celular:</label>
-                    <input type="text" name="celular" id="celular" placeholder="Introduce tu número de celular" required />
+                    <input type="text" name="celular" id="celular" placeholder="Introduce tu número de celular"
+                        required />
                 </div>
-                <button type="submit" form="login-form" value="Submit" class="boton">Registrar</button>
+
+                <button type="submit" class="boton">Registrar</button>
             </form>
-            <?php if(isset($error)): ?>
-                <p style="color: red;"><?php echo $error; ?></p>
+
+            <?php if (isset($error)): ?>
+                <div class="error-message"><?php echo $error; ?></div>
             <?php endif; ?>
-            <?php if(isset($success)): ?>
-                <p style="color: green;"><?php echo $success; ?></p>
+
+            <?php if (isset($success)): ?>
+                <div class="success-message"><?php echo $success; ?></div>
             <?php endif; ?>
-            <a href="<?php echo site_url('Welcome/index') ?>" class="boton">Volver</a>
+
+            <a href="<?php echo site_url('Welcome/index') ?>" class="boton"
+                onclick="return confirm('¿Estás seguro que deseas volver? Se perderán los datos ingresados.')">Volver</a>
         </div>
     </main>
+
+    <script>
+        // Validación de campos antes de enviar
+        document.getElementById('login-form').onsubmit = function (e) {
+            const nombre = document.getElementById('nombre').value.trim();
+            const primerApellido = document.getElementById('primerApellido').value.trim();
+            const celular = document.getElementById('celular').value.trim();
+
+            if (!nombre || !primerApellido || !celular) {
+                alert('Por favor, completa todos los campos requeridos');
+                return false;
+            }
+
+            // Validación básica del celular (solo números y longitud)
+            if (!/^\d{8,10}$/.test(celular)) {
+                alert('Por favor, ingresa un número de celular válido (9-10 dígitos)');
+                return false;
+            }
+
+            return true;
+        };
+    </script>
 </body>
 
 </html>

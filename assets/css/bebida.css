@@ -1,0 +1,87 @@
+.full-box.dashboard-contentPage {
+	padding: 20px;
+	background: linear-gradient(135deg, #1c1c1c, #333);
+	color: #fff;
+}
+
+#inicio .container-fluid {
+	display: flex;
+	margin-top: 120px;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 20px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.6);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	position: relative;
+	overflow: hidden;
+}
+
+#inicio .container-fluid .col-md-5 img {
+	width: 300px;
+	border-radius: 15px;
+	margin-right: 25px;
+	transition: transform 0.3s ease;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+.texto-detalle {
+	margin-left: 100px; 
+}
+#inicio .container-fluid .col-md-5 img:hover {
+	transform: scale(1.05);
+}
+
+#inicio .container-fluid .col-md-7 h2,
+#inicio .container-fluid .col-md-7 h4 {
+	color: #ffcc00;
+	font-weight: bold;
+    font-size: 45px;
+}
+
+#inicio .container-fluid .col-md-7 ul li {
+	font-size: 25px;
+	color: #e0e0e0;
+	line-height: 1.7;
+}
+
+#inicio .container-fluid .col-md-7 .btn {
+	font-size: 1rem;
+	padding: 10px 25px;
+	border-radius: 5px;
+	background-color: #ffcc00;
+	color: #333;
+	font-weight: bold;
+	transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#inicio .container-fluid .col-md-7 .btn:hover {
+	background-color: #ffaa00;
+	transform: scale(1.05);
+}
+
+#inicio .container-fluid::before {
+	content: "";
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(
+		circle at center,
+		rgba(255, 255, 255, 0.2),
+		transparent
+	);
+	animation: rotateGlow 8s linear infinite;
+	pointer-events: none;
+}
+
+@keyframes rotateGlow {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Bebida_model extends CI_Model {
+class Bebida_model extends CI_Model
+{
 
     public function __construct()
     {
@@ -18,6 +19,12 @@ class Bebida_model extends CI_Model {
     {
         $query = $this->db->get_where('Bebidas', array('bebida_id' => $id));
         return $query->row_array();
+    }
+    public function get_bebida($bebida_id)
+    {
+        // Asegúrate de reemplazar 'tu_tabla_de_bebidas' por el nombre real de la tabla en la base de datos
+        $query = $this->db->get_where('Bebidas', array('bebida_id' => $bebida_id));
+        return $query->row_array(); // Retorna un array con los datos de la bebida
     }
 
     public function insert_bebida($data)

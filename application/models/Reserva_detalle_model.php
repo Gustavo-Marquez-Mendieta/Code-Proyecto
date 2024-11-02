@@ -38,6 +38,17 @@ class Reserva_detalle_model extends CI_Model
     {
         return $this->db->delete('Reserva_Detalles', ['detalle_id' => $detalle_id]);
     }
-
+    public function get_detalle_by_id($detalle_id)
+    {
+        $this->db->where('detalle_id', $detalle_id);
+        $query = $this->db->get('Reserva_Detalles');
+        return $query->row();
+    }
+    public function actualizar_cantidad($detalle_id, $nueva_cantidad)
+    {
+        $this->db->set('cantidad', $nueva_cantidad);
+        $this->db->where('detalle_id', $detalle_id);
+        return $this->db->update('Reserva_Detalles');
+    }
 
 }

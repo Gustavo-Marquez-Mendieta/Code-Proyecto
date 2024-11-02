@@ -45,6 +45,16 @@ class Usuario_model extends CI_Model
         $this->db->where('usuario_id', $usuario_id);
         return $this->db->update('Usuarios', $data);
     }
+    public function activar_usuario($usuario_id)
+    {
+        $data = array(
+            'estado' => 1 // Cambiar el estado a activo (1)
+        );
+
+        $this->db->where('usuario_id', $usuario_id);
+        return $this->db->update('Usuarios', $data); // Asegúrate de que el nombre de la tabla es correcto
+    }
+
     public function eliminar_producto($producto_id)
     {
         return $this->db->delete('Vajilla', array('vajilla_id' => $producto_id));

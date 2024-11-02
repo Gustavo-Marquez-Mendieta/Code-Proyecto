@@ -66,11 +66,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                <li>
-                    <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
+                
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería

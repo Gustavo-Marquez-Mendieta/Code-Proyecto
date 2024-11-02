@@ -18,6 +18,7 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .dashboard-sideBar {
             left: 0;
@@ -59,7 +60,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" title="Mi Informacion" class="btn-user">
+                        <a href="<?php echo site_url('Welcome/mis_reservas'); ?>" title="Mi Informacion" class="btn-user">
                             <img src="../../assets/img/avatar (1).png">
                         </a>
                     </li>
@@ -85,11 +86,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/decoracion'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
-                <li>
                     <a href="<?php echo site_url('Welcome/manteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
                     </a>
@@ -105,6 +101,23 @@
                     </a>
                 </li>
             </ul>
+            <div style="text-align: center; margin-top: 50px;">
+                <h5 style="margin-bottom: 15px;">Síguenos en nuestras redes sociales</h5>
+                <ul class="list-unstyled" style="display: flex; justify-content: center; gap: 10px;">
+                    <li>
+                        <a href="https://www.facebook.com/people/El-Detalle-Eventos/100063608673458/?mibextid=ZbWKwL"
+                            target="_blank" title="Facebook">
+                            <i class="fab fa-facebook" style="font-size: 24px; color: #1877f2;"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.tiktok.com/@detalle_eventos?is_from_webapp=1&sender_device=pc"
+                            target="_blank" title="TikTok">
+                            <i class="fab fa-tiktok" style="font-size: 24px; color: #000000;"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </section>
 
@@ -116,13 +129,20 @@
                 <div class="col-md-12">
                     <br>
                     <h1 class="titulo">"VAJILLA"</h1>
+                    <?php if ($this->session->flashdata('success')): ?>
+                        <div class="alert alert-success">
+                            <?php echo $this->session->flashdata('success'); ?>
+                        </div>
+                    <?php endif; ?>
+
                 </div>
                 <div class="col-md-9">
                     <?php foreach ($productos as $row) { ?>
                         <div class="col-12 col-md-4 mt-5 text-center Products">
                             <div class="card">
                                 <div>
-                                    <img class="card-img-top" class="image" src="<?php echo base_url('./assets/img/' . $row->imagen); ?>"
+                                    <img class="card-img-top" class="image"
+                                        src="<?php echo base_url('./assets/img/' . $row->imagen); ?>"
                                         alt="<?php echo $row->nombre; ?>"
                                         style="max-width: 200px; max-height: 200px; object-fit: cover;">
                                 </div>
@@ -205,7 +225,6 @@
                 }
             });
 
-            // Manejar el envío al carrito
             $('.agregar-carrito').click(function (e) {
                 e.preventDefault();
                 var productId = $(this).data('id');

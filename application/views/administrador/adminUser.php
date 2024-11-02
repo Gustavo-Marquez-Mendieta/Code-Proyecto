@@ -73,11 +73,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                <li>
-                    <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
+                
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -155,19 +151,26 @@
                                     <td><?php echo $usuario->fechaCreacionUsuario; ?></td>
                                     <td><?php echo $usuario->fechaActualizacionUsuario; ?></td>
                                     <td>
-                                        <a href="<?php echo site_url('Welcome/editUser/' . $usuario->usuario_id); ?>"
-                                            class="btn btn-primary btn-edit" style="color:white">Editar</a>
-                                        <a href="<?php echo site_url('Welcome/eliminarUsuario/' . $usuario->usuario_id); ?>"
-                                            class="btn btn-danger"
-                                            onclick="return confirm('¿Estás seguro de eliminar este usuario?');"
-                                            style="color:white">Eliminar</a>
+                                        <?php if ($usuario->estado): ?>
+                                            <!-- Mostrar botones de Editar y Eliminar si el usuario está Activo -->
+                                            <a href="<?php echo site_url('Welcome/editUser/' . $usuario->usuario_id); ?>"
+                                                class="btn btn-primary btn-edit" style="color:white">Editar</a>
+                                            <a href="<?php echo site_url('Welcome/eliminarUsuario/' . $usuario->usuario_id); ?>"
+                                                class="btn btn-danger"
+                                                onclick="return confirm('¿Estás seguro de eliminar este usuario?');"
+                                                style="color:white">Eliminar</a>
+                                        <?php else: ?>
+                                            <!-- Mostrar botón de Activar si el usuario está Inactivo -->
+                                            <a href="<?php echo site_url('Welcome/activarUsuario/' . $usuario->usuario_id); ?>"
+                                                class="btn btn-success" style="color:white">Activar</a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+
                     </table>
                 </div>
-
             </div>
         </div>
     </section>

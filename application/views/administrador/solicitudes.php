@@ -166,11 +166,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                <li>
-                    <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Decoración"> Decoración
-                    </a>
-                </li>
+                
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería"> Mantelería
@@ -210,7 +206,7 @@
                 </div>
                 <div class="col-md-6">
                     <h2 style="color:white">Solicitudes</h2>
-                    <div style="margin-top: 10px; margin-right:550px">
+                    <div style="margin-top: 10px; margin-right:400px">
                         <select name="solicitud_estado" id="solicitud_estado" class="form-control">
                             <option value="pendiente">Seleccione tipo de estado deseado</option>
                             <option value="pendiente">pendiente</option>

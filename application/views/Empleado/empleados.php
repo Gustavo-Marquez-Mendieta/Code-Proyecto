@@ -163,11 +163,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                <li>
-                    <a href="<?php echo site_url('Welcome/adminDecoracion'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
+
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -203,7 +199,15 @@
             <div class="row">
                 <div class="col-md-12">
                     <h1 class="titulo">"Empleados"</h1>
+
+                    <!-- Mostrar el mensaje de éxito si está presente -->
+                    <?php if ($this->session->flashdata('success_message')): ?>
+                        <div class="alert alert-success">
+                            <?= $this->session->flashdata('success_message'); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
+
                 <div class="col-md-7">
                     <a href="<?= site_url('Welcome/agregar_empleado'); ?>" class="btn btn-primary"
                         style="color:white; margin:20px">Agregar Empleado</a>
@@ -227,24 +231,30 @@
                                     <td><?= $empleado->apellido_materno; ?></td>
                                     <td><?= $empleado->celular; ?></td>
                                     <td>
-                                        <a href="<?= site_url('Welcome/editar_empleado/' . $empleado->empleado_id); ?>"
-                                            class="btn btn-warning btn-sm" style="color:white">Editar</a>
-                                        <a href="<?= site_url('Welcome/eliminar_empleado/' . $empleado->empleado_id); ?>"
-                                            class="btn btn-danger btn-sm" style="color:white">Eliminar</a>
+                                        <?php if ($empleado->estado == 1): ?>
+                                            <!-- Botones de editar y eliminar si el estado es 1 -->
+                                            <a href="<?= site_url('Welcome/editar_empleado/' . $empleado->empleado_id); ?>"
+                                                class="btn btn-warning btn-sm" style="color:white">Editar</a>
+                                            <a href="<?= site_url('Welcome/eliminar_empleado/' . $empleado->empleado_id); ?>"
+                                                class="btn btn-danger btn-sm" style="color:white">Eliminar</a>
+                                        <?php else: ?>
+                                            <!-- Botón de reactivar si el estado es 0 -->
+                                            <a href="<?= site_url('Welcome/reactivar_empleado/' . $empleado->empleado_id); ?>"
+                                                class="btn btn-success btn-sm" style="color:white">Reactivar</a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
-                    </table>
 
+                    </table>
                 </div>
                 <div class="col-md-6">
-
                 </div>
-
             </div>
         </div>
     </section>
+
 
     <!--====== Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>

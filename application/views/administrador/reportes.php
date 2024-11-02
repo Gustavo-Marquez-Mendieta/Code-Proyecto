@@ -163,11 +163,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                <li>
-                    <a href="<?php echo site_url('Welcome/adminDecoracion'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
+                
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -213,9 +209,11 @@
                         </option>
                         <option value="<?php echo site_url('Welcome/reporte_empleado'); ?>">Reporte de empleados
                         </option>
+                        <option value="<?php echo site_url('Welcome/reporte_barras'); ?>">Reporte en barras</option>
                     </select>
+
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-2">
                     <form action="<?php echo site_url('Welcome/reporte_fechas'); ?>" method="post">
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de inicio:</label>
@@ -228,59 +226,50 @@
                         <button type="submit" class="btn btn-primary" style="color:white">Generar Reporte</button>
                     </form>
                 </div>
+                <div class="col-md-10">
+                    <?php if (isset($reservas) && !empty($reservas)): ?>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th> <!-- Nueva columna -->
+                                            <th>Fecha de Reserva</th>
+                                            <th>Tipo de Evento</th>
+                                            <th>Días</th>
+                                            <th>Monto Total</th>
+                                            <th>Estado de Evento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($reservas as $reserva): ?>
+                                            <tr>
+                                                <td><?php echo $reserva->cliente_nombre . ' ' . $reserva->cliente_primerApellido . ' ' . $reserva->cliente_segundoApellido; ?>
+                                                </td>
+                                                <td><?php echo $reserva->tipo_evento; ?></td>
+                                                <td><?php echo $reserva->fecha_reserva; ?></td>
+                                                <td><?php echo $reserva->dias; ?></td>
+                                                <td><?php echo $reserva->monto_total; ?> Bs.</td>
+                                                <td><?php echo $reserva->estado_pago; ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php elseif (isset($reservas)): ?>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <br>
+                                <p>No se encontraron reservas en el rango de fechas especificado.</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
             </div>
 
-            <?php if (isset($reservas) && !empty($reservas)): ?>
-                <div class="row">
-                    <div class="col-md-10">
-                        <br>
-                        <h2 class="titulo">Reporte de Reservas</h2>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Fecha de Reserva</th>
-                                    <th>Tipo de Evento</th>
-                                    <th>Días</th>
-                                    <th>Monto Total</th>
-                                    <th>Estado de Pago</th>
-                                    <th>Garzones</th>
-                                    <th>Detalle del Evento</th>
-                                    <th>Aprobado Por</th>
-                                    <th>Fecha de Entrega de Vajilla</th>
-                                    <th>Entregado Por</th>
-                                    <th>Fecha de Recogida de Vajilla</th>
-                                    <th>Recogido Por</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($reservas as $reserva): ?>
-                                    <tr>
-                                        <td><?php echo $reserva->fecha_reserva; ?></td>
-                                        <td><?php echo $reserva->tipo_evento; ?></td>
-                                        <td><?php echo $reserva->dias; ?></td>
-                                        <td><?php echo $reserva->monto_total; ?></td>
-                                        <td><?php echo $reserva->estado_pago; ?></td>
-                                        <td><?php echo $reserva->garzones; ?></td>
-                                        <td><?php echo $reserva->detalle_evento; ?></td>
-                                        <td><?php echo $reserva->aprobado_por_nombre; ?></td>
-                                        <td><?php echo $reserva->fecha_entrega_vajilla; ?></td>
-                                        <td><?php echo $reserva->entregado_por_nombre; ?></td>
-                                        <td><?php echo $reserva->fecha_recogida_vajilla; ?></td>
-                                        <td><?php echo $reserva->recogido_por_nombre; ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            <?php elseif (isset($reservas)): ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <br>
-                        <p>No se encontraron reservas en el rango de fechas especificado.</p>
-                    </div>
-                </div>
-            <?php endif; ?>
+
         </div>
     </section>
 

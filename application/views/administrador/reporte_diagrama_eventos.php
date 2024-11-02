@@ -18,6 +18,100 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos adicionales que puedas necesitar */
+        .dashboard-sideBar {
+            /* Estilos de la barra lateral */
+            left: 0;
+            z-index: 2;
+            background-image: url('../../assets/img/copa.jpg');
+            background-color: #333;
+            color: white;
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        canvas {
+            background-color: #fff;
+        }
+
+        .dashboard-sideBar a {
+            /* Estilos de los enlaces en la barra lateral */
+            display: block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .dashboard-sideBar a:hover {
+            /* Estilos para el estado hover de los enlaces */
+            background-color: #555;
+        }
+
+        .dashboard-sideBar .btn-sideBar-SubMenu {
+            /* Estilos para los enlaces del submenú */
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .dashboard-sideBar .btn-sideBar-SubMenu::after {
+            /* Estilos para la flecha del submenú */
+            content: "\f0d7";
+            font-family: "Material Icons";
+            position: absolute;
+            right: 20px;
+        }
+
+        .dashboard-contentPage {
+            /* Estilos para el contenido principal */
+            margin-left: 250px;
+            padding: 20px;
+            position: relative;
+            /* Añadido */
+            z-index: 1;
+            /* Añadido */
+        }
+
+        /* Estilos para las imágenes en los enlaces */
+        .dashboard-sideBar img {
+            width: 24px;
+            /* Ajusta el tamaño según tus necesidades */
+            height: 24px;
+            margin-right: 10px;
+            /* Espacio entre la imagen y el texto */
+            vertical-align: middle;
+            /* Alineación vertical */
+        }
+
+        .frase {
+            font-size: 40px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-left: 30px;
+            /* Ajusta este valor según sea necesario */
+            background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
+            /* Degradado de coral a celeste */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .titulo {
+            font-size: 60px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-left: 30px;
+            /* Ajusta este valor según sea necesario */
+            background-image: linear-gradient(45deg, #FF6B6B, #87CEEB);
+            /* Degradado de coral a celeste */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,7 +126,7 @@
             <!-- SideBar User info -->
             <div class="full-box dashboard-sideBar-UserInfo">
                 <figure class="full-box">
-                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon"> <!-- Imagen de avatar -->
+                    <img src="../../assets/img/StudetMaleAvatar.png" alt="UserIcon">
 
                     <figcaption class="text-center text-titles">
                         <h6>Bienvenido</h6>
@@ -99,6 +193,7 @@
                         <img src="../../assets/image/reportes.png" alt="Reportes"> Reportes
                     </a>
                 </li>
+
             </ul>
         </div>
     </section>
@@ -109,65 +204,48 @@
             <div class="row">
                 <div class="col-md-12">
                     <br>
-                    <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
-                    <h1 class="frase">"Agregar Decoración"</h1>
+                    <h1 class="titulo">Reportes</h1>
+                    <h1 class="titulo">Diagrama de Reporte por meses</h1>
+                    <select name="reportes" id="reportes" style="margin-top: 10px;" onchange="location = this.value;">
+                        <option value="">Seleccione un reporte</option>
+                        <option value="<?php echo site_url('Welcome/reportes'); ?>">Reporte por fecha</option>
+                        <option value="<?php echo site_url('Welcome/tipo_evento'); ?>">Reporte por tipo de evento
+                        </option>
+                        <option value="<?php echo site_url('Welcome/reporte_empleado'); ?>">Reporte de empleados
+                        </option>
+                        <option value="<?php echo site_url('Welcome/reporte_barras'); ?>">Reporte en barras</option>
+                    </select>
+
                 </div>
                 <div class="col-md-10">
-                   
-                    <div class="col-md-6">
-                        <?php if (isset($error)): ?>
-                            <div class="alert alert-danger">
-                                <?php echo $error; ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (isset($error)): ?>
-                            <div class="alert alert-danger">
-                                <?php echo $error; ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <form action="<?php echo site_url('Welcome/agregarDecoracion'); ?>" method="post"
-                            enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label for="nombre">Tipo</label>
-                                <select class="form-control" id="nombre" name="nombre" required>
-                                    <option value="">Selecciona un tipo</option>
-                                    <option value="Manteleria">Altar</option>
-                                    <option value="Decoracion">Decoracion</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="precio">Precio</label>
-                                <input type="number" class="form-control" id="precio" name="precio" step="0.01"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <label for="tipo">Plan</label>
-                                <select class="form-control" id="tipo" name="tipo" required>
-                                    <option value="">Seleccione Plan</option>
-                                    <option value="Basico">Basico</option>
-                                    <option value="Intermedio">Intermedio</option>
-                                    <option value="Premium">Premium</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="imagen">Imagen</label>
-                                <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*">
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="color:white">Agregar
-                                Decoración</button>
-                            <a href="<?php echo site_url('Welcome/adminDecoraciones'); ?>" class="btn btn-primary"
-                                style="color:white">Ver
-                                Decoraciones</a>
-                        </form>
-                    </div>
+                    <canvas id="graficoBarras" width="400" height="200"></canvas>
+                    <script>
+                        var ctx = document.getElementById('graficoBarras').getContext('2d');
+                        var graficoBarras = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: <?= json_encode(array_column($eventos_por_mes, 'mes')) ?>,
+                                datasets: [{
+                                    label: 'Cantidad de eventos',
+                                    data: <?= json_encode(array_column($eventos_por_mes, 'cantidad')) ?>,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    </script>
                 </div>
             </div>
         </div>
     </section>
-
-    <!--====== Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>
     <script src="./js/sweetalert2.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>

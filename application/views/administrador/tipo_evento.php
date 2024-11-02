@@ -164,11 +164,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo site_url('Welcome/adminDecoracion'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
-                <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
                     </a>
@@ -213,9 +208,10 @@
                         </option>
                         <option value="<?php echo site_url('Welcome/reporte_empleado'); ?>">Reporte de empleados
                         </option>
+                        <option value="<?php echo site_url('Welcome/reporte_barras'); ?>">Reporte en barras</option>
                     </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <form action="<?php echo site_url('Welcome/reporte_evento'); ?>" method="post">
                         <div class="form-group">
                             <label for="evento">Seleccione un tipo de evento:</label>
@@ -240,51 +236,49 @@
                         <button type="submit" class="btn btn-primary" style="color:white">Generar Reporte</button>
                     </form>
                 </div>
+                <div class="col-md-9">
+                    <?php if (isset($eventos) && !empty($eventos)): ?>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th> <!-- Nueva columna para el nombre del cliente -->
+                                            <th>Tipo de Evento</th>
+                                            <th>Fecha de Reserva</th>
+                                            <th>Días</th>
+                                            <th>Monto Total</th>
+                                            <th>Estado de Pago</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($eventos as $evento): ?>
+                                            <tr>
+                                                <td><?php echo $evento->cliente_nombre . ' ' . $evento->cliente_primerApellido . ' ' . $evento->cliente_segundoApellido; ?>
+                                                </td> <!-- Nombre completo del cliente -->
+                                                <td><?php echo $evento->tipo_evento; ?></td>
+                                                <td><?php echo $evento->fecha_reserva; ?></td>
+                                                <td><?php echo $evento->dias; ?></td>
+                                                <td><?php echo $evento->monto_total; ?> Bs.</td>
+                                                <td><?php echo $evento->estado_pago; ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php elseif (isset($eventos)): ?>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <br>
+                                <p>No se encontraron eventos del tipo seleccionado en el rango de fechas especificado.</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
-            <?php if (isset($eventos) && !empty($eventos)): ?>
-                <div class="row">
-                    <div class="col-md-6">
-                        <br>
-                        <h2 class="titulo">Reporte de Tipo de Evento</h2>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Tipo de Evento</th>
-                                    <th>Fecha de Reserva</th>
-                                    <th>Días</th>
-                                    <th>Monto Total</th>
-                                    <th>Estado de Pago</th>
-                                    <th>Garzones</th>
-                                    <th>Aprobado Por</th>
-                                    <th>Detalle del Evento</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($eventos as $evento): ?>
-                                    <tr>
-                                        <td><?php echo $evento->tipo_evento; ?></td>
-                                        <td><?php echo $evento->fecha_reserva; ?></td>
-                                        <td><?php echo $evento->dias; ?></td>
-                                        <td><?php echo $evento->monto_total; ?> Bs.</td>
-                                        <td><?php echo $evento->estado_pago; ?></td>
-                                        <td><?php echo $evento->garzones; ?></td>
-                                        <td><?php echo $evento->aprobado_por; ?></td>
-                                        <td><?php echo $evento->detalle_evento; ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            <?php elseif (isset($eventos)): ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <br>
-                        <p>No se encontraron eventos del tipo seleccionado en el rango de fechas especificado.</p>
-                    </div>
-                </div>
-            <?php endif; ?>
+
         </div>
     </section>
 

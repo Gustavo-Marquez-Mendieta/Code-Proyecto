@@ -19,17 +19,59 @@ class Welcome extends CI_Controller
 		$this->load->model('Reservas_model');
 		$this->load->model('Empleado_model');
 		$this->load->model('Manteleria_model');
+		$this->load->model('Bebida_model');
 	}
 
 	public function index()
 	{
+		$this->session->unset_userdata('email_verificado');
+		$this->session->unset_userdata('email_temporal');
+		$this->session->unset_userdata('codigo_verificacion');
 		$this->load->view('welcome_message');
 	}
-
 	public function user()
 	{
 		$this->check_session_and_load_view('inicio');
 	}
+	private function check_session_and_load_view($view, $data = [], $load_users = false)
+	{
+		if ($this->session->userdata('nombre')) {
+			$data['nombre'] = $this->session->userdata('nombre');
+
+			if ($load_users) {
+				$this->load->model('Usuario_model');
+				$data['usuarios'] = $this->Usuario_model->get_usuarios();
+			}
+			$this->load->view($view, $data);
+		} else {
+			redirect('Welcome/index');
+		}
+	}
+
+
+	public function mis_reservas()
+	{
+		$usuario_id = $this->session->userdata('usuario_id');
+		$nombre = $this->session->userdata('nombre');
+		$this->load->model('Reservas_model');
+		$data['reservas'] = $this->Reservas_model->obtener_reservas_usuario($usuario_id);
+		$data['usuario_id'] = $usuario_id;
+		$this->check_session_and_load_view('reservas', $data);
+	}
+	public function detalle_evento($reserva_id)
+	{
+		$this->load->model('Reservas_model');
+		$data['reserva'] = $this->Reservas_model->obtener_reserva_por_id($reserva_id);
+		$data['detalles'] = $this->Reservas_model->obtener_detalles_por_reserva_id($reserva_id);
+
+		if (!$data['reserva']) {
+			show_404();
+		}
+
+		$this->check_session_and_load_view('detalle_evento', $data);
+	}
+
+
 
 	public function adminVajilla()
 	{
@@ -77,26 +119,36 @@ class Welcome extends CI_Controller
 		$data['nombre'] = $this->session->userdata('nombre');
 		$data['empleados'] = $this->Reservas_model->obtener_empleados();
 
-		// Comprobar si se ha enviado un formulario
+
 		if ($this->input->post()) {
-			// Si el formulario fue enviado, obtener los datos
 			$empleado_id = $this->input->post('empleado');
 			$fecha_inicio = $this->input->post('fecha_inicio');
 			$fecha_fin = $this->input->post('fecha_fin');
 
-			// Obtener los eventos del empleado en el rango de fechas
 			$data['eventos'] = $this->Reservas_model->obtener_eventos_empleado($empleado_id, $fecha_inicio, $fecha_fin);
 
-			// Obtener el empleado seleccionado para mostrar en el título
 			$data['empleado'] = $this->Reservas_model->obtener_empleado_por_id($empleado_id);
 		} else {
 			$data['eventos'] = null;
 			$data['empleado'] = null;
 		}
 
-		// Cargar la vista del reporte con los datos
 		$this->load->view('administrador/reporte_empleado', $data);
 	}
+	public function reporte_barras()
+	{
+		$this->load->model('Reservas_model');
+		$data['eventos_por_mes'] = $this->Reservas_model->getEventosPorMes();
+		$this->load->view('administrador/reporte_diagrama_eventos', $data);
+	}
+	public function ingredientes_bebida($bebida_id)
+	{
+		$this->load->model('Bebida_model');
+		$data['bebida'] = $this->Bebida_model->get_bebida($bebida_id);
+		$data['nombre'] = $this->session->userdata('nombre');
+		$this->load->view('ingredientes', $data);
+	}
+
 	public function reporte_evento()
 	{
 		$data['nombre'] = $this->session->userdata('nombre');
@@ -338,7 +390,6 @@ class Welcome extends CI_Controller
 		// Obtener los detalles de la reserva
 		$detalles = $this->Reservas_model->get_detalles_reserva($reserva_id);
 
-		// Depuración: Verificar los detalles
 		echo "<pre>";
 		print_r($detalles);
 		echo "</pre>";
@@ -375,38 +426,28 @@ class Welcome extends CI_Controller
 
 	public function guardar_detalles_recogida($reserva_id)
 	{
-		// Recibir los detalles del formulario
 		$detalles_recogida = $this->input->post('detalles');
-
-		// Definir el nuevo estado
 		$nuevo_estado = 'Vajilla Recogida';
 
-		// Llamar al modelo para actualizar el estado de la reserva
 		$this->Reservas_model->update_estado_recogida_vajilla($reserva_id, $nuevo_estado, $detalles_recogida, $this->session->userdata('usuario_id'));
 
-		// Obtener los detalles de la reserva
 		$detalles = $this->Reservas_model->get_detalles_reserva($reserva_id);
-
-		// Actualizar el stock de vajilla y mantelería según corresponda
 		foreach ($detalles as $detalle) {
-			// Verificar si tiene vajilla asignada
+
 			if (!empty($detalle->vajilla_id)) {
-				// Sumar la cantidad al stock de la Vajilla
+
 				$this->db->set('stock_cajas', 'stock_cajas + ' . (int) $detalle->cantidad, FALSE);
 				$this->db->where('vajilla_id', $detalle->vajilla_id);
 				$this->db->update('Vajilla');
 			}
-
-			// Verificar si tiene mantelería asignada
 			if (!empty($detalle->manteleria_id)) {
-				// Sumar la cantidad al stock de la Mantelería
+
 				$this->db->set('stock', 'stock + ' . (int) $detalle->cantidad, FALSE);
 				$this->db->where('manteleria_id', $detalle->manteleria_id);
 				$this->db->update('Manteleria');
 			}
 		}
 
-		// Redirigir a la página de solicitudes
 		redirect('Welcome/solicitudes');
 	}
 
@@ -501,9 +542,24 @@ class Welcome extends CI_Controller
 
 	public function registro()
 	{
+		$this->session->unset_userdata('email_verificado');
+		$this->session->unset_userdata('email_temporal');
+		$this->session->unset_userdata('codigo_verificacion');
+
+		// Cargar la vista de verificación de email
+		$this->load->view('verificar_email');
+	}
+	public function registro_form()
+	{
+		// Verificar si el email está verificado
+		if (!$this->session->userdata('email_verificado')) {
+			redirect('Welcome/registro');
+			return;
+		}
+
+		// Cargar la vista del formulario de registro
 		$this->load->view('registrarse');
 	}
-
 
 	public function vajilla()
 	{
@@ -563,8 +619,16 @@ class Welcome extends CI_Controller
 		}
 
 		$this->session->set_userdata('carrito', $carrito);
-		redirect('Welcome/carrito');
+		$this->session->set_flashdata('success', 'Se agregó al carrito');
+
+		// Redirigir de nuevo a la vista que corresponde
+		if ($tipo_producto == 'manteleria') {
+			redirect('Welcome/manteleria');
+		} elseif ($tipo_producto == 'vajilla') {
+			redirect('Welcome/vajilla');
+		}
 	}
+
 
 
 
@@ -591,44 +655,52 @@ class Welcome extends CI_Controller
 		$dias = $this->input->post('dias');
 		$evento = $this->input->post('evento');
 		$detalle_evento = $this->input->post('detalle_evento');
-		$monto_total = $this->input->post('monto_total');// Recibir el monto total del formulario
+		$monto_total = $this->input->post('monto_total');
 
-		// Capturamos los valores del radio button y la cantidad de garzones
-		$garzones = $this->input->post('garzones'); // 'si' o 'no'
-		$cantidad_garzones = $this->input->post('cantidad_garzones'); // Captura de la cantidad si es "si"
+		$garzones = $this->input->post('garzones');
+		$cantidad_garzones = $this->input->post('cantidad_garzones');
 
 		$carrito = $this->session->userdata('carrito');
 
 		if (empty($carrito)) {
 			$this->session->set_flashdata('error', 'No puedes hacer una reserva con el carrito vacío.');
 			redirect('Welcome/carrito');
-			return; // Detenemos la ejecución si el carrito está vacío
+			return;
 		}
 
 		if ($this->Reservas_model->verificar_disponibilidad_fecha($fecha_reserva, $dias)) {
 			$this->session->set_flashdata('error', 'Las fechas seleccionadas ya están reservadas. Por favor elige otras fechas.');
 			redirect('Welcome/carrito');
-			return; // Detenemos la ejecución si las fechas ya están reservadas
+			return;
 		}
 
-		// Si el usuario selecciona "si" en garzones, guardamos la cantidad; si es "no", guardamos "Ninguno".
 		if ($garzones === 'si') {
 			$garzones_value = $cantidad_garzones;
 		} else {
-			$garzones_value = 'Ninguno';
+			$garzones_value = '0';
 		}
 
+		$this->db->trans_start();
 
 		$reserva_id = $this->Reservas_model->guardar_reserva($usuario_id, $fecha_reserva, $evento, $dias, $monto_total, $detalle_evento, $garzones_value);
 
 		foreach ($carrito as $item) {
 			$this->Reserva_detalle_model->guardar_detalle($reserva_id, $item['vajilla_id'], $item['manteleria_id'], $item['cantidad'], $item['precio']);
 		}
-		$this->session->unset_userdata('carrito');
+		$this->db->trans_complete();
 
+		if ($this->db->trans_status() === FALSE) {
+			$this->session->set_flashdata('error', 'Hubo un problema al procesar tu reserva. Por favor, intenta de nuevo.');
+			redirect('Welcome/carrito');
+			return;
+		}
+
+		$this->session->unset_userdata('carrito');
 		$this->session->set_flashdata('success', 'La solicitud del servicio se ha realizado con éxito. Se enviará la confirmación a su correo electrónico.');
 		redirect('Welcome/confirmacion_reserva');
 	}
+
+
 
 
 
@@ -705,6 +777,9 @@ class Welcome extends CI_Controller
 	{
 		$this->check_session_and_load_view('informacionUsuario');
 	}
+
+
+
 
 	public function configuracion()
 	{
@@ -785,11 +860,90 @@ class Welcome extends CI_Controller
 		}
 	}
 
+	public function validarCorreo()
+	{
+		$email = $this->input->post('usuario');
+		log_message('debug', 'Iniciando validación de correo: ' . $email);
 
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			echo json_encode(['success' => false, 'message' => 'Formato de correo inválido']);
+			return;
+		}
+		$codigo = rand(100000, 999999);
+		$this->session->set_userdata('codigo_verificacion', (string) $codigo); // Convertir a string
+		$this->session->set_userdata('email_temporal', $email);
 
+		log_message('debug', 'Código generado: ' . $codigo);
+		log_message('debug', 'Código en sesión: ' . $this->session->userdata('codigo_verificacion'));
 
+		$config = array(
+			'protocol' => 'smtp',
+			'smtp_host' => 'smtp.gmail.com',
+			'smtp_port' => 587,
+			'smtp_user' => 'marquez.gustavo.1296@gmail.com',
+			'smtp_pass' => 'mhjp nbfq xqhj hiys',
+			'mailtype' => 'html',
+			'charset' => 'utf-8',
+			'wordwrap' => TRUE,
+			'newline' => "\r\n",
+			'smtp_crypto' => 'tls'
+		);
+
+		$this->load->library('email', $config);
+		$this->email->from('tu_email@gmail.com', 'Gustavo Marquez');
+		$this->email->to($email);
+		$this->email->subject('Código de Verificación');
+		$this->email->message('Tu código de verificación es: ' . $codigo);
+
+		if ($this->email->send()) {
+			echo json_encode([
+				'success' => true,
+				'message' => 'Código de verificación enviado',
+				'debug_code' => $codigo
+			]);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Error al enviar el código']);
+		}
+	}
+
+	public function verificarCodigo()
+	{
+		$codigo_ingresado = $this->input->post('codigo');
+		$codigo_correcto = $this->session->userdata('codigo_verificacion');
+
+		if ($codigo_ingresado === $codigo_correcto) {
+			$this->session->set_userdata('email_verificado', true);
+			echo json_encode([
+				'success' => true,
+				'message' => 'Código verificado correctamente'
+			]);
+		} else {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Código incorrecto'
+			]);
+		}
+	}
+	public function salir()
+	{
+		$this->session->sess_destroy();
+		redirect('Welcome/index');
+	}
 	public function registrarusuariobd()
 	{
+		// Solo verificamos que el email esté verificado
+		if (!$this->session->userdata('email_verificado')) {
+			$data['error'] = 'El email no ha sido verificado';
+			$this->load->view('registrarse', $data);
+			return;
+		}
+
+		// Verificar que el email sea el mismo que se verificó
+		if ($this->session->userdata('email_temporal') != $this->input->post('usuario')) {
+			$data['error'] = 'El correo electrónico no coincide con el verificado';
+			$this->load->view('registrarse', $data);
+			return;
+		}
 
 		$password = bin2hex(random_bytes(8));
 
@@ -798,42 +952,45 @@ class Welcome extends CI_Controller
 			'primerApellido' => $this->input->post('primerApellido'),
 			'segundoApellido' => $this->input->post('segundoApellido'),
 			'usuario' => $this->input->post('usuario'),
-			'password' => password_hash($password, PASSWORD_BCRYPT), // Almacena la contraseña cifrada
+			'password' => password_hash($password, PASSWORD_BCRYPT),
 			'celular' => $this->input->post('celular'),
-			'estado' => 0, // Estado de verificación pendiente
+			'estado' => 1, // Usuario verificado
 			'fechaCreacionUsuario' => date('Y-m-d H:i:s'),
 			'fechaActualizacionUsuario' => null
 		);
 
-
+		// Validación de campos requeridos
 		if (empty($data['nombre']) || empty($data['usuario']) || empty($data['celular'])) {
 			$data['error'] = 'Todos los campos son obligatorios';
 			$this->load->view('registrarse', $data);
 			return;
 		}
 
+		// Verificar si el correo ya existe
 		if ($this->login_model->existeUsuarioPorCorreo($data['usuario'])) {
 			$data['error'] = 'El correo ya está registrado';
 			$this->load->view('registrarse', $data);
 			return;
 		}
 
+		// Agregar usuario a la base de datos
 		$this->login_model->agregarusuario($data);
 
-
+		// Configuración del email
 		$config = array(
 			'protocol' => 'smtp',
 			'smtp_host' => 'smtp.gmail.com',
-			'smtp_port' => 587, // El puerto 587 es compatible con STARTTLS
+			'smtp_port' => 587,
 			'smtp_user' => 'marquez.gustavo.1296@gmail.com',
-			'smtp_pass' => 'mhjp nbfq xqhj hiys', // Llave de correo electrónico
+			'smtp_pass' => 'mhjp nbfq xqhj hiys',
 			'mailtype' => 'html',
 			'charset' => 'utf-8',
 			'wordwrap' => TRUE,
-			'newline' => "\r\n", // IMPORTANTE: Necesario para SMTP
-			'smtp_crypto' => 'tls' // Utiliza STARTTLS para la conexión segura
+			'newline' => "\r\n",
+			'smtp_crypto' => 'tls'
 		);
 
+		// Enviar contraseña por correo
 		$this->load->library('email', $config);
 		$this->email->from('tu_email@gmail.com', 'Gustavo Marquez');
 		$this->email->to($data['usuario']);
@@ -841,7 +998,12 @@ class Welcome extends CI_Controller
 		$this->email->message('Tu cuenta ha sido creada. Tu contraseña es: ' . $password);
 
 		if ($this->email->send()) {
-			$data['success'] = 'Se envio su contraseña a' . $data['usuario'];
+			// Limpiar la sesión después del registro exitoso
+			$this->session->unset_userdata('email_verificado');
+			$this->session->unset_userdata('email_temporal');
+			$this->session->unset_userdata('codigo_verificacion');
+
+			$data['success'] = 'Se envió su contraseña a ' . $data['usuario'];
 		} else {
 			$data['error'] = 'Correo no enviado: ' . $this->email->print_debugger();
 		}
@@ -911,24 +1073,18 @@ class Welcome extends CI_Controller
 		$user = $this->input->post('email');
 		$password = $this->input->post('password');
 
-		// Obtener usuario validado
 		$usuario = $this->login_model->obtenerUsuarioPorEmail($user);
 
-		// Verificar si el usuario existe y la contraseña es correcta
 		if ($usuario && password_verify($password, $usuario->password)) {
 			$this->session->set_userdata('usuario_id', $usuario->usuario_id);
 			$this->session->set_userdata('nombre', $usuario->nombre . ' ' . $usuario->primerApellido);
 
-			// Redirección basada en el rol
 			switch ($usuario->rol) {
 				case "cliente":
-					redirect('Welcome/inicio'); // Cliente
-					break;
-				case "empleado":
-					redirect('Welcome/empleado'); // Empleado
+					redirect('Welcome/inicio');
 					break;
 				case "administrador":
-					redirect('Welcome/admin'); // Administrador
+					redirect('Welcome/admin');
 					break;
 				default:
 					$data['error'] = 'Rol de usuario no válido';
@@ -952,21 +1108,86 @@ class Welcome extends CI_Controller
 		$data['garzones_asignados'] = $this->Garzones_reservas_model->obtener_garzones_por_reserva($reserva_id);
 		$this->load->view('administrador/detalles_reserva', $data);
 	}
-	public function eliminar($detalle_id)
+	public function eliminarDetalle($detalle_id)
 	{
-		// Cargar el modelo correspondiente si aún no lo has hecho
 		$this->load->model('Reserva_detalle_model');
+		$this->load->model('Reservas_model');
+		$this->load->model('Vajilla_model');
+		$this->load->model('Manteleria_model');
 
-		// Llamar a la función del modelo para eliminar el detalle
-		if ($this->Reserva_detalle_model->eliminar_detalle($detalle_id)) {
-			$this->session->set_flashdata('success', 'Detalle eliminado correctamente.');
+		$detalle = $this->Reserva_detalle_model->get_detalle_by_id($detalle_id);
+
+		if ($detalle) {
+			$reserva_id = $detalle->reserva_id;
+			$precio_detalle = $detalle->cantidad * $detalle->precio;
+
+			// Devolver el stock según el tipo de item
+			if ($detalle->vajilla_id) {
+				$this->Vajilla_model->incrementar_stock_vajilla($detalle->vajilla_id, $detalle->cantidad);
+			} elseif ($detalle->manteleria_id) {
+				$this->Manteleria_model->incrementar_stock_manteleria($detalle->manteleria_id, $detalle->cantidad);
+			}
+
+			// Resta el monto del detalle del total de la reserva y elimina el detalle
+			if ($this->Reservas_model->restar_monto_total($reserva_id, $precio_detalle)) {
+				if ($this->Reserva_detalle_model->eliminar_detalle($detalle_id)) {
+					$this->session->set_flashdata('success', 'Detalle eliminado correctamente y stock actualizado.');
+				} else {
+					$this->session->set_flashdata('error', 'Error al eliminar el detalle.');
+				}
+			} else {
+				$this->session->set_flashdata('error', 'Error al actualizar el monto total de la reserva.');
+			}
 		} else {
-			$this->session->set_flashdata('error', 'Error al eliminar el detalle.');
+			$this->session->set_flashdata('error', 'Detalle no encontrado.');
+		}
+		redirect('Welcome/detalles/' . $reserva_id);
+	}
+
+	public function actualizarCantidad($detalle_id)
+	{
+		$this->load->model('Reserva_detalle_model');
+		$this->load->model('Reservas_model');
+		$nueva_cantidad = $this->input->post('cantidad');
+
+		if ($nueva_cantidad > 0) {
+			// Obtén el detalle usando el detalle_id
+			$detalle = $this->Reserva_detalle_model->get_detalle_by_id($detalle_id);
+
+			if ($detalle) {
+				// Actualiza la cantidad del detalle
+				$this->Reserva_detalle_model->actualizar_cantidad($detalle_id, $nueva_cantidad);
+
+				// Calcula el precio total del detalle
+				$precio_total_detalle = $nueva_cantidad * $detalle->precio;
+
+				// Obtén el reserva_id y garzones de la reserva asociada
+				$reserva_id = $detalle->reserva_id;
+				$reserva = $this->Reservas_model->get_reserva_by_id($reserva_id); // Asegúrate de tener este método en el modelo
+				$garzones = isset($reserva->garzones) ? $reserva->garzones : 0; // Obtén la cantidad de garzones
+
+				// Calcula el nuevo monto total incluyendo el costo de los garzones
+				$monto_total = $this->Reservas_model->calcular_monto_total($reserva_id, $garzones);
+
+				// Actualiza el monto total en la reserva
+				$this->Reservas_model->actualizar_monto_total($reserva_id, $monto_total);
+
+				// Mensaje de éxito
+				$this->session->set_flashdata('success', 'Cantidad actualizada correctamente.');
+			} else {
+				// Mensaje de error si no se encuentra el detalle
+				$this->session->set_flashdata('error', 'Detalle no encontrado.');
+			}
+		} else {
+			// Mensaje de error si la cantidad no es válida
+			$this->session->set_flashdata('error', 'La cantidad debe ser mayor a 0.');
 		}
 
-		// Redireccionar de vuelta a la página de detalles de la reserva
-		redirect(uri: 'Welcome/detalles/' . $this->input->post('reserva_id'));
+		// Redirige a la página de detalles de la reserva
+		redirect('Welcome/detalles/' . $detalle->reserva_id);
 	}
+
+
 
 	public function empleados()
 	{
@@ -983,25 +1204,21 @@ class Welcome extends CI_Controller
 	// Guardar empleado
 	public function guardar_empleado()
 	{
-		// Obtener datos del formulario
 		$nombre = $this->input->post('nombre');
 		$apellido_paterno = $this->input->post('apellido_paterno');
 		$apellido_materno = $this->input->post('apellido_materno');
 		$celular = $this->input->post('celular');
 
-		// Validar si el celular ya existe
 		if ($this->Empleado_model->celular_existe($celular)) {
 			$this->session->set_flashdata('error', 'El celular ya está registrado.');
 			redirect('Welcome/agregar_empleado');
 		}
 
-		// Validar si el nombre ya existe (esto es opcional)
 		if ($this->Empleado_model->nombre_existe($nombre, $apellido_paterno, $apellido_materno)) {
 			$this->session->set_flashdata('error', 'El empleado ya está registrado.');
 			redirect('Welcome/agregar_empleado');
 		}
 
-		// Preparar los datos para insertar
 		$data = array(
 			'nombre' => $nombre,
 			'apellido_paterno' => $apellido_paterno,
@@ -1009,10 +1226,11 @@ class Welcome extends CI_Controller
 			'celular' => $celular
 		);
 
-		// Insertar el nuevo empleado
 		$this->Empleado_model->insert_empleado($data);
+		$this->session->set_flashdata('success_message', 'Empleado agregado correctamente.');
 		redirect('Welcome/empleados');
 	}
+
 
 
 	// Cargar vista para editar empleado
@@ -1040,9 +1258,27 @@ class Welcome extends CI_Controller
 	// Eliminar empleado
 	public function eliminar_empleado($empleado_id)
 	{
-		$this->Empleado_model->delete_empleado($empleado_id);
+		$data = array('estado' => 0);
+		$this->db->where('empleado_id', $empleado_id);
+		$this->db->update('Empleados', $data);
+
+		// Establece un mensaje de flash
+		$this->session->set_flashdata('success_message', 'Empleado eliminado correctamente.');
+
 		redirect('Welcome/empleados');
 	}
+	public function reactivar_empleado($empleado_id)
+	{
+		$data = array('estado' => 1); // Cambia el estado a 1 para reactivar
+		$this->db->where('empleado_id', $empleado_id);
+		$this->db->update('Empleados', $data);
+
+		// Mensaje de éxito
+		$this->session->set_flashdata('success_message', 'Empleado reactivado correctamente.');
+
+		redirect('Welcome/empleados');
+	}
+
 
 
 	public function admin()
@@ -1064,20 +1300,7 @@ class Welcome extends CI_Controller
 		redirect('Welcome/index');
 	}
 
-	private function check_session_and_load_view($view, $load_users = false)
-	{
-		if ($this->session->userdata('nombre')) {
-			$data['nombre'] = $this->session->userdata('nombre');
 
-			if ($load_users) {
-				$data['usuarios'] = $this->Usuario_model->get_usuarios();
-			}
-
-			$this->load->view($view, $data);
-		} else {
-			redirect('Welcome/index');
-		}
-	}
 
 	public function eliminarUsuario($usuario_id)
 	{
@@ -1086,7 +1309,22 @@ class Welcome extends CI_Controller
 		} else {
 			$this->session->set_flashdata('error', 'Error al eliminar el usuario.');
 		}
-		redirect('Welcome/detalles');
+		redirect('Welcome/adminUser');
+	}
+	public function activarUsuario($usuario_id)
+	{
+		// Cargar el modelo de usuarios
+		$this->load->model('Usuario_model');
+
+		// Llamar a la función del modelo para activar al usuario
+		if ($this->Usuario_model->activar_usuario($usuario_id)) {
+			$this->session->set_flashdata('success', 'Usuario activado correctamente.');
+		} else {
+			$this->session->set_flashdata('error', 'Error al activar el usuario.');
+		}
+
+		// Redirigir a la página de detalles o la lista de usuarios
+		redirect('Welcome/adminUser');
 	}
 
 	public function agregarVajilla()

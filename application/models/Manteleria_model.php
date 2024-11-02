@@ -49,5 +49,11 @@ class Manteleria_model extends CI_Model
     {
         return $this->db->insert('Manteleria', $data);
     }
+    public function incrementar_stock_manteleria($manteleria_id, $cantidad)
+    {
+        $this->db->set('stock', 'stock + ' . (int) $cantidad, FALSE);
+        $this->db->where('manteleria_id', $manteleria_id);
+        return $this->db->update('Manteleria');
+    }
 
 }

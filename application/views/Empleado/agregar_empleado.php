@@ -164,11 +164,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                <li>
-                    <a href="<?php echo site_url('Welcome/adminDecoracion'); ?>">
-                        <img src="../../assets/image/decoracion.png" alt="Mantelería y Decoración"> Decoración
-                    </a>
-                </li>
+
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -198,20 +194,13 @@
         </div>
     </section>
 
-    <!-- Content page -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="titulo">"Agregar Empleado"</h1>
+                    <h1 class="titulo">Agregar Empleado</h1>
                 </div>
                 <div class="col-md-6">
-                    <?php if ($this->session->flashdata('error')): ?>
-                        <div class="alert alert-danger">
-                            <?= $this->session->flashdata('error'); ?>
-                        </div>
-                    <?php endif; ?>
-
                     <form action="<?= site_url('Welcome/guardar_empleado'); ?>" method="post">
                         <div class="form-group">
                             <label for="nombre">Nombre</label>
@@ -236,11 +225,36 @@
         </div>
     </section>
 
+    <script>
+        // Mostrar mensajes de éxito o error usando SweetAlert2
+        <?php if ($this->session->flashdata('success_message')): ?>
+            $(document).ready(function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: '<?= $this->session->flashdata('success_message'); ?>',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            });
+        <?php endif; ?>
 
+        <?php if ($this->session->flashdata('error')): ?>
+            $(document).ready(function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '<?= $this->session->flashdata('error'); ?>',
+                    showConfirmButton: true
+                });
+            });
+        <?php endif; ?>
 
-    <!--====== Scripts -->
+    </script>
+
+    <!-- Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>
-    <script src="./js/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 desde CDN -->
     <script src="./js/bootstrap.min.js"></script>
     <script src="./js/material.min.js"></script>
     <script src="./js/ripples.min.js"></script>
@@ -249,6 +263,7 @@
     <script>
         $.material.init();
     </script>
+
 </body>
 
 </html>
