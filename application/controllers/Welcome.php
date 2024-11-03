@@ -647,6 +647,11 @@ class Welcome extends CI_Controller
 	}
 	public function guardar_reserva()
 	{
+		// Asegurarnos de que no se haya enviado ninguna salida antes
+		if (!headers_sent()) {
+			header('Content-Type: application/json');
+		}
+
 		$this->load->model('Reservas_model');
 		$this->load->model('Reserva_detalle_model');
 
@@ -663,15 +668,19 @@ class Welcome extends CI_Controller
 		$carrito = $this->session->userdata('carrito');
 
 		if (empty($carrito)) {
-			$this->session->set_flashdata('error', 'No puedes hacer una reserva con el carrito vacío.');
-			redirect('Welcome/carrito');
-			return;
+			echo json_encode([
+				'success' => false,
+				'message' => 'No puedes hacer una reserva con el carrito vacío.'
+			]);
+			exit;
 		}
 
 		if ($this->Reservas_model->verificar_disponibilidad_fecha($fecha_reserva, $dias)) {
-			$this->session->set_flashdata('error', 'Las fechas seleccionadas ya están reservadas. Por favor elige otras fechas.');
-			redirect('Welcome/carrito');
-			return;
+			echo json_encode([
+				'success' => false,
+				'message' => 'Las fechas seleccionadas ya están reservadas. Por favor elige otras fechas.'
+			]);
+			exit;
 		}
 
 		if ($garzones === 'si') {
@@ -680,31 +689,51 @@ class Welcome extends CI_Controller
 			$garzones_value = '0';
 		}
 
-		$this->db->trans_start();
+		try {
+			$this->db->trans_start();
 
-		$reserva_id = $this->Reservas_model->guardar_reserva($usuario_id, $fecha_reserva, $evento, $dias, $monto_total, $detalle_evento, $garzones_value);
+			$reserva_id = $this->Reservas_model->guardar_reserva(
+				$usuario_id,
+				$fecha_reserva,
+				$evento,
+				$dias,
+				$monto_total,
+				$detalle_evento,
+				$garzones_value
+			);
 
-		foreach ($carrito as $item) {
-			$this->Reserva_detalle_model->guardar_detalle($reserva_id, $item['vajilla_id'], $item['manteleria_id'], $item['cantidad'], $item['precio']);
+			foreach ($carrito as $item) {
+				$this->Reserva_detalle_model->guardar_detalle(
+					$reserva_id,
+					$item['vajilla_id'] ?? null,
+					$item['manteleria_id'] ?? null,
+					$item['cantidad'],
+					$item['precio']
+				);
+			}
+
+			$this->db->trans_complete();
+
+			if ($this->db->trans_status() === FALSE) {
+				throw new Exception('Error en la transacción de la base de datos');
+			}
+
+			$this->session->unset_userdata('carrito');
+
+			echo json_encode([
+				'success' => true,
+				'message' => 'La solicitud del servicio se ha realizado con éxito. Se enviará la confirmación a su correo electrónico.'
+			]);
+			exit;
+
+		} catch (Exception $e) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Hubo un error al procesar la reserva: ' . $e->getMessage()
+			]);
+			exit;
 		}
-		$this->db->trans_complete();
-
-		if ($this->db->trans_status() === FALSE) {
-			$this->session->set_flashdata('error', 'Hubo un problema al procesar tu reserva. Por favor, intenta de nuevo.');
-			redirect('Welcome/carrito');
-			return;
-		}
-
-		$this->session->unset_userdata('carrito');
-		$this->session->set_flashdata('success', 'La solicitud del servicio se ha realizado con éxito. Se enviará la confirmación a su correo electrónico.');
-		redirect('Welcome/confirmacion_reserva');
 	}
-
-
-
-
-
-
 	public function confirmacion_reserva()
 	{
 		$data['nombre'] = $this->session->userdata('nombre');
@@ -712,8 +741,72 @@ class Welcome extends CI_Controller
 	}
 
 
-
-
+	public function eliminar_producto_carrito() {
+		header('Content-Type: application/json');
+		
+		$id = $this->input->post('id');
+		$tipo = $this->input->post('tipo');
+		$cantidad = $this->input->post('cantidad');
+		
+		$carrito = $this->session->userdata('carrito');
+		$producto_encontrado = false;
+		
+		try {
+			$this->db->trans_start();
+			
+			if ($tipo == 'vajilla') {
+				// Actualizar stock de vajilla
+				$this->db->set('stock_cajas', 'stock_cajas + ' . $cantidad, FALSE);
+				$this->db->where('vajilla_id', $id);
+				$this->db->update('Vajilla');
+			} else if ($tipo == 'manteleria') {
+				// Actualizar stock de mantelería
+				$this->db->set('stock', 'stock + ' . $cantidad, FALSE);
+				$this->db->where('manteleria_id', $id);
+				$this->db->update('Manteleria');
+			}
+			
+			// Eliminar el producto del carrito
+			if ($carrito && is_array($carrito)) {
+				foreach ($carrito as $key => $item) {
+					if (($tipo == 'vajilla' && isset($item['vajilla_id']) && $item['vajilla_id'] == $id) ||
+						($tipo == 'manteleria' && isset($item['manteleria_id']) && $item['manteleria_id'] == $id)) {
+						unset($carrito[$key]);
+						$producto_encontrado = true;
+						break;
+					}
+				}
+			}
+			
+			$this->db->trans_complete();
+			
+			if ($this->db->trans_status() === FALSE) {
+				throw new Exception('Error al actualizar la base de datos');
+			}
+			
+			if ($producto_encontrado) {
+				// Reindexar el array del carrito y guardarlo en la sesión
+				$carrito = array_values($carrito);
+				$this->session->set_userdata('carrito', $carrito);
+				
+				echo json_encode([
+					'success' => true,
+					'message' => 'Producto eliminado correctamente del carrito'
+				]);
+			} else {
+				echo json_encode([
+					'success' => false,
+					'message' => 'Producto no encontrado en el carrito'
+				]);
+			}
+			
+		} catch (Exception $e) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Error al eliminar el producto: ' . $e->getMessage()
+			]);
+		}
+	}
 
 	public function vaciar_carrito()
 	{

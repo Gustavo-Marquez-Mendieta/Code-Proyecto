@@ -31,7 +31,6 @@
             overflow-y: auto;
         }
 
-        /* Estilos del modal con mayor especificidad */
         body .modal {
             z-index: 9999 !important;
             background-color: rgba(0, 0, 0, 0.5);
@@ -85,10 +84,36 @@
             box-shadow: 0 0 0 0.2rem rgba(135, 206, 235, 0.25);
         }
 
-        /* Resto de tu CSS actual */
         .dashboard-contentPage {
             margin-left: 250px;
             padding: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff !important;
+            border-color: #007bff !important;
+        }
+
+        .btn-success {
+            background-color: #28a745 !important;
+            border-color: #28a745 !important;
+        }
+
+        .btn-danger {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+
+        .btn-primary:hover,
+        .btn-success:hover,
+        .btn-danger:hover {
+            opacity: 0.9 !important;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin: 0 2px;
         }
     </style>
 </head>
@@ -213,19 +238,19 @@
                                     <td>
                                         <?php if ($empleado->estado == 1): ?>
                                             <button type="button" onclick="editarEmpleado(
-                                                    '<?= $empleado->empleado_id; ?>', 
-                                                    '<?= htmlspecialchars($empleado->nombre); ?>', 
-                                                    '<?= htmlspecialchars($empleado->apellido_paterno); ?>', 
-                                                    '<?= htmlspecialchars($empleado->apellido_materno); ?>', 
-                                                    '<?= htmlspecialchars($empleado->celular); ?>'
-                                                )" class="btn btn-success btn-sm" style="color:white">
+                '<?= $empleado->empleado_id; ?>', 
+                '<?= htmlspecialchars($empleado->nombre); ?>', 
+                '<?= htmlspecialchars($empleado->apellido_paterno); ?>', 
+                '<?= htmlspecialchars($empleado->apellido_materno); ?>', 
+                '<?= htmlspecialchars($empleado->celular); ?>'
+            )" class="btn btn-primary btn-sm text-white">
                                                 Editar
                                             </button>
                                             <a href="<?= site_url('Welcome/eliminar_empleado/' . $empleado->empleado_id); ?>"
-                                                class="btn btn-danger btn-sm" style="color:white">Eliminar</a>
+                                                class="btn btn-danger btn-sm text-white">Eliminar</a>
                                         <?php else: ?>
                                             <a href="<?= site_url('Welcome/reactivar_empleado/' . $empleado->empleado_id); ?>"
-                                                class="btn btn-success btn-sm" style="color:white">Reactivar</a>
+                                                class="btn btn-success btn-sm text-white">Reactivar</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -272,7 +297,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" id="btnGuardarCambios">Guardar cambios</button>
+                    <button type="button" class="btn btn-success text-white" id="btnGuardarCambios">Guardar cambios</button>
                 </div>
             </div>
         </div>
@@ -314,7 +339,6 @@
                 });
             };
 
-            // Manejador del botón guardar
             $('#btnGuardarCambios').on('click', function () {
                 var empleado_id = $('#empleado_id').val();
                 var formData = $('#formEditarEmpleado').serialize();
@@ -324,31 +348,36 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
+                        // Primero ocultamos el modal de edición
                         $('#modalEditarEmpleado').modal('hide');
+                        $('.modal-backdrop').remove(); // Elimina el backdrop del modal
+
+                        // Mostramos el SweetAlert con cierre automático
                         Swal.fire({
                             title: '¡Éxito!',
                             text: 'Empleado actualizado correctamente',
-                            icon: 'success'
-                        }).then(function () {
-                            location.reload();
+                            icon: 'success',
+                            showConfirmButton: false, // Oculta el botón de OK
+                            allowOutsideClick: false, // Evita que se cierre al hacer clic fuera
+                            timer: 2000 // Se cerrará automáticamente después de 2 segundos
+                        }).then(() => {
+                            window.location.href = window.location.href;
                         });
                     },
                     error: function () {
                         Swal.fire({
                             title: 'Error',
                             text: 'No se pudo actualizar el empleado',
-                            icon: 'error'
+                            icon: 'error',
+                            showConfirmButton: true
                         });
                     }
                 });
             });
-
-            // Test del modal
             window.testModal = function () {
                 $('#modalEditarEmpleado').modal('show');
             }
 
-            // Inicializar Material Design si es necesario
             if (typeof $.material !== 'undefined') {
                 $.material.init();
             }

@@ -5,20 +5,17 @@
     <title>Inicio</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<?php echo base_url(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/configuracion.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-    <!-- Vendor CSS Files -->
-    <link href="<?php echo base_url(); ?>assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/modal.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/formulary.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/icofont/icofont.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
 
     <style>
         /* Estilos adicionales que puedas necesitar */
@@ -201,32 +198,77 @@
                     <h1 class="titulo">Agregar Empleado</h1>
                 </div>
                 <div class="col-md-6">
-                    <form action="<?= site_url('Welcome/guardar_empleado'); ?>" method="post">
+                    <form id="formAgregarEmpleado" action="<?= site_url('Welcome/guardar_empleado'); ?>" method="post">
                         <div class="form-group">
-                            <label for="nombre">Nombre</label>
+                            <label for="nombre" style="color:white;">Nombre</label>
                             <input type="text" name="nombre" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="apellido_paterno">Apellido Paterno</label>
+                            <label for="apellido_paterno"  style="color:white;">Apellido Paterno</label>
                             <input type="text" name="apellido_paterno" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="apellido_materno">Apellido Materno</label>
+                            <label for="apellido_materno" style="color:white;">Apellido Materno</label>
                             <input type="text" name="apellido_materno" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="celular">Celular</label>
+                            <label for="celular"  style="color:white;">Celular</label>
                             <input type="text" name="celular" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-success" style="color:white">Guardar</button>
+                        <button type="submit" class="btn btn-success text-white">Guardar Empleado</button>
                     </form>
                 </div>
             </div>
         </div>
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Tus scripts locales -->
+    <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
+    <!-- Agregar este script al final del archivo, justo antes de cerrar el body -->
+    <script>
+        $(document).ready(function () {
+            $('#formAgregarEmpleado').on('submit', function (e) {
+                e.preventDefault(); // Previene el envío tradicional del formulario
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        // Mostrar SweetAlert con cierre automático
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Empleado agregado correctamente',
+                            icon: 'success',
+                            showConfirmButton: false, // Oculta el botón de OK
+                            allowOutsideClick: false, // Evita que se cierre al hacer clic fuera
+                            timer: 2000 // Se cerrará automáticamente después de 2 segundos
+                        }).then(() => {
+                            // Redirigir a la página de empleados
+                            window.location.href = '<?= site_url('Welcome/empleados'); ?>';
+                        });
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo agregar el empleado',
+                            icon: 'error',
+                            showConfirmButton: true
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 
     <script>
-        // Mostrar mensajes de éxito o error usando SweetAlert2
         <?php if ($this->session->flashdata('success_message')): ?>
             $(document).ready(function () {
                 Swal.fire({
@@ -249,20 +291,16 @@
                 });
             });
         <?php endif; ?>
-
+        $.material.init();
     </script>
 
-    <!-- Scripts -->
     <script src="./js/jquery-3.1.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./js/bootstrap.min.js"></script>
     <script src="./js/material.min.js"></script>
     <script src="./js/ripples.min.js"></script>
     <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
     <script src="./js/main.js"></script>
-    <script>
-        $.material.init();
-    </script>
 
 </body>
 

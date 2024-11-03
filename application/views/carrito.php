@@ -165,13 +165,7 @@
                                         <td><?php echo $item['cantidad']; ?></td>
                                         <td><?php echo 'Bs. ' . number_format($item['precio'] * $item['cantidad'], 2); ?></td>
                                         <td>
-                                            <?php if ($item['tipo'] == 'decoracion'): ?>
-                                                <a href="<?php echo site_url('Welcome/eliminar_del_carrito/' . $item['manteleria_id'] . '/decoracion'); ?>"
-                                                    class="btn btn-danger">Eliminar</a>
-                                            <?php elseif ($item['tipo'] == 'vajilla'): ?>
-                                                <a href="<?php echo site_url('Welcome/eliminar_del_carrito/' . $item['vajilla_id'] . '/vajilla'); ?>"
-                                                    class="btn btn-danger">Eliminar</a>
-                                            <?php endif; ?>
+                                            aca boton de eliminar
                                         </td>
                                     </tr>
                                     <?php $total_carrito += $item['precio'] * $item['cantidad']; ?>
@@ -275,12 +269,69 @@
     </section>
 
 
-    <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/vendor/owl.carousel/owl.carousel.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/vendor/venobox/venobox.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/vendor/aos/aos.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Tus scripts locales -->
+    <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                html: `
+                    <div class="mb-4">Reserva guardada correctamente</div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        ${response.message}
+                    </div>
+                `,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                window.location.href = '<?= site_url('Welcome/carrito'); ?>';
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: response.message || 'Error al procesar la reserva',
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error en la petición:', { xhr, status, error });
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un problema al conectar con el servidor. Por favor, intente nuevamente.',
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
