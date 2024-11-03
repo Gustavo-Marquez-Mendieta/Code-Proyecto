@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/formulario.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
@@ -31,6 +30,32 @@
             position: fixed;
             height: 100%;
             overflow-y: auto;
+        }
+
+        .titulo {
+            color: #ff6b6b;
+            margin: 20px 0;
+        }
+
+        .table {
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .table thead th {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .table tbody td {
+            color: #fff;
+        }
+
+        .mt-3 h4 {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -126,9 +151,10 @@
                 <div class="col-md-12">
                     <br>
                     <h1 class="titulo">"EL DETALLE EVENTOS"</h1>
+                    <h1 class="titulo">Servicios a Adquirir</h1>
                 </div>
                 <div class="col-md-6">
-                    <h1 class="titulo">Servicios a Adquirir</h1>
+
 
                     <?php if ($this->session->flashdata('error')): ?>
                         <div class="alert alert-danger">
@@ -139,42 +165,95 @@
                     <?php
                     $total_carrito = 0;
                     if (!empty($carrito)):
+                        // Separar items por tipo
+                        $items_vajilla = array_filter($carrito, function ($item) {
+                            return $item['tipo_producto'] == 'vajilla';
+                        });
+                        $items_manteleria = array_filter($carrito, function ($item) {
+                            return $item['tipo_producto'] == 'manteleria';
+                        });
                         ?>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Imagen</th>
-                                    <th>Nombre</th>
-                                    <th>Tipo</th>
-                                    <th>Precio</th>
-                                    <th>Cantidad</th>
-                                    <th>Total</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($carrito as $item): ?>
+                        <!-- Tabla de Vajilla -->
+                        <?php if (!empty($items_vajilla)): ?>
+                            <h3 style="color:white;">Vajilla</h3>
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <img src="<?php echo base_url('./assets/img/' . $item['imagen']); ?>"
-                                                alt="<?php echo $item['nombre']; ?>" style="width: 100px;">
-                                        </td>
-                                        <td><?php echo $item['nombre']; ?></td>
-                                        <td><?php echo $item['tipo']; ?></td>
-                                        <td><?php echo 'Bs. ' . number_format($item['precio'], 2); ?></td>
-                                        <td><?php echo $item['cantidad']; ?></td>
-                                        <td><?php echo 'Bs. ' . number_format($item['precio'] * $item['cantidad'], 2); ?></td>
-                                        <td>
-                                            aca boton de eliminar
-                                        </td>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad (Cajas)</th>
+                                        <th>Total</th>
+                                        <th>Acción</th>
                                     </tr>
-                                    <?php $total_carrito += $item['precio'] * $item['cantidad']; ?>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($items_vajilla as $item): ?>
+                                        <tr>
+                                            <td>
+                                                <img src="<?php echo base_url('./assets/img/' . $item['imagen']); ?>"
+                                                    alt="<?php echo $item['nombre']; ?>" style="width: 100px;">
+                                            </td>
+                                            <td><?php echo $item['nombre']; ?></td>
+                                            <td><?php echo 'Bs. ' . number_format($item['precio'], 2); ?></td>
+                                            <td><?php echo $item['cantidad']; ?></td>
+                                            <td><?php echo 'Bs. ' . number_format($item['precio'] * $item['cantidad'], 2); ?></td>
+                                            <td>
+                                                <button type="button"
+                                                    onclick="eliminarProducto(<?= $item['vajilla_id']; ?>, 'vajilla', <?= $item['cantidad']; ?>)"
+                                                    class="btn btn-danger btn-sm text-white">
+                                                    Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <?php $total_carrito += $item['precio'] * $item['cantidad']; ?>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
 
-                        <a href="<?php echo site_url('Welcome/vaciar_carrito'); ?>" class="btn btn-danger btn-vaciar"
-                            style="color:white">Vaciar Carrito</a>
+                        <!-- Tabla de Mantelería -->
+                        <?php if (!empty($items_manteleria)): ?>
+                            <h3 style="color:white;">Mantelería</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th>Total</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($items_manteleria as $item): ?>
+                                        <tr>
+                                            <td>
+                                                <img src="<?php echo base_url('./assets/img/' . $item['imagen']); ?>"
+                                                    alt="<?php echo $item['nombre']; ?>" style="width: 100px;">
+                                            </td>
+                                            <td><?php echo $item['nombre']; ?></td>
+                                            <td><?php echo 'Bs. ' . number_format($item['precio'], 2); ?></td>
+                                            <td><?php echo $item['cantidad']; ?></td>
+                                            <td><?php echo 'Bs. ' . number_format($item['precio'] * $item['cantidad'], 2); ?></td>
+                                            <td>
+                                                <button type="button"
+                                                    onclick="eliminarProducto(<?= $item['manteleria_id']; ?>, 'manteleria', <?= $item['cantidad']; ?>)"
+                                                    class="btn btn-danger btn-sm text-white">
+                                                    Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <?php $total_carrito += $item['precio'] * $item['cantidad']; ?>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+
+                        <div class="mt-3">
+                            <h4>Total General: Bs. <?php echo number_format($total_carrito, 2); ?></h4>
+                        </div>
                     <?php else: ?>
                         <p style="color:white">El carrito está vacío.</p>
                     <?php endif; ?>
@@ -229,57 +308,146 @@
                                 min="1" placeholder="Ingrese la cantidad de garzones" oninput="calcularTotal()">
                         </div>
 
-                        <!-- Campo para mostrar el total del servicio -->
                         <p>Total del Servicio: Bs. <span
                                 id="total_servicio"><?php echo number_format($total_carrito, 2); ?></span></p>
-
-                        <!-- Campo oculto para enviar el total del servicio al controlador -->
                         <input type="hidden" name="monto_total" id="monto_total" value="<?php echo $total_carrito; ?>">
 
                         <button type="submit" class="btn btn-primary" style="color:white">Confirmar Reserva</button>
                     </form>
-
-                    <script>
-                        const costoGarzon = 150;
-                        let totalCarrito = <?php echo $total_carrito; ?>;
-
-                        function mostrarCantidadGarzones() {
-                            document.getElementById('cantidad_garzones_div').style.display = 'block';
-                        }
-
-                        function ocultarCantidadGarzones() {
-                            document.getElementById('cantidad_garzones_div').style.display = 'none';
-                            document.getElementById('cantidad_garzones').value = '';
-                            calcularTotal();
-                        }
-
-                        function calcularTotal() {
-                            let cantidadGarzones = document.getElementById('cantidad_garzones').value;
-                            let totalGarzones = cantidadGarzones ? cantidadGarzones * costoGarzon : 0;
-                            let totalServicio = totalCarrito + totalGarzones;
-
-                            // Actualiza el valor en el <p> y el campo oculto
-                            document.getElementById('total_servicio').innerText = totalServicio.toFixed(2);
-                            document.getElementById('monto_total').value = totalServicio.toFixed(2); // Actualiza el campo oculto
-                        }
-                    </script>
                 </div>
             </div>
         </div>
     </section>
 
-
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Tus scripts locales -->
-    <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
-    <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
+    <style>
+        .titulo {
+            color: #ff6b6b;
+            margin: 20px 0;
+           
+        }
+
+        .table {
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .table thead th {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            text-align: center;
+        }
+
+        .table tbody td {
+            color: #fff;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .mt-3 h4 {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .form-group label {
+            color: #fff;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .btn-vaciar {
+            margin-top: 10px;
+            width: 100%;
+        }
+    </style>
+
     <script>
+        const costoGarzon = 150;
+        let totalCarrito = <?php echo $total_carrito; ?>;
+
+        function mostrarCantidadGarzones() {
+            document.getElementById('cantidad_garzones_div').style.display = 'block';
+        }
+
+        function ocultarCantidadGarzones() {
+            document.getElementById('cantidad_garzones_div').style.display = 'none';
+            document.getElementById('cantidad_garzones').value = '';
+            calcularTotal();
+        }
+
+        function calcularTotal() {
+            let cantidadGarzones = document.getElementById('cantidad_garzones').value;
+            let totalGarzones = cantidadGarzones ? cantidadGarzones * costoGarzon : 0;
+            let totalServicio = totalCarrito + totalGarzones;
+
+            document.getElementById('total_servicio').innerText = totalServicio.toFixed(2);
+            document.getElementById('monto_total').value = totalServicio.toFixed(2);
+        }
+
+        function eliminarProducto(id, tipo, cantidad) {
+            // Eliminar directamente sin confirmación
+            $.ajax({
+                url: '<?= site_url('Welcome/eliminar_producto_carrito'); ?>',
+                type: 'POST',
+                data: {
+                    id: id,
+                    tipo: tipo,
+                    cantidad: cantidad
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        // Mostrar mensaje de éxito
+                        Swal.fire({
+                            title: 'Producto Eliminado',
+                            text: response.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        // Mostrar mensaje de error
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.message,
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error de conexión',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true
+                    });
+                }
+            });
+        }
+
+        // Manejo del formulario de reserva
         $(document).ready(function () {
             $('form').on('submit', function (e) {
                 e.preventDefault();
@@ -294,17 +462,17 @@
                             Swal.fire({
                                 title: '¡Éxito!',
                                 html: `
-                    <div class="mb-4">Reserva guardada correctamente</div>
-                    <div style="font-size: 0.9em; color: #666;">
-                        ${response.message}
-                    </div>
-                `,
+                            <div class="mb-4">Reserva guardada correctamente</div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                ${response.message}
+                            </div>
+                        `,
                                 icon: 'success',
                                 showConfirmButton: false,
                                 timer: 3000,
                                 timerProgressBar: true
                             }).then(() => {
-                                window.location.href = '<?= site_url('Welcome/carrito'); ?>';
+                                window.location.href = '<?= site_url('Welcome/confirmacion_reserva'); ?>';
                             });
                         } else {
                             Swal.fire({
@@ -318,10 +486,9 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error en la petición:', { xhr, status, error });
                         Swal.fire({
                             title: 'Error',
-                            text: 'Hubo un problema al conectar con el servidor. Por favor, intente nuevamente.',
+                            text: 'Hubo un problema al conectar con el servidor',
                             icon: 'error',
                             showConfirmButton: false,
                             timer: 3000,

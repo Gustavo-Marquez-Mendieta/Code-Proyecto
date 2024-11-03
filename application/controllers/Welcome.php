@@ -741,66 +741,77 @@ class Welcome extends CI_Controller
 	}
 
 
-	public function eliminar_producto_carrito() {
+	public function eliminar_producto_carrito()
+	{
 		header('Content-Type: application/json');
-		
+
 		$id = $this->input->post('id');
 		$tipo = $this->input->post('tipo');
 		$cantidad = $this->input->post('cantidad');
-		
+
 		$carrito = $this->session->userdata('carrito');
-		$producto_encontrado = false;
-		
+		$producto_key = false;
+
 		try {
 			$this->db->trans_start();
-			
+
+			// Buscar y actualizar según el tipo de producto
 			if ($tipo == 'vajilla') {
-				// Actualizar stock de vajilla
-				$this->db->set('stock_cajas', 'stock_cajas + ' . $cantidad, FALSE);
-				$this->db->where('vajilla_id', $id);
-				$this->db->update('Vajilla');
+				// Verificar que el producto existe
+				$producto = $this->db->get_where('Vajilla', ['vajilla_id' => $id])->row();
+				if ($producto) {
+					// Actualizar stock_cajas en la tabla Vajilla
+					$nuevo_stock = $producto->stock_cajas + $cantidad;
+					$this->db->where('vajilla_id', $id);
+					$this->db->update('Vajilla', ['stock_cajas' => $nuevo_stock]);
+
+					// Buscar en el carrito
+					foreach ($carrito as $key => $item) {
+						if (isset($item['vajilla_id']) && $item['vajilla_id'] == $id) {
+							$producto_key = $key;
+							break;
+						}
+					}
+				}
 			} else if ($tipo == 'manteleria') {
-				// Actualizar stock de mantelería
-				$this->db->set('stock', 'stock + ' . $cantidad, FALSE);
-				$this->db->where('manteleria_id', $id);
-				$this->db->update('Manteleria');
-			}
-			
-			// Eliminar el producto del carrito
-			if ($carrito && is_array($carrito)) {
-				foreach ($carrito as $key => $item) {
-					if (($tipo == 'vajilla' && isset($item['vajilla_id']) && $item['vajilla_id'] == $id) ||
-						($tipo == 'manteleria' && isset($item['manteleria_id']) && $item['manteleria_id'] == $id)) {
-						unset($carrito[$key]);
-						$producto_encontrado = true;
-						break;
+				// Verificar que el producto existe
+				$producto = $this->db->get_where('Manteleria', ['manteleria_id' => $id])->row();
+				if ($producto) {
+					// Actualizar stock en la tabla Manteleria
+					$nuevo_stock = $producto->stock + $cantidad;
+					$this->db->where('manteleria_id', $id);
+					$this->db->update('Manteleria', ['stock' => $nuevo_stock]);
+
+					// Buscar en el carrito
+					foreach ($carrito as $key => $item) {
+						if (isset($item['manteleria_id']) && $item['manteleria_id'] == $id) {
+							$producto_key = $key;
+							break;
+						}
 					}
 				}
 			}
-			
+
+			// Si se encontró el producto en el carrito, eliminarlo
+			if ($producto_key !== false) {
+				unset($carrito[$producto_key]);
+				$carrito = array_values($carrito);
+				$this->session->set_userdata('carrito', $carrito);
+			}
+
 			$this->db->trans_complete();
-			
+
 			if ($this->db->trans_status() === FALSE) {
 				throw new Exception('Error al actualizar la base de datos');
 			}
-			
-			if ($producto_encontrado) {
-				// Reindexar el array del carrito y guardarlo en la sesión
-				$carrito = array_values($carrito);
-				$this->session->set_userdata('carrito', $carrito);
-				
-				echo json_encode([
-					'success' => true,
-					'message' => 'Producto eliminado correctamente del carrito'
-				]);
-			} else {
-				echo json_encode([
-					'success' => false,
-					'message' => 'Producto no encontrado en el carrito'
-				]);
-			}
-			
+
+			echo json_encode([
+				'success' => true,
+				'message' => 'Producto eliminado correctamente'
+			]);
+
 		} catch (Exception $e) {
+			// Si hay error, hacer rollback automático
 			echo json_encode([
 				'success' => false,
 				'message' => 'Error al eliminar el producto: ' . $e->getMessage()
