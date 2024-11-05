@@ -283,8 +283,11 @@
                         <a href="<?php echo site_url('Welcome/recibir_adelanto/' . $reserva->reserva_id); ?>"
                             class="btn btn-info" style="color:white">Adelanto Recibido</a>
                     <?php elseif ($reserva->estado_pago == 'En Curso de entrega'): ?>
-                        <a href="<?php echo site_url('Welcome/entregar_vajilla/' . $reserva->reserva_id); ?>"
-                            class="btn btn-warning" style="color:white">Entregar Vajilla</a>
+                        <a href="#" id="btnEntregarVajilla"
+                            data-url="<?= site_url('Welcome/entregar_vajilla/' . $reserva->reserva_id); ?>"
+                            class="btn btn-warning" style="color:white">
+                            Entregar Vajilla
+                        </a>
                     <?php elseif ($reserva->estado_pago == 'Vajilla Entregada'): ?>
                         <form action="<?= site_url('Welcome/guardar_detalles_recogida/' . $reserva->reserva_id); ?>"
                             method="post" style="margin-top: 20px;">
@@ -318,7 +321,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="garzonesTableBody">
-                                       
+
                                         <tr></tr>
                                     </tbody>
                                 </table>
@@ -399,6 +402,7 @@
         $.material.init();
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const garzonesSeleccionados = [];
         const maxGarzones = <?= $reserva->garzones ?>;
@@ -441,7 +445,6 @@
             }
         });
 
-        // Función para guardar garzones seleccionados
         document.getElementById('guardarGarzonesBtn').addEventListener('click', function () {
             const reservaId = <?= $reserva->reserva_id; ?>;
 
@@ -479,8 +482,56 @@
                 alert('No has seleccionado ningún garzón.');
             }
         });
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnEntregarVajilla = document.getElementById('btnEntregarVajilla');
 
-        // Función para quitar garzones (usando jQuery)
+            if (btnEntregarVajilla) {
+                btnEntregarVajilla.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Obtener los valores directamente del dataset del botón
+                    const garzonesRequeridos = parseInt(maxGarzones); // Usar la constante global
+                    const garzonesAsignados = parseInt(garzonesActuales); // Usar la constante global
+                    const urlEntrega = this.dataset.url;
+
+                    // Lógica simplificada para determinar si se puede entregar
+                    if (garzonesRequeridos === 0) {
+                        // Si no requiere garzones, entregar directamente
+                        Swal.fire({
+                            title: 'Vajilla Entregada',
+                            icon: 'success',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = urlEntrega;
+                        });
+                    } else if (garzonesAsignados < garzonesRequeridos) {
+                        // Si faltan garzones por asignar
+                        Swal.fire({
+                            title: '¡Atención!',
+                            text: `No se puede entregar la vajilla. Faltan garzones por asignar. 
+                           Se requieren ${garzonesRequeridos} garzones y solo hay ${garzonesAsignados} asignados.`,
+                            icon: 'warning',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        // Si todos los garzones están asignados
+                        Swal.fire({
+                            title: 'Vajilla Entregada',
+                            icon: 'success',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = urlEntrega;
+                        });
+                    }
+                });
+            }
+        });
         $(document).ready(function () {
             $('.quitar-garzon').on('click', function () {
                 var empleado_id = $(this).data('empleado-id');
