@@ -9,6 +9,7 @@
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/formulario.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/botoncaida.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -56,6 +57,96 @@
             background: rgba(0, 0, 0, 0.3);
             padding: 15px;
             border-radius: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            z-index: 1050 !important;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .modal.show {
+            display: block !important;
+            opacity: 1 !important;
+        }
+
+        /* Asegurar que SweetAlert2 aparezca encima del modal */
+        .swal2-container {
+            z-index: 2000 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 0.5rem;
+            pointer-events: all;
+            transform: none !important;
+        }
+
+        @media (min-width: 576px) {
+            .modal-dialog {
+                max-width: 500px;
+                margin: 1.75rem auto;
+            }
+        }
+
+        .modal-content {
+            background: white !important;
+            position: relative !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            pointer-events: auto !important;
+            outline: 0 !important;
+        }
+
+        .btn-danger {
+            padding: 8px 20px;
+            background: linear-gradient(45deg, #ff3636, #ff5555);
+            color: white;
+            border: 2px solid white;
+            /* Borde blanco para más contraste */
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            /* Sombra en el texto */
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #ff0000, #ff3636);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            transform: scale(1.05);
+            border-color: #ffcccc;
+            letter-spacing: 1px;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+        }
+
+        /* Asegurarnos que el texto "Eliminar" sea siempre visible */
+        .btn-danger span {
+            position: relative;
+            z-index: 2;
         }
     </style>
 </head>
@@ -254,13 +345,38 @@
                         <div class="mt-3">
                             <h4>Total General: Bs. <?php echo number_format($total_carrito, 2); ?></h4>
                         </div>
+                        <div class="mt-3 text-center">
+                            <h4 class="mb-4">Total General: Bs. <?php echo number_format($total_carrito, 2); ?></h4>
+                            <button type="button" class="animated-button btn btn-proceed" data-bs-toggle="modal"
+                                data-bs-target="#reservationModal" alt="Proceder Reserva" style="background: blue;">
+                                <div class="button-content">
+                                    <i>P</i><i>r</i><i>o</i><i>c</i><i>e</i><i>d</i><i>e</i><i>r</i><i>&nbsp;</i><i>R</i><i>e</i><i>s</i><i>e</i><i>r</i><i>v</i><i>a</i>
+                                </div>
+                            </button>
+                        </div>
                     <?php else: ?>
                         <p style="color:white">El carrito está vacío.</p>
                     <?php endif; ?>
                 </div>
-                <div class="col-md-3">
-                    <form action="<?php echo site_url('Welcome/guardar_reserva'); ?>" method="post">
-                        <h2>Información para la reserva</h2>
+
+            </div>
+        </div>
+
+    </section>
+
+    <div class="modal fade" id="reservationModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reservationModalLabel">Información para la Reserva</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="reservationForm" action="<?php echo site_url('Welcome/guardar_reserva'); ?>"
+                        method="post">
                         <div class="form-group">
                             <label for="fecha_reserva">Fecha de Reserva:</label>
                             <input type="date" id="fecha_reserva" name="fecha_reserva" class="form-control" required>
@@ -287,7 +403,6 @@
                             <textarea id="detalle_evento" name="detalle_evento" class="form-control" rows="4"
                                 placeholder="Escribe aquí la descripción del evento"></textarea>
                         </div>
-
                         <div class="form-group">
                             <label>¿Desea garzones en su reserva? Costo por garzón 150 Bs.</label>
                             <div>
@@ -301,81 +416,72 @@
                                 <label for="garzones_no">No, solo vajilla</label>
                             </div>
                         </div>
-
                         <div class="form-group" id="cantidad_garzones_div" style="display: none;">
                             <label for="cantidad_garzones">Cantidad de Garzones:</label>
                             <input type="number" id="cantidad_garzones" name="cantidad_garzones" class="form-control"
                                 min="1" placeholder="Ingrese la cantidad de garzones" oninput="calcularTotal()">
                         </div>
-
                         <p>Total del Servicio: Bs. <span
                                 id="total_servicio"><?php echo number_format($total_carrito, 2); ?></span></p>
                         <input type="hidden" name="monto_total" id="monto_total" value="<?php echo $total_carrito; ?>">
-
-                        <button type="submit" class="btn btn-primary" style="color:white">Confirmar Reserva</button>
                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmarReserva">
+                        Confirmar Reserva
+                    </button>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Scripts -->
+    </div>
+    <!-- Al final del body, antes del cierre -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        .titulo {
-            color: #ff6b6b;
-            margin: 20px 0;
-           
-        }
-
-        .table {
-            background: rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .table thead th {
-            background: rgba(0, 0, 0, 0.3);
-            color: #fff;
-            text-align: center;
-        }
-
-        .table tbody td {
-            color: #fff;
-            vertical-align: middle;
-            text-align: center;
-        }
-
-        .mt-3 h4 {
-            color: #fff;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-        }
-
-        .form-group label {
-            color: #fff;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-
-        .btn-vaciar {
-            margin-top: 10px;
-            width: 100%;
-        }
-    </style>
+    <!-- Después tus scripts locales -->
+    <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
 
     <script>
+        $(document).ready(function () {
+            $('.modal-backdrop').remove();
+            $('.btn-proceed').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+                $('#reservationModal')
+                    .addClass('show')
+                    .css('display', 'block')
+                    .attr('aria-hidden', 'false');
+                $('body')
+                    .addClass('modal-open')
+                    .append('<div class="modal-backdrop fade show"></div>');
+            });
+            $('.close, .btn-secondary').click(function () {
+                $('#reservationModal')
+                    .removeClass('show')
+                    .css('display', 'none')
+                    .attr('aria-hidden', 'true');
+
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            });
+            $('.btn-proceed').on('click', function () {
+                console.log('Botón clickeado');
+            });
+
+            $('#reservationModal').on('show.bs.modal', function () {
+                console.log('Modal mostrándose');
+            });
+
+            $('#reservationModal').on('shown.bs.modal', function () {
+                console.log('Modal mostrado');
+            });
+        });
         const costoGarzon = 150;
         let totalCarrito = <?php echo $total_carrito; ?>;
 
@@ -398,8 +504,98 @@
             document.getElementById('monto_total').value = totalServicio.toFixed(2);
         }
 
+        function submitReservation() {
+            const form = document.getElementById('reservationForm');
+
+            // Validar que todos los campos requeridos estén llenos
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Obtener los datos del formulario
+            const formData = $(form).serialize();
+
+            // Cerrar el modal antes de mostrar cualquier mensaje
+            $('#reservationModal').modal('hide');
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+
+            // Mostrar el mensaje de procesando por 2 segundos
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Por favor espere mientras se procesa su reserva',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            }).then(() => {
+                // Después de los 2 segundos, hacer la petición AJAX
+                $.ajax({
+                    url: '<?= site_url('Welcome/guardar_reserva'); ?>',
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                html: `
+                            <div class="mb-4">Reserva guardada correctamente</div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                ${response.message}
+                            </div>
+                        `,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                window.location.href = '<?= site_url('Welcome/carrito'); ?>';
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: response.message || 'Error al procesar la reserva',
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error en la solicitud:', error);
+                        console.log('Respuesta del servidor:', xhr.responseText);
+
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un problema al conectar con el servidor',
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    }
+                });
+            });
+        }
+        const fechaInput = document.getElementById('fecha_reserva');
+        const hoy = new Date();
+        const formatoFecha = hoy.toISOString().split('T')[0];
+        fechaInput.min = formatoFecha;
+        $(document).ready(function () {
+            $('#btnConfirmarReserva').off('click').on('click', function (e) {
+                e.preventDefault();
+                submitReservation();
+            });
+        });
+
         function eliminarProducto(id, tipo, cantidad) {
-            // Eliminar directamente sin confirmación
             $.ajax({
                 url: '<?= site_url('Welcome/eliminar_producto_carrito'); ?>',
                 type: 'POST',
@@ -411,7 +607,6 @@
                 dataType: 'json',
                 success: function (response) {
                     if (response.success) {
-                        // Mostrar mensaje de éxito
                         Swal.fire({
                             title: 'Producto Eliminado',
                             text: response.message,
@@ -423,7 +618,6 @@
                             location.reload();
                         });
                     } else {
-                        // Mostrar mensaje de error
                         Swal.fire({
                             title: 'Error',
                             text: response.message,
@@ -446,59 +640,8 @@
                 }
             });
         }
-
-        // Manejo del formulario de reserva
-        $(document).ready(function () {
-            $('form').on('submit', function (e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                title: '¡Éxito!',
-                                html: `
-                            <div class="mb-4">Reserva guardada correctamente</div>
-                            <div style="font-size: 0.9em; color: #666;">
-                                ${response.message}
-                            </div>
-                        `,
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true
-                            }).then(() => {
-                                window.location.href = '<?= site_url('Welcome/confirmacion_reserva'); ?>';
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: response.message || 'Error al procesar la reserva',
-                                icon: 'error',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Hubo un problema al conectar con el servidor',
-                            icon: 'error',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true
-                        });
-                    }
-                });
-            });
-        });
     </script>
+
 </body>
 
 </html>

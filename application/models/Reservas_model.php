@@ -209,20 +209,75 @@ class Reservas_model extends CI_Model
     }
     public function obtener_eventos_por_tipo($tipo_evento, $fecha_inicio, $fecha_fin)
     {
-        $this->db->select('r.tipo_evento, r.fecha_reserva, r.dias, r.monto_total, r.estado_pago, 
-                       r.garzones, u_aprobado.nombre AS aprobado_por, 
-                       u_cliente.nombre AS cliente_nombre, 
-                       u_cliente.primerApellido AS cliente_primerApellido, 
-                       u_cliente.segundoApellido AS cliente_segundoApellido,
-                       r.detalle_evento');
+        $this->db->select('r.reserva_id, r.tipo_evento, r.fecha_reserva, r.dias, r.monto_total, r.estado_pago, 
+                   r.garzones, r.detalle_evento, r.fecha_entrega_vajilla, r.fecha_recogida_vajilla,
+                   u_aprobado.nombre AS aprobado_por, 
+                   u_aprobado.primerApellido AS aprobado_primerApellido,
+                   u_aprobado.segundoApellido AS aprobado_segundoApellido,
+                   u_cliente.nombre AS cliente_nombre, 
+                   u_cliente.primerApellido AS cliente_primerApellido, 
+                   u_cliente.segundoApellido AS cliente_segundoApellido,
+                   u_entregado.nombre AS entregado_nombre,
+                   u_entregado.primerApellido AS entregado_primerApellido,
+                   u_entregado.segundoApellido AS entregado_segundoApellido,
+                   u_recogido.nombre AS recogido_nombre,
+                   u_recogido.primerApellido AS recogido_primerApellido,
+                   u_recogido.segundoApellido AS recogido_segundoApellido');
         $this->db->from('Reservas r');
         $this->db->join('Usuarios u_aprobado', 'r.aprobado_por = u_aprobado.usuario_id', 'left');
-        $this->db->join('Usuarios u_cliente', 'r.usuario_id = u_cliente.usuario_id', 'left'); // Unión para el cliente que hizo la reserva
+        $this->db->join('Usuarios u_cliente', 'r.usuario_id = u_cliente.usuario_id', 'left');
+        $this->db->join('Usuarios u_entregado', 'r.entregado_por = u_entregado.usuario_id', 'left');
+        $this->db->join('Usuarios u_recogido', 'r.recogido_por = u_recogido.usuario_id', 'left');
         $this->db->where('r.tipo_evento', $tipo_evento);
         $this->db->where('r.fecha_reserva >=', $fecha_inicio);
         $this->db->where('r.fecha_reserva <=', $fecha_fin);
+        $this->db->order_by('r.fecha_reserva', 'DESC');
+
         $query = $this->db->get();
         return $query->result();
+    }
+
+    // Método adicional para obtener los detalles de una reserva específica
+    public function obtener_detalles_tipo($reserva_id)
+    {
+        // Obtener los detalles de la reserva
+        $this->db->select('r.*, 
+                     u_cliente.nombre AS cliente_nombre, 
+                     u_cliente.primerApellido AS cliente_primerApellido, 
+                     u_cliente.segundoApellido AS cliente_segundoApellido,
+                     u_aprobado.nombre AS aprobado_nombre,
+                     u_aprobado.primerApellido AS aprobado_primerApellido,
+                     u_aprobado.segundoApellido AS aprobado_segundoApellido,
+                     u_entregado.nombre AS entregado_nombre,
+                     u_entregado.primerApellido AS entregado_primerApellido,
+                     u_entregado.segundoApellido AS entregado_segundoApellido,
+                     u_recogido.nombre AS recogido_nombre,
+                     u_recogido.primerApellido AS recogido_primerApellido,
+                     u_recogido.segundoApellido AS recogido_segundoApellido');
+        $this->db->from('Reservas r');
+        $this->db->join('Usuarios u_cliente', 'r.usuario_id = u_cliente.usuario_id', 'left');
+        $this->db->join('Usuarios u_aprobado', 'r.aprobado_por = u_aprobado.usuario_id', 'left');
+        $this->db->join('Usuarios u_entregado', 'r.entregado_por = u_entregado.usuario_id', 'left');
+        $this->db->join('Usuarios u_recogido', 'r.recogido_por = u_recogido.usuario_id', 'left');
+        $this->db->where('r.reserva_id', $reserva_id);
+        $reserva = $this->db->get()->row();
+
+        if ($reserva) {
+            // Obtener los detalles de vajilla y mantelería
+            $this->db->select('rd.*, v.nombre as nombre_vajilla, m.nombre as nombre_manteleria');
+            $this->db->from('Reserva_Detalles rd');
+            $this->db->join('Vajilla v', 'rd.vajilla_id = v.vajilla_id', 'left');
+            $this->db->join('Manteleria m', 'rd.manteleria_id = m.manteleria_id', 'left');
+            $this->db->where('rd.reserva_id', $reserva_id);
+            $detalles = $this->db->get()->result();
+
+            return array(
+                'reserva' => $reserva,
+                'detalles' => $detalles
+            );
+        }
+
+        return null;
     }
 
     public function obtener_reservas_por_fechas($fecha_inicio, $fecha_fin)

@@ -20,6 +20,22 @@
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
 
     <style>
+        .btn-danger {
+            padding: 8px 20px;
+            background: linear-gradient(45deg, #ff3636, #ff5555);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
         li.user-info {
             list-style-type: none;
             padding-left: 0;
@@ -166,7 +182,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                
+
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería"> Mantelería

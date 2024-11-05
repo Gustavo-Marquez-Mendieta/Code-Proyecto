@@ -168,6 +168,27 @@ class Welcome extends CI_Controller
 		// Cargar la vista del reporte con los datos
 		$this->load->view('administrador/tipo_evento', $data);
 	}
+	public function obtener_detalles_reservas($reserva_id)
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+			return;
+		}
+
+		$this->load->model('Reservas_model');
+		$resultado = $this->Reservas_model->obtener_detalles_tipo($reserva_id);
+
+		if ($resultado) {
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($resultado));
+		} else {
+			$this->output
+				->set_content_type('application/json')
+				->set_status_header(404)
+				->set_output(json_encode(['error' => 'Reserva no encontrada']));
+		}
+	}
 	public function reporte_fechas()
 	{
 		$data['nombre'] = $this->session->userdata('nombre');
@@ -732,6 +753,75 @@ class Welcome extends CI_Controller
 				'message' => 'Hubo un error al procesar la reserva: ' . $e->getMessage()
 			]);
 			exit;
+		}
+	}
+	public function obtener_detalles_reserva($reserva_id)
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+			return;
+		}
+
+		try {
+			// Obtener detalles de la reserva con información de usuarios
+			$this->db->select('r.*, 
+				u_cliente.nombre as cliente_nombre,
+				u_cliente.primerApellido as cliente_primerApellido,
+				u_cliente.segundoApellido as cliente_segundoApellido,
+				u_aprobado.nombre as aprobado_nombre,
+				u_aprobado.primerApellido as aprobado_primerApellido,
+				u_aprobado.segundoApellido as aprobado_segundoApellido,
+				u_entregado.nombre as entregado_nombre,
+				u_entregado.primerApellido as entregado_primerApellido,
+				u_entregado.segundoApellido as entregado_segundoApellido,
+				u_recogido.nombre as recogido_nombre,
+				u_recogido.primerApellido as recogido_primerApellido,
+				u_recogido.segundoApellido as recogido_segundoApellido');
+			$this->db->from('Reservas r');
+			$this->db->join('Usuarios u_cliente', 'r.usuario_id = u_cliente.usuario_id', 'left');
+			$this->db->join('Usuarios u_aprobado', 'r.aprobado_por = u_aprobado.usuario_id', 'left');
+			$this->db->join('Usuarios u_entregado', 'r.entregado_por = u_entregado.usuario_id', 'left');
+			$this->db->join('Usuarios u_recogido', 'r.recogido_por = u_recogido.usuario_id', 'left');
+			$this->db->where('r.reserva_id', $reserva_id);
+			$reserva = $this->db->get()->row();
+
+			// Formatear nombres completos
+			if ($reserva) {
+				$reserva->aprobado_por_nombre = $reserva->aprobado_nombre ?
+					$reserva->aprobado_nombre . ' ' . $reserva->aprobado_primerApellido . ' ' . $reserva->aprobado_segundoApellido :
+					'No asignado';
+
+				$reserva->entregado_por_nombre = $reserva->entregado_nombre ?
+					$reserva->entregado_nombre . ' ' . $reserva->entregado_primerApellido . ' ' . $reserva->entregado_segundoApellido :
+					'No asignado';
+
+				$reserva->recogido_por_nombre = $reserva->recogido_nombre ?
+					$reserva->recogido_nombre . ' ' . $reserva->recogido_primerApellido . ' ' . $reserva->recogido_segundoApellido :
+					'No asignado';
+			}
+
+			// Obtener los detalles de items
+			$this->db->select('rd.*, v.nombre as nombre_vajilla, m.nombre as nombre_manteleria');
+			$this->db->from('Reserva_Detalles rd');
+			$this->db->join('Vajilla v', 'rd.vajilla_id = v.vajilla_id', 'left');
+			$this->db->join('Manteleria m', 'rd.manteleria_id = m.manteleria_id', 'left');
+			$this->db->where('rd.reserva_id', $reserva_id);
+			$detalles = $this->db->get()->result();
+
+			$response = array(
+				'reserva' => $reserva,
+				'detalles' => $detalles
+			);
+
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($response));
+
+		} catch (Exception $e) {
+			$this->output
+				->set_content_type('application/json')
+				->set_status_header(500)
+				->set_output(json_encode(['error' => $e->getMessage()]));
 		}
 	}
 	public function confirmacion_reserva()

@@ -314,7 +314,6 @@
     <script src="<?php echo base_url(); ?>assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
 
-    <!-- Script para el manejo del modal -->
     <script>
         $(document).ready(function () {
             // Verificar que jQuery está cargado
