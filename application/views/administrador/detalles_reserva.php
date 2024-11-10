@@ -220,7 +220,6 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>ID Detalle</th>
                                 <th>Vajilla</th>
                                 <th>Mantelería</th>
                                 <th>Cantidad</th>
@@ -233,7 +232,6 @@
                             <?php if (!empty($detalles)): ?>
                                 <?php foreach ($detalles as $detalle): ?>
                                     <tr id="detalle_row_<?= $detalle->detalle_id; ?>">
-                                        <td><?= $detalle->detalle_id; ?></td>
                                         <td><?= $detalle->vajilla_nombre; ?></td>
                                         <td><?= $detalle->manteleria_nombre . ' ' . $detalle->tipo; ?></td>
                                         <td>

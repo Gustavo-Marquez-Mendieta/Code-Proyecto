@@ -138,7 +138,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="precio">Precio</label>
+                                <label for="precio">Precio (Bs.)</label>
                                 <input type="number" class="form-control" id="precio" name="precio" required>
                             </div>
                             <div class="form-group">

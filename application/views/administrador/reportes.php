@@ -19,6 +19,7 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         /* Estilos adicionales que puedas necesitar */
@@ -181,6 +182,36 @@
             cursor: not-allowed;
             box-shadow: none;
         }
+
+        .export-pdf-btn {
+            float: right;
+            margin-bottom: 20px;
+            padding: 8px 20px;
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+        }
+
+        .export-pdf-btn:hover {
+            background: linear-gradient(45deg, #c82333, #bd2130);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+        }
+
+        .export-pdf-btn i {
+            font-size: 1.1em;
+        }
+
+        .export-pdf-btn:active {
+            transform: translateY(1px);
+        }
     </style>
 </head>
 
@@ -291,19 +322,29 @@
                     <form action="<?php echo site_url('Welcome/reporte_fechas'); ?>" method="post">
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de inicio:</label>
-                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required
+                                value="<?php echo isset($_POST['fecha_inicio']) ? $_POST['fecha_inicio'] : ''; ?>">
                         </div>
                         <div class="form-group">
                             <label for="fecha_fin">Fecha de fin:</label>
-                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required
+                                value="<?php echo isset($_POST['fecha_fin']) ? $_POST['fecha_fin'] : ''; ?>">
                         </div>
                         <button type="submit" class="btn btn-primary" style="color:white">Generar Reporte</button>
                     </form>
                 </div>
                 <div class="col-md-10">
                     <?php if (isset($reservas) && !empty($reservas)): ?>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-danger" style="color:white" onclick="exportarPDF()">
+                                    <i class="fas fa-file-pdf"></i> Exportar a PDF
+                                </button>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-8">
+
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -798,6 +839,61 @@
             }
         }
     </style>
+    <script>
+        function exportarPDF() {
+            const fechaInicio = document.getElementById('fecha_inicio').value;
+            const fechaFin = document.getElementById('fecha_fin').value;
+
+            if (!fechaInicio || !fechaFin) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Por favor, primero genere un reporte seleccionando las fechas',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            // Mostrar loading
+            Swal.fire({
+                title: 'Generando PDF',
+                text: 'Por favor espere...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Crear y enviar formulario
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<?= site_url('Welcome/exportar_reporte_fechas'); ?>';
+
+            // Agregar fechas al formulario
+            const fechaInicioInput = document.createElement('input');
+            fechaInicioInput.type = 'hidden';
+            fechaInicioInput.name = 'fecha_inicio';
+            fechaInicioInput.value = fechaInicio;
+            form.appendChild(fechaInicioInput);
+
+            const fechaFinInput = document.createElement('input');
+            fechaFinInput.type = 'hidden';
+            fechaFinInput.name = 'fecha_fin';
+            fechaFinInput.value = fechaFin;
+            form.appendChild(fechaFinInput);
+
+            // Enviar formulario
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            // Cerrar loading después de un momento
+            setTimeout(() => {
+                Swal.close();
+            }, 1500);
+        }
+    </script>
     <script>
         $(document).ready(function () {
             // Limpiar cualquier modal backdrop residual al cargar la página

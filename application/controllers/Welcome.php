@@ -109,31 +109,295 @@ class Welcome extends CI_Controller
 		$data['nombre'] = $this->session->userdata('nombre');
 		$this->load->view('administrador/reportes', $data);
 	}
+	// En el controlador Welcome.php
+
+	public function exportar_reporte_fechas()
+	{
+		// Obtener las fechas del POST
+		$fecha_inicio = $this->input->post('fecha_inicio');
+		$fecha_fin = $this->input->post('fecha_fin');
+
+		// Obtener las reservas usando las mismas fechas
+		$reservas = $this->Reservas_model->obtener_reservas_por_fechas($fecha_inicio, $fecha_fin);
+
+		if (empty($reservas)) {
+			redirect('Welcome/reportes');
+			return;
+		}
+
+		// Inicializar PDF
+		$this->load->library('pdf');
+		$pdf = new Pdf();
+		$pdf->AliasNbPages();
+		$pdf->AddPage('L');
+
+		// Calcular el ancho total de la tabla
+		$anchoTabla = 260;
+		$margenIzquierdo = (297 - $anchoTabla) / 2;
+
+		// Establecer márgenes
+		$pdf->SetLeftMargin($margenIzquierdo);
+		$pdf->SetRightMargin($margenIzquierdo);
+
+		// Subtítulo con fechas
+		$pdf->SetFont('Arial', '', 12);
+		$pdf->Cell(0, 10, 'Periodo: ' . date('d/m/Y', strtotime($fecha_inicio)) . ' - ' . date('d/m/Y', strtotime($fecha_fin)), 0, 1, 'C');
+		$pdf->Ln(5);
+
+		// Cabeceras de la tabla
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->SetFillColor(200, 200, 200);
+
+		// Definir anchos de columnas
+		$pdf->Cell(20, 8, 'N°', 1, 0, 'C', true);
+		$pdf->Cell(70, 8, 'Cliente', 1, 0, 'C', true);
+		$pdf->Cell(35, 8, 'Tipo de Evento', 1, 0, 'C', true);
+		$pdf->Cell(30, 8, 'Fecha', 1, 0, 'C', true);
+		$pdf->Cell(15, 8, 'Dias', 1, 0, 'C', true);
+		$pdf->Cell(30, 8, 'Monto Total', 1, 0, 'C', true);
+		$pdf->Cell(50, 8, 'Estado', 1, 1, 'C', true);
+
+		// Contenido de la tabla
+		$pdf->SetFont('Arial', '', 10);
+		$total_general = 0;
+		$numero = 1;
+
+		foreach ($reservas as $reserva) {
+			$nombre_completo = $reserva->cliente_nombre . ' ' .
+				$reserva->cliente_primerApellido . ' ' .
+				$reserva->cliente_segundoApellido;
+			$pdf->Cell(20, 8, $numero, 1, 0, 'C');
+			$pdf->Cell(70, 8, $nombre_completo, 1, 0, 'L');
+			$pdf->Cell(35, 8, $reserva->tipo_evento, 1, 0, 'L');
+			$pdf->Cell(30, 8, date('d/m/Y', strtotime($reserva->fecha_reserva)), 1, 0, 'C');
+			$pdf->Cell(15, 8, $reserva->dias, 1, 0, 'C');
+			$pdf->Cell(30, 8, 'Bs. ' . number_format($reserva->monto_total, 2), 1, 0, 'R');
+			$pdf->Cell(50, 8, $reserva->estado_pago, 1, 1, 'L');
+
+			$total_general += $reserva->monto_total;
+			$numero++;
+		}
+
+		// Total General
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->Cell(150, 8, 'TOTAL GENERAL:', 1, 0, 'R', true);
+		$pdf->Cell(100, 8, 'Bs. ' . number_format($total_general, 2), 1, 1, 'R', true);
+
+		// Generar el PDF
+		$pdf->Output('D', 'reporte_reservas_' . date('Y-m-d') . '.pdf');
+	}
 	public function tipo_evento()
 	{
 		$data['nombre'] = $this->session->userdata('nombre');
 		$this->load->view('administrador/tipo_evento', $data);
+	}
+	public function reporte_evento()
+	{
+		$data['nombre'] = $this->session->userdata('nombre');
+
+		if ($this->input->post()) {
+			$eventos = $this->Reservas_model->obtener_eventos_por_tipo(
+				$this->input->post('evento'),
+				$this->input->post('fecha_inicio'),
+				$this->input->post('fecha_fin')
+			);
+
+			// Guardar en sesión para el PDF
+			$this->session->set_userdata('eventos', $eventos);
+
+			// Preparar datos para la vista
+			$data['eventos'] = $eventos;
+			$data['evento_seleccionado'] = $this->input->post('evento');
+			$data['fecha_inicio'] = $this->input->post('fecha_inicio');
+			$data['fecha_fin'] = $this->input->post('fecha_fin');
+		}
+
+		$this->load->view('administrador/tipo_evento', $data);
+	}
+
+	public function exportar_reporte_evento()
+	{
+		// Obtener datos del POST
+		$tipo_evento = $this->input->post('evento');
+		$fecha_inicio = $this->input->post('fecha_inicio');
+		$fecha_fin = $this->input->post('fecha_fin');
+
+		// Obtener eventos de la sesión
+		$eventos = $this->session->userdata('eventos');
+
+		// Inicializar PDF
+		$this->load->library('pdf');
+		$pdf = new Pdf();
+		$pdf->AliasNbPages();
+		$pdf->AddPage('L');
+
+		// Calcular el ancho total de la tabla (aumentado para la nueva columna)
+		$anchoTabla = 250;
+		$margenIzquierdo = (297 - $anchoTabla) / 2;
+
+		// Establecer márgenes
+		$pdf->SetLeftMargin($margenIzquierdo);
+		$pdf->SetRightMargin($margenIzquierdo);
+
+		// Subtítulo con tipo de evento y fechas
+		$pdf->SetFont('Arial', '', 12);
+		$pdf->Cell(0, 10, 'Tipo de Evento: ' . $tipo_evento, 0, 1, 'C');
+		$pdf->Cell(0, 10, 'Periodo: ' . date('d/m/Y', strtotime($fecha_inicio)) . ' - ' . date('d/m/Y', strtotime($fecha_fin)), 0, 1, 'C');
+		$pdf->Ln(5);
+
+		// Cabeceras de la tabla
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->SetFillColor(200, 200, 200);
+
+		// Definir anchos de columnas (agregada columna para numeración)
+		$pdf->Cell(20, 8, 'N°', 1, 0, 'C', true);
+		$pdf->Cell(70, 8, 'Cliente', 1, 0, 'C', true);
+		$pdf->Cell(35, 8, 'Tipo de Evento', 1, 0, 'C', true);
+		$pdf->Cell(30, 8, 'Fecha', 1, 0, 'C', true);
+		$pdf->Cell(15, 8, 'Dias', 1, 0, 'C', true);
+		$pdf->Cell(30, 8, 'Monto Total', 1, 0, 'C', true);
+		$pdf->Cell(50, 8, 'Estado', 1, 1, 'C', true);
+
+		// Contenido de la tabla
+		$pdf->SetFont('Arial', '', 10);
+		$total_general = 0;
+		$numero = 1; // Inicializar contador
+
+		foreach ($eventos as $evento) {
+			$pdf->Cell(20, 8, $numero, 1, 0, 'C'); // Número de fila
+			$pdf->Cell(70, 8, $evento->cliente_nombre . ' ' . $evento->cliente_primerApellido . ' ' . $evento->cliente_segundoApellido, 1, 0, 'L');
+			$pdf->Cell(35, 8, $evento->tipo_evento, 1, 0, 'L');
+			$pdf->Cell(30, 8, date('d/m/Y', strtotime($evento->fecha_reserva)), 1, 0, 'C');
+			$pdf->Cell(15, 8, $evento->dias, 1, 0, 'C');
+			$pdf->Cell(30, 8, 'Bs. ' . number_format($evento->monto_total, 2), 1, 0, 'R');
+			$pdf->Cell(50, 8, $evento->estado_pago, 1, 1, 'L');
+
+			$total_general += $evento->monto_total;
+			$numero++; // Incrementar contador
+		}
+
+		// Total General
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->Cell(170, 8, 'TOTAL GENERAL:', 1, 0, 'R', true); // Ajustado el ancho para incluir la columna de numeración
+		$pdf->Cell(80, 8, 'Bs. ' . number_format($total_general, 2), 1, 1, 'R', true);
+
+		// Generar PDF
+		$pdf->Output('D', 'reporte_evento_' . str_replace(' ', '_', $tipo_evento) . '_' . date('Y-m-d') . '.pdf');
 	}
 	public function reporte_empleado()
 	{
 		$data['nombre'] = $this->session->userdata('nombre');
 		$data['empleados'] = $this->Reservas_model->obtener_empleados();
 
-
 		if ($this->input->post()) {
 			$empleado_id = $this->input->post('empleado');
 			$fecha_inicio = $this->input->post('fecha_inicio');
 			$fecha_fin = $this->input->post('fecha_fin');
 
-			$data['eventos'] = $this->Reservas_model->obtener_eventos_empleado($empleado_id, $fecha_inicio, $fecha_fin);
+			// Guardar datos en sesión para el PDF
+			$this->session->set_userdata('empleado_id', $empleado_id);
+			$this->session->set_userdata('fecha_inicio', $fecha_inicio);
+			$this->session->set_userdata('fecha_fin', $fecha_fin);
 
+			$data['eventos'] = $this->Reservas_model->obtener_eventos_empleado($empleado_id, $fecha_inicio, $fecha_fin);
 			$data['empleado'] = $this->Reservas_model->obtener_empleado_por_id($empleado_id);
+
+			// Mantener valores seleccionados
+			$data['empleado_seleccionado'] = $empleado_id;
+			$data['fecha_inicio'] = $fecha_inicio;
+			$data['fecha_fin'] = $fecha_fin;
 		} else {
 			$data['eventos'] = null;
 			$data['empleado'] = null;
 		}
 
 		$this->load->view('administrador/reporte_empleado', $data);
+	}
+	public function exportar_reporte_empleado()
+	{
+		// Obtener datos del POST
+		$empleado_id = $this->input->post('empleado');
+		$fecha_inicio = $this->input->post('fecha_inicio');
+		$fecha_fin = $this->input->post('fecha_fin');
+
+		// Obtener datos
+		$eventos = $this->Reservas_model->obtener_eventos_empleado($empleado_id, $fecha_inicio, $fecha_fin);
+		$empleado = $this->Reservas_model->obtener_empleado_por_id($empleado_id);
+
+		// Inicializar PDF
+		$this->load->library('pdf');
+		$pdf = new Pdf();
+		$pdf->AliasNbPages();
+		$pdf->AddPage('L');
+
+		// Calcular el ancho total de la tabla
+		$anchoTabla = 250; // Aumentado para acomodar la nueva columna
+		$margenIzquierdo = (297 - $anchoTabla) / 2;
+
+		// Establecer márgenes
+		$pdf->SetLeftMargin($margenIzquierdo);
+		$pdf->SetRightMargin($margenIzquierdo);
+
+		// Título
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->Cell(0, 10, 'El Detalle Eventos - Reporte de Empleado', 0, 1, 'C');
+
+		// Subtítulo con datos del empleado y fechas
+		$pdf->SetFont('Arial', '', 12);
+		$pdf->Cell(0, 10, 'Empleado: ' . $empleado->nombre . ' ' . $empleado->apellido_paterno . ' ' . $empleado->apellido_materno, 0, 1, 'C');
+		$pdf->Cell(0, 10, 'Periodo: ' . date('d/m/Y', strtotime($fecha_inicio)) . ' - ' . date('d/m/Y', strtotime($fecha_fin)), 0, 1, 'C');
+		$pdf->Ln(5);
+
+		// Definir anchos de columnas (agregada nueva columna para numeración)
+		$w = array(20, 70, 35, 30, 65, 30); // El primer valor (20) es el ancho de la columna de numeración
+
+		// Cabeceras de la tabla
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->SetFillColor(200, 200, 200);
+		$pdf->Cell($w[0], 8, 'N°', 1, 0, 'C', true);
+		$pdf->Cell($w[1], 8, 'Empleado', 1, 0, 'C', true);
+		$pdf->Cell($w[2], 8, 'Tipo de Evento', 1, 0, 'C', true);
+		$pdf->Cell($w[3], 8, 'Fecha', 1, 0, 'C', true);
+		$pdf->Cell($w[4], 8, 'Detalle del Evento', 1, 0, 'C', true);
+		$pdf->Cell($w[5], 8, 'Dias', 1, 1, 'C', true);
+
+		// Contenido de la tabla
+		$pdf->SetFont('Arial', '', 10);
+		$numero = 1; // Inicializar contador
+
+		foreach ($eventos as $evento) {
+			$garzon = $this->Reservas_model->obtener_nombre_empleado($evento->empleado_id);
+			$nombre_empleado = $garzon ? $garzon->nombre . ' ' . $garzon->apellido_paterno . ' ' . $garzon->apellido_materno : 'No disponible';
+
+			// Calcular altura necesaria para el detalle del evento
+			$pdf->SetFont('Arial', '', 10);
+			$alturaLinea = 6; // Altura mínima de línea
+			$numLineas = ceil($pdf->GetStringWidth($evento->detalle_evento) / ($w[4] - 2));
+			$altura = max($alturaLinea * $numLineas, $alturaLinea);
+
+			// Guardar posición X inicial
+			$x = $pdf->GetX();
+			$y = $pdf->GetY();
+
+			// Dibujar celdas con la misma altura
+			$pdf->Cell($w[0], $altura, $numero, 1, 0, 'C'); // Número de fila
+			$pdf->Cell($w[1], $altura, $nombre_empleado, 1, 0, 'L');
+			$pdf->Cell($w[2], $altura, $evento->tipo_evento, 1, 0, 'L');
+			$pdf->Cell($w[3], $altura, date('d/m/Y', strtotime($evento->fecha_reserva)), 1, 0, 'C');
+
+			// Usar MultiCell para el detalle del evento
+			$xDetalle = $pdf->GetX();
+			$pdf->MultiCell($w[4], $alturaLinea, $evento->detalle_evento, 1, 'L');
+
+			// Volver a la posición correcta para la siguiente celda
+			$pdf->SetXY($xDetalle + $w[4], $y);
+			$pdf->Cell($w[5], $altura, $evento->dias, 1, 1, 'C');
+
+			$numero++; // Incrementar contador
+		}
+
+		// Generar PDF
+		$pdf->Output('D', 'reporte_empleado_' . date('Y-m-d') . '.pdf');
 	}
 	public function reporte_barras()
 	{
@@ -147,26 +411,6 @@ class Welcome extends CI_Controller
 		$data['bebida'] = $this->Bebida_model->get_bebida($bebida_id);
 		$data['nombre'] = $this->session->userdata('nombre');
 		$this->load->view('ingredientes', $data);
-	}
-
-	public function reporte_evento()
-	{
-		$data['nombre'] = $this->session->userdata('nombre');
-		// Comprobar si se ha enviado un formulario
-		if ($this->input->post()) {
-			// Si el formulario fue enviado, obtener los datos
-			$tipo_evento = $this->input->post('evento');
-			$fecha_inicio = $this->input->post('fecha_inicio');
-			$fecha_fin = $this->input->post('fecha_fin');
-
-			// Obtener los eventos del tipo seleccionado en el rango de fechas
-			$data['eventos'] = $this->Reservas_model->obtener_eventos_por_tipo($tipo_evento, $fecha_inicio, $fecha_fin);
-		} else {
-			$data['eventos'] = null;
-		}
-
-		// Cargar la vista del reporte con los datos
-		$this->load->view('administrador/tipo_evento', $data);
 	}
 	public function obtener_detalles_reservas($reserva_id)
 	{
@@ -620,7 +864,7 @@ class Welcome extends CI_Controller
 		$this->session->unset_userdata('email_temporal');
 		$this->session->unset_userdata('codigo_verificacion');
 
-		// Cargar la vista de verificación de email
+		// Cargar la vista de verificación de email1
 		$this->load->view('verificar_email');
 	}
 	public function registro_form()
@@ -721,7 +965,6 @@ class Welcome extends CI_Controller
 	}
 	public function guardar_reserva()
 	{
-		// Asegurarnos de que no se haya enviado ninguna salida antes
 		if (!headers_sent()) {
 			header('Content-Type: application/json');
 		}
@@ -749,12 +992,16 @@ class Welcome extends CI_Controller
 			exit;
 		}
 
-		if ($this->Reservas_model->verificar_disponibilidad_fecha($fecha_reserva, $dias)) {
-			echo json_encode([
-				'success' => false,
-				'message' => 'Las fechas seleccionadas ya están reservadas. Por favor elige otras fechas.'
-			]);
-			exit;
+		if ($garzones === 'si') {
+			$reservas_con_garzones = $this->Reservas_model->contar_reservas_con_garzones($fecha_reserva, $dias);
+
+			if ($reservas_con_garzones >= 2) {
+				echo json_encode([
+					'success' => false,
+					'message' => 'Las fechas seleccionadas ya están reservadas. Por favor elige otras fechas.'
+				]);
+				exit;
+			}
 		}
 
 		if ($garzones === 'si') {
@@ -792,11 +1039,16 @@ class Welcome extends CI_Controller
 				throw new Exception('Error en la transacción de la base de datos');
 			}
 
+			// Guardamos temporalmente el carrito para el PDF
+			$this->session->set_userdata('temp_carrito', $carrito);
+
+			// Limpiamos el carrito original
 			$this->session->unset_userdata('carrito');
 
 			echo json_encode([
 				'success' => true,
-				'message' => 'La solicitud del servicio se ha realizado con éxito. Se enviará la confirmación a su correo electrónico.'
+				'message' => 'La solicitud del servicio se ha realizado con éxito. Se enviará la confirmación a su correo electrónico.',
+				'reserva_id' => $reserva_id // Agregamos el ID de la reserva si lo necesitamos
 			]);
 			exit;
 
@@ -807,6 +1059,139 @@ class Welcome extends CI_Controller
 			]);
 			exit;
 		}
+	}
+	public function generar_pdf_reserva()
+	{
+		$carrito = $this->session->userdata('temp_carrito');
+		$fecha_reserva = $this->input->post('fecha_reserva');
+		$dias = $this->input->post('dias');
+		$evento = $this->input->post('evento');
+		$detalle_evento = $this->input->post('detalle_evento');
+		$garzones = $this->input->post('garzones');
+		$cantidad_garzones = $this->input->post('cantidad_garzones');
+		$monto_total = $this->input->post('monto_total');
+		$usuario = $this->session->userdata('nombre');
+		if (empty($carrito)) {
+			$ultima_reserva = $this->Reservas_model->obtener_ultima_reserva($this->session->userdata('usuario_id'));
+			if ($ultima_reserva) {
+				$carrito = $this->obtener_datos_carrito_db($ultima_reserva->id);
+			} else {
+				$carrito = array();
+			}
+		}
+		$this->load->library('pdf');
+		$pdf = new Pdf();
+		$pdf->AliasNbPages();
+		$pdf->AddPage();
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->Cell(0, 10, 'El Detalle Eventos - Comprobante de Reserva', 0, 1, 'C');
+		$pdf->SetFont('Arial', '', 10);
+		$pdf->Cell(0, 10, 'Fecha de emision: ' . date('d/m/Y'), 0, 1, 'R');
+		$pdf->Ln(5);
+		$pdf->SetFont('Arial', 'B', 12);
+		$pdf->Cell(0, 10, 'Informacion de la Reserva', 0, 1, 'L');
+
+		$pdf->SetFont('Arial', '', 11);
+		$pdf->Cell(40, 8, 'Cliente:', 0);
+		$pdf->Cell(0, 8, $usuario, 0, 1);
+
+		$pdf->Cell(40, 8, 'Fecha:', 0);
+		$pdf->Cell(0, 8, date('d/m/Y', strtotime($fecha_reserva)), 0, 1);
+
+		$pdf->Cell(40, 8, 'Dias:', 0);
+		$pdf->Cell(0, 8, $dias, 0, 1);
+
+		$pdf->Cell(40, 8, 'Evento:', 0);
+		$pdf->Cell(0, 8, $evento, 0, 1);
+
+		if (!empty($detalle_evento)) {
+			$pdf->Cell(40, 8, 'Descripcion:', 0);
+			$pdf->MultiCell(0, 8, $detalle_evento, 0);
+		}
+		$pdf->Ln(5);
+		$pdf->SetFont('Arial', 'B', 12);
+		$pdf->Cell(0, 10, 'Detalle de Productos', 0, 1, 'L');
+		$pdf->SetFillColor(200, 200, 200);
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->Cell(80, 8, 'Producto', 1, 0, 'C', true);
+		$pdf->Cell(30, 8, 'Cantidad', 1, 0, 'C', true);
+		$pdf->Cell(35, 8, 'Precio Unit.', 1, 0, 'C', true);
+		$pdf->Cell(35, 8, 'Subtotal', 1, 1, 'C', true);
+		$pdf->SetFont('Arial', '', 10);
+		$subtotal = 0;
+		if (!empty($carrito)) {
+			foreach ($carrito as $item) {
+				if (isset($item['tipo_producto']) && $item['tipo_producto'] == 'vajilla') {
+					$subtotal_item = $item['precio'] * $item['cantidad'];
+					$pdf->Cell(80, 8, $item['nombre'], 1, 0, 'L');
+					$pdf->Cell(30, 8, $item['cantidad'] . ' (Cajas)', 1, 0, 'C');
+					$pdf->Cell(35, 8, 'Bs. ' . number_format($item['precio'], 2), 1, 0, 'R');
+					$pdf->Cell(35, 8, 'Bs. ' . number_format($subtotal_item, 2), 1, 1, 'R');
+					$subtotal += $subtotal_item;
+				}
+			}
+			foreach ($carrito as $item) {
+				if (isset($item['tipo_producto']) && $item['tipo_producto'] == 'manteleria') {
+					$subtotal_item = $item['precio'] * $item['cantidad'];
+					$pdf->Cell(80, 8, $item['nombre'], 1, 0, 'L');
+					$pdf->Cell(30, 8, $item['cantidad'] . ' (unididades)', 1, 0, 'C');
+					$pdf->Cell(35, 8, 'Bs. ' . number_format($item['precio'], 2), 1, 0, 'R');
+					$pdf->Cell(35, 8, 'Bs. ' . number_format($subtotal_item, 2), 1, 1, 'R');
+					$subtotal += $subtotal_item;
+				}
+			}
+		}
+		if ($garzones == 'si' && $cantidad_garzones > 0) {
+			$costo_garzones = $cantidad_garzones * 150;
+			$pdf->Cell(80, 8, 'Servicio de Garzones', 1, 0, 'L');
+			$pdf->Cell(30, 8, $cantidad_garzones, 1, 0, 'C');
+			$pdf->Cell(35, 8, 'Bs. 150.00', 1, 0, 'R');
+			$pdf->Cell(35, 8, 'Bs. ' . number_format($costo_garzones, 2), 1, 1, 'R');
+			$subtotal += $costo_garzones;
+		}
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->Cell(145, 8, 'TOTAL:', 1, 0, 'R', true);
+		$pdf->Cell(35, 8, 'Bs. ' . number_format($monto_total, 2), 1, 1, 'R', true);
+		$pdf->Ln(10);
+		$pdf->SetFont('Arial', 'B', 10);
+		$pdf->Cell(0, 8, 'Terminos y Condiciones:', 0, 1);
+		$pdf->SetFont('Arial', '', 9);
+		$pdf->MultiCell(
+			0,
+			5,
+			"1. Se requiere un adelanto del 35% para confirmar la reserva.\n" .
+			"2. La cancelacion debe realizarse con al menos 48 horas de anticipacion.\n" .
+			"3. El cliente es responsable por daños o perdidas del material.\n" .
+			"4. Los precios incluyen el transporte dentro de la ciudad."
+		);
+		$pdf->Ln(10);
+		$pdf->SetFont('Arial', 'I', 8);
+		$pdf->Cell(0, 5, 'Este documento es un comprobante de reserva y no un comprobante fiscal.', 0, 1, 'C');
+		$this->session->unset_userdata('temp_carrito');
+		$pdf->Output('D', 'reserva_el_detalle_eventos.pdf');
+	}
+
+	private function obtener_datos_carrito_db($reserva_id)
+	{
+		$this->load->model('Reserva_detalle_model');
+		$detalles = $this->Reserva_detalle_model->obtener_detalles_reserva($reserva_id);
+
+		$carrito = array();
+		if ($detalles) {
+			foreach ($detalles as $detalle) {
+				$item = array(
+					'nombre' => $detalle->nombre,
+					'precio' => $detalle->precio,
+					'cantidad' => $detalle->cantidad,
+					'tipo_producto' => $detalle->vajilla_id ? 'vajilla' : 'manteleria',
+					'vajilla_id' => $detalle->vajilla_id,
+					'manteleria_id' => $detalle->manteleria_id
+				);
+				$carrito[] = $item;
+			}
+		}
+
+		return $carrito;
 	}
 	public function obtener_detalles_reserva($reserva_id)
 	{
@@ -1116,8 +1501,7 @@ class Welcome extends CI_Controller
 		$this->session->set_userdata('codigo_verificacion', (string) $codigo); // Convertir a string
 		$this->session->set_userdata('email_temporal', $email);
 
-		log_message('debug', 'Código generado: ' . $codigo);
-		log_message('debug', 'Código en sesión: ' . $this->session->userdata('codigo_verificacion'));
+
 
 		$config = array(
 			'protocol' => 'smtp',
@@ -1141,7 +1525,7 @@ class Welcome extends CI_Controller
 		if ($this->email->send()) {
 			echo json_encode([
 				'success' => true,
-				'message' => 'Código de verificación enviado',
+				'message' => 'Código de verificación enviadoooo',
 				'debug_code' => $codigo
 			]);
 		} else {
@@ -1418,16 +1802,33 @@ class Welcome extends CI_Controller
 			$this->load->view('welcome_message', $data);
 		}
 	}
+	// En application/controllers/Welcome.php
+
 	public function detalles($reserva_id)
 	{
 		$this->load->model('Reservas_model');
 		$this->load->model('Reserva_detalle_model');
 		$this->load->model('Garzones_reservas_model');
+		$this->load->model('Empleado_model');
+
 		$data['nombre'] = $this->session->userdata('nombre');
-		$data['reserva'] = $this->Reservas_model->get_reserva_by_id($reserva_id); // Obtiene la reserva
+
+		// Obtiene la reserva
+		$data['reserva'] = $this->Reservas_model->get_reserva_by_id($reserva_id);
+
+		// Obtiene los detalles de la reserva
 		$data['detalles'] = $this->Reserva_detalle_model->get_detalles_by_reserva($reserva_id);
-		$data['empleados'] = $this->Empleado_model->get_all_empleados();
+
+		// Obtiene solo los empleados disponibles para las fechas de esta reserva
+		$data['empleados'] = $this->Empleado_model->get_empleados_disponibles(
+			$data['reserva']->fecha_reserva,
+			$data['reserva']->dias,
+			$reserva_id  // Pasar el ID de la reserva actual para excluirla
+		);
+
+		// Obtiene los garzones ya asignados a esta reserva
 		$data['garzones_asignados'] = $this->Garzones_reservas_model->obtener_garzones_por_reserva($reserva_id);
+
 		$this->load->view('administrador/detalles_reserva', $data);
 	}
 	public function eliminarDetalle($detalle_id)

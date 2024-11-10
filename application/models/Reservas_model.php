@@ -32,15 +32,17 @@ class Reservas_model extends CI_Model
 
     public function verificar_disponibilidad_fecha($fecha_reserva, $dias)
     {
-        // Calcula la fecha final de la nueva reserva
         $fecha_final = date('Y-m-d', strtotime($fecha_reserva . ' + ' . ($dias - 1) . ' days'));
-
-        // Consulta para encontrar reservas que se solapen con la nueva reserva
+        $this->db->select('COUNT(*) as total');
+        $this->db->from('reservas');
         $this->db->where('(fecha_reserva <= "' . $fecha_final . '" 
-                       AND DATE_ADD(fecha_reserva, INTERVAL dias - 1 DAY) >= "' . $fecha_reserva . '")');
-        $query = $this->db->get('reservas');
-
-        return $query->num_rows() > 0;
+                        AND DATE_ADD(fecha_reserva, INTERVAL dias - 1 DAY) >= "' . $fecha_reserva . '")');
+        $this->db->where('estado_pago !=', 'cancelado');
+        $this->db->where('estado_pago !=', 'Evento Completado');
+        $this->db->where('garzones >', 0); 
+        $query = $this->db->get();
+        $resultado = $query->row();
+        return $resultado->total >= 2;
     }
     public function get_all_reservas()
     {
@@ -169,6 +171,26 @@ class Reservas_model extends CI_Model
 
         // Reindexar para obtener un arreglo simple
         return array_values($resultados);
+    }
+
+    public function contar_reservas_con_garzones($fecha_reserva, $dias)
+    {
+        $fecha_inicio = $fecha_reserva;
+        $fecha_fin = date('Y-m-d', strtotime($fecha_reserva . ' + ' . ($dias - 1) . ' days'));
+
+        $this->db->select('COUNT(*) as total');
+        $this->db->from('reservas');
+        $this->db->where('estado_pago !=', 'cancelado');
+        $this->db->where('estado_pago !=', 'Evento Completado');
+        $this->db->where('garzones >', 0); // Solo contar reservas que tienen garzones
+
+        // Verificar solapamiento de fechas
+        $this->db->where("(
+            (fecha_reserva <= '$fecha_fin' AND DATE_ADD(fecha_reserva, INTERVAL dias-1 DAY) >= '$fecha_inicio')
+        )");
+
+        $result = $this->db->get()->row();
+        return $result->total;
     }
 
 

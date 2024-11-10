@@ -18,6 +18,7 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         /* Estilos adicionales que puedas necesitar */
@@ -216,27 +217,35 @@
                         <div class="form-group">
                             <label for="empleado">Seleccione un empleado:</label>
                             <select name="empleado" id="empleado" class="form-control">
-                                <!-- Opciones de empleados -->
-                                <?php foreach ($empleados as $empleado): ?>
-                                    <option value="<?php echo $empleado->empleado_id; ?>">
-                                        <?php echo $empleado->nombre . ' ' . $empleado->apellido_paterno; ?>
+                                <?php foreach ($empleados as $emp): ?>
+                                    <option value="<?php echo $emp->empleado_id; ?>" <?= isset($empleado_seleccionado) && $empleado_seleccionado == $emp->empleado_id ? 'selected' : ''; ?>>
+                                        <?php echo $emp->nombre . ' ' . $emp->apellido_paterno; ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de inicio:</label>
-                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required
+                                value="<?php echo isset($fecha_inicio) ? $fecha_inicio : ''; ?>">
                         </div>
                         <div class="form-group">
                             <label for="fecha_fin">Fecha de fin:</label>
-                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required
+                                value="<?php echo isset($fecha_fin) ? $fecha_fin : ''; ?>">
                         </div>
                         <button type="submit" class="btn btn-primary" style="color:white">Generar Reporte</button>
                     </form>
                 </div>
                 <div class="col-md-10">
                     <?php if (isset($eventos) && !empty($eventos) && isset($empleado)): ?>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-danger" style="color:white" onclick="exportarPDF()">
+                                    <i class="fas fa-file-pdf"></i> Exportar a PDF
+                                </button>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-8">
                                 <table class="table table-bordered">
@@ -288,7 +297,52 @@
 
         </div>
     </section>
+    <script>
+        function exportarPDF() {
+            const empleado = document.getElementById('empleado').value;
+            const fechaInicio = document.getElementById('fecha_inicio').value;
+            const fechaFin = document.getElementById('fecha_fin').value;
 
+            if (!empleado || !fechaInicio || !fechaFin) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Por favor, genere un reporte primero',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            // Crear y enviar formulario
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<?= site_url('Welcome/exportar_reporte_empleado'); ?>';
+
+            // Agregar campos
+            const empleadoInput = document.createElement('input');
+            empleadoInput.type = 'hidden';
+            empleadoInput.name = 'empleado';
+            empleadoInput.value = empleado;
+            form.appendChild(empleadoInput);
+
+            const fechaInicioInput = document.createElement('input');
+            fechaInicioInput.type = 'hidden';
+            fechaInicioInput.name = 'fecha_inicio';
+            fechaInicioInput.value = fechaInicio;
+            form.appendChild(fechaInicioInput);
+
+            const fechaFinInput = document.createElement('input');
+            fechaFinInput.type = 'hidden';
+            fechaFinInput.name = 'fecha_fin';
+            fechaFinInput.value = fechaFin;
+            form.appendChild(fechaFinInput);
+
+            // Enviar formulario
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+    </script>
 
 
 

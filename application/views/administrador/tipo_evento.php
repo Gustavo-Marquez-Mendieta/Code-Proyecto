@@ -18,6 +18,7 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         /* Estilos adicionales que puedas necesitar */
@@ -217,27 +218,37 @@
                             <label for="evento">Seleccione un tipo de evento:</label>
                             <select id="evento" name="evento" class="form-control" required>
                                 <option value="">Selecciona un evento</option>
-                                <option value="Matrimonio">Matrimonio</option>
-                                <option value="Bautizo">Bautizo</option>
-                                <option value="Cumpleaños">Cumpleaños</option>
-                                <option value="15 Años">15 Años</option>
-                                <option value="Fiesta de Santito">Fiesta de Santito</option>
-                                <option value="Otro">Otro</option>
+                                <option value="Matrimonio" <?= isset($evento_seleccionado) && $evento_seleccionado == 'Matrimonio' ? 'selected' : ''; ?>>Matrimonio</option>
+                                <option value="Bautizo" <?= isset($evento_seleccionado) && $evento_seleccionado == 'Bautizo' ? 'selected' : ''; ?>>Bautizo</option>
+                                <option value="Cumpleaños" <?= isset($evento_seleccionado) && $evento_seleccionado == 'Cumpleaños' ? 'selected' : ''; ?>>Cumpleaños</option>
+                                <option value="15 Años" <?= isset($evento_seleccionado) && $evento_seleccionado == '15 Años' ? 'selected' : ''; ?>>15 Años</option>
+                                <option value="Fiesta de Santito" <?= isset($evento_seleccionado) && $evento_seleccionado == 'Fiesta de Santito' ? 'selected' : ''; ?>>Fiesta de Santito
+                                </option>
+                                <option value="Otro" <?= isset($evento_seleccionado) && $evento_seleccionado == 'Otro' ? 'selected' : ''; ?>>Otro</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de inicio:</label>
-                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required
+                                value="<?php echo isset($fecha_inicio) ? $fecha_inicio : ''; ?>">
                         </div>
                         <div class="form-group">
                             <label for="fecha_fin">Fecha de fin:</label>
-                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required
+                                value="<?php echo isset($fecha_fin) ? $fecha_fin : ''; ?>">
                         </div>
                         <button type="submit" class="btn btn-primary" style="color:white">Generar Reporte</button>
                     </form>
                 </div>
                 <div class="col-md-9">
                     <?php if (isset($eventos) && !empty($eventos)): ?>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-danger" style="color:white" onclick="exportarPDF()">
+                                    <i class="fas fa-file-pdf"></i> Exportar a PDF
+                                </button>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-9">
                                 <table class="table table-bordered">
@@ -744,6 +755,63 @@
             }
         }
     </style>
+    <script>
+        function exportarPDF() {
+            const tipoEvento = document.getElementById('evento').value;
+            const fechaInicio = document.getElementById('fecha_inicio').value;
+            const fechaFin = document.getElementById('fecha_fin').value;
+
+            if (!tipoEvento || !fechaInicio || !fechaFin) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Por favor, primero genere un reporte seleccionando el tipo de evento y las fechas',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            // Mostrar loading
+            Swal.fire({
+                title: 'Generando PDF',
+                text: 'Por favor espere...',
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Crear y enviar formulario
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<?= site_url('Welcome/exportar_reporte_evento'); ?>';
+
+            // Agregar campos
+            const eventoInput = document.createElement('input');
+            eventoInput.type = 'hidden';
+            eventoInput.name = 'evento';
+            eventoInput.value = tipoEvento;
+            form.appendChild(eventoInput);
+
+            const fechaInicioInput = document.createElement('input');
+            fechaInicioInput.type = 'hidden';
+            fechaInicioInput.name = 'fecha_inicio';
+            fechaInicioInput.value = fechaInicio;
+            form.appendChild(fechaInicioInput);
+
+            const fechaFinInput = document.createElement('input');
+            fechaFinInput.type = 'hidden';
+            fechaFinInput.name = 'fecha_fin';
+            fechaFinInput.value = fechaFin;
+            form.appendChild(fechaFinInput);
+
+            // Enviar formulario
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+    </script>
     <script>
         let detallesModal;
 

@@ -435,7 +435,6 @@
             </div>
         </div>
     </div>
-    <!-- Al final del body, antes del cierre -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
@@ -444,7 +443,55 @@
     <!-- Después tus scripts locales -->
     <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
+    <style>
+        /* Reset de estilos que pueden interferir */
+        .swal2-container {
+            z-index: 999999 !important;
+        }
 
+        .swal2-popup {
+            font-size: 1rem !important;
+        }
+
+        .swal2-actions {
+            z-index: 999999 !important;
+        }
+
+        /* Estilos para los botones */
+        .swal2-popup .btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .swal2-popup .btn-success {
+            color: #fff;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .swal2-popup .btn-secondary {
+            color: #fff;
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        /* Asegurar que no haya elementos residuales del modal */
+        .modal-backdrop {
+            display: none !important;
+        }
+
+        body.modal-open {
+            overflow: auto !important;
+            padding-right: 0 !important;
+        }
+
+        /* Asegurar que los botones sean clickeables */
+        .swal2-actions button {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+    </style>
     <script>
         $(document).ready(function () {
             $('.modal-backdrop').remove();
@@ -503,87 +550,135 @@
             document.getElementById('total_servicio').innerText = totalServicio.toFixed(2);
             document.getElementById('monto_total').value = totalServicio.toFixed(2);
         }
-
         function submitReservation() {
             const form = document.getElementById('reservationForm');
-
-            // Validar que todos los campos requeridos estén llenos
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
 
-            // Obtener los datos del formulario
-            const formData = $(form).serialize();
+            // Guardar los datos del formulario antes de cualquier operación
+            const formData = new FormData(form);
+            const serializedData = $(form).serialize();
 
-            // Cerrar el modal antes de mostrar cualquier mensaje
+            // Cerrar el modal Bootstrap
             $('#reservationModal').modal('hide');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+
+            // Mostrar loading
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Por favor espere',
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                showConfirmButton: false
+            });
+
+            // Realizar la petición AJAX
+            $.ajax({
+                url: '<?= site_url('Welcome/guardar_reserva'); ?>',
+                type: 'POST',
+                data: serializedData,
+                dataType: 'json',
+                success: function (response) {
+                    Swal.close();
+
+                    if (response.success) {
+                        // Crear funciones para manejar las acciones
+                        function descargarPDF() {
+                            const tempForm = document.createElement('form');
+                            tempForm.method = 'POST';
+                            tempForm.action = '<?= site_url('Welcome/generar_pdf_reserva'); ?>';
+                            tempForm.target = '_blank';
+
+                            for (let [key, value] of formData.entries()) {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = key;
+                                input.value = value;
+                                tempForm.appendChild(input);
+                            }
+
+                            document.body.appendChild(tempForm);
+                            tempForm.submit();
+                            document.body.removeChild(tempForm);
+                        }
+
+                        function redirigir() {
+                            window.location.href = '<?= site_url('Welcome/carrito'); ?>';
+                        }
+
+                        // Mostrar el mensaje de éxito con botones personalizados
+                        const swalWithBootstrapButtons = Swal.mixin({
+                            customClass: {
+                                confirmButton: 'btn btn-success m-2',
+                                cancelButton: 'btn btn-secondary m-2'
+                            },
+                            buttonsStyling: false
+                        });
+
+                        swalWithBootstrapButtons.fire({
+                            title: '¡Reserva Exitosa!',
+                            text: response.message,
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonText: 'Descargar PDF',
+                            cancelButtonText: 'Cerrar',
+                            reverseButtons: true,
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                descargarPDF();
+                                setTimeout(redirigir, 1000);
+                            } else {
+                                redirigir();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.message || 'Error al procesar la reserva',
+                            icon: 'error'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error de conexión con el servidor',
+                        icon: 'error'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            });
+        }
+
+        // Inicialización
+        $(document).ready(function () {
+            // Limpiar cualquier modal residual
             $('.modal-backdrop').remove();
             $('body').removeClass('modal-open');
 
-            // Mostrar el mensaje de procesando por 2 segundos
-            Swal.fire({
-                title: 'Procesando...',
-                text: 'Por favor espere mientras se procesa su reserva',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            }).then(() => {
-                // Después de los 2 segundos, hacer la petición AJAX
-                $.ajax({
-                    url: '<?= site_url('Welcome/guardar_reserva'); ?>',
-                    type: 'POST',
-                    data: formData,
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                title: '¡Éxito!',
-                                html: `
-                            <div class="mb-4">Reserva guardada correctamente</div>
-                            <div style="font-size: 0.9em; color: #666;">
-                                ${response.message}
-                            </div>
-                        `,
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true
-                            }).then(() => {
-                                window.location.href = '<?= site_url('Welcome/carrito'); ?>';
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: response.message || 'Error al procesar la reserva',
-                                icon: 'error',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error en la solicitud:', error);
-                        console.log('Respuesta del servidor:', xhr.responseText);
-
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Hubo un problema al conectar con el servidor',
-                            icon: 'error',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true
-                        });
-                    }
-                });
+            // Configurar el botón de confirmar reserva
+            $('#btnConfirmarReserva').off('click').on('click', function (e) {
+                e.preventDefault();
+                submitReservation();
             });
-        }
+
+            // Asegurar que el modal se cierre correctamente
+            $('#reservationModal').on('hidden.bs.modal', function () {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            });
+        });
         const fechaInput = document.getElementById('fecha_reserva');
         const hoy = new Date();
         const formatoFecha = hoy.toISOString().split('T')[0];

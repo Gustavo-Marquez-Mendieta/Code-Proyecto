@@ -32,5 +32,4 @@ class Garzones_reservas_model extends CI_Model
         $this->db->where('reserva_id', $reserva_id);
         return $this->db->delete('garzones_reservas');
     }
-   
 }
