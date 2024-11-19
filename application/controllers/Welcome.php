@@ -143,7 +143,8 @@ class Welcome extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Cell(0, 10, 'Periodo: ' . date('d/m/Y', strtotime($fecha_inicio)) . ' - ' . date('d/m/Y', strtotime($fecha_fin)), 0, 1, 'C');
 		$pdf->Ln(5);
-
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->Cell(0, 10, 'El Detalle Eventos - Reporte por Fechas', 0, 1, 'C');
 		// Cabeceras de la tabla
 		$pdf->SetFont('Arial', 'B', 10);
 		$pdf->SetFillColor(200, 200, 200);
@@ -238,7 +239,8 @@ class Welcome extends CI_Controller
 		// Establecer márgenes
 		$pdf->SetLeftMargin($margenIzquierdo);
 		$pdf->SetRightMargin($margenIzquierdo);
-
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->Cell(0, 10, 'El Detalle Eventos - Reporte por Evento', 0, 1, 'C');
 		// Subtítulo con tipo de evento y fechas
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Cell(0, 10, 'Tipo de Evento: ' . $tipo_evento, 0, 1, 'C');
@@ -465,7 +467,7 @@ class Welcome extends CI_Controller
 			foreach ($reservas as $reserva) {
 				echo '
 					<tr>
-						<td>' . $reserva->usuario_id . '</td>
+						<td>' . $reserva->nombre_completo . '</td>
 						<td>' . $reserva->fecha_reserva . '</td>
 						<td>' . $reserva->tipo_evento . '</td>
 						<td>' . $reserva->dias . '</td>
@@ -485,10 +487,6 @@ class Welcome extends CI_Controller
 			';
 		}
 	}
-
-
-
-
 	public function aprobar_solicitud($reserva_id)
 	{
 		$this->load->model('Reservas_model');
@@ -1085,9 +1083,6 @@ class Welcome extends CI_Controller
 		$pdf->AddPage();
 		$pdf->SetFont('Arial', 'B', 16);
 		$pdf->Cell(0, 10, 'El Detalle Eventos - Comprobante de Reserva', 0, 1, 'C');
-		$pdf->SetFont('Arial', '', 10);
-		$pdf->Cell(0, 10, 'Fecha de emision: ' . date('d/m/Y'), 0, 1, 'R');
-		$pdf->Ln(5);
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->Cell(0, 10, 'Informacion de la Reserva', 0, 1, 'L');
 
@@ -1161,7 +1156,7 @@ class Welcome extends CI_Controller
 			5,
 			"1. Se requiere un adelanto del 35% para confirmar la reserva.\n" .
 			"2. La cancelacion debe realizarse con al menos 48 horas de anticipacion.\n" .
-			"3. El cliente es responsable por daños o perdidas del material.\n" .
+			"3. El cliente es responsable por perdidas de bienes.\n" .
 			"4. Los precios incluyen el transporte dentro de la ciudad."
 		);
 		$pdf->Ln(10);

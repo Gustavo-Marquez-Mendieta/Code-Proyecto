@@ -9,6 +9,7 @@
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/formulary.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -193,7 +194,38 @@
             </ul>
         </div>
     </section>
+    <style>
+        .custom-select-container {
+            position: relative;
+            width: fit-content;
+        }
 
+        select {
+            appearance: none;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 40px 10px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+        }
+
+        .custom-select-container::after {
+            content: "▼";
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: white;
+            pointer-events: none;
+            font-size: 14px;
+        }
+    </style>
     <!-- Content page -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
@@ -202,16 +234,19 @@
                     <br>
                     <h1 class="titulo">Reportes</h1>
                     <h1 class="titulo">Reporte por Tipo de Evento</h1>
-                    <select name="reportes" id="reportes" style="margin-top: 10px;" onchange="location = this.value;">
-                        <option value="">Seleccione un reporte</option>
-                        <option value="<?php echo site_url('Welcome/reportes'); ?>">Reporte por fecha</option>
-                        <option value="<?php echo site_url('Welcome/tipo_evento'); ?>">Reporte por tipo de evento
-                        </option>
-                        <option value="<?php echo site_url('Welcome/reporte_empleado'); ?>">Reporte de empleados
-                        </option>
-                        <option value="<?php echo site_url('Welcome/reporte_barras'); ?>">Reporte en barras</option>
-                    </select>
+                    <div class="custom-select-container">
+                        <select name="reportes" id="reportes" onchange="location = this.value;">
+                            <option value="">Seleccione un reporte</option>
+                            <option value="<?php echo site_url('Welcome/reportes'); ?>">Reporte por fecha</option>
+                            <option value="<?php echo site_url('Welcome/tipo_evento'); ?>">Reporte por tipo de evento
+                            </option>
+                            <option value="<?php echo site_url('Welcome/reporte_empleado'); ?>">Reporte de empleados
+                            </option>
+                            <option value="<?php echo site_url('Welcome/reporte_barras'); ?>">Reporte en barras</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div class="col-md-3">
                     <form action="<?php echo site_url('Welcome/reporte_evento'); ?>" method="post">
                         <div class="form-group">
@@ -226,6 +261,8 @@
                                 </option>
                                 <option value="Otro" <?= isset($evento_seleccionado) && $evento_seleccionado == 'Otro' ? 'selected' : ''; ?>>Otro</option>
                             </select>
+                            <i class="fas fa-chevron-down"
+                                style="position: absolute; right: 10px; top: 38px; pointer-events: none; color: white;"></i>
                         </div>
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de inicio:</label>

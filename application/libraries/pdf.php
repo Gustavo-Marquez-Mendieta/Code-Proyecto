@@ -32,10 +32,6 @@ class Pdf extends FPDF
 
     public function Header()
     {
-        // Título
-        $this->SetFont('Arial', 'B', 16);
-        $this->Cell(0, 10, 'El Detalle Eventos - Reporte de Reservas', 0, 1, 'C');
-
         // Fecha de generación
         $this->SetFont('Arial', 'I', 8);
         $this->Cell(0, 5, 'Fecha de generacion: ' . $this->fecha_generacion, 0, 1, 'R');

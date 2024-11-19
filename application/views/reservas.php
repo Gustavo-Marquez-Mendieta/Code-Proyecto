@@ -142,7 +142,7 @@
                                     <th>Tipo de Evento</th>
                                     <th>Días</th>
                                     <th>Monto Total</th>
-                                    <th>Estado de Pago</th>
+                                    <th>Estado de Evento</th>
                                     <th>Garzones</th>
                                     <th>Detalle del Evento</th>
                                     <th>Detalles</th> <!-- Nueva columna para el botón -->

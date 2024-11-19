@@ -39,19 +39,26 @@ class Reservas_model extends CI_Model
                         AND DATE_ADD(fecha_reserva, INTERVAL dias - 1 DAY) >= "' . $fecha_reserva . '")');
         $this->db->where('estado_pago !=', 'cancelado');
         $this->db->where('estado_pago !=', 'Evento Completado');
-        $this->db->where('garzones >', 0); 
+        $this->db->where('garzones >', 0);
         $query = $this->db->get();
         $resultado = $query->row();
         return $resultado->total >= 2;
     }
     public function get_all_reservas()
     {
-        $this->db->select('Reservas.*, Usuarios.nombre AS usuario_nombre');
-        $this->db->from('Reservas');
-        $this->db->join('Usuarios', 'Reservas.usuario_id = Usuarios.usuario_id');
-        $query = $this->db->get();
+        $this->db->select('reservas.*, CONCAT(usuarios.nombre, " ", usuarios.primerApellido, " ", usuarios.segundoApellido) as nombre_completo');
+        $this->db->from('reservas');
+        $this->db->join('usuarios', 'usuarios.usuario_id = reservas.usuario_id');
+        return $this->db->get()->result();
+    }
 
-        return $query->result();
+    public function get_reservas_by_estado($estado)
+    {
+        $this->db->select('reservas.*, CONCAT(usuarios.nombre, " ", usuarios.primerApellido, " ", usuarios.segundoApellido) as nombre_completo');
+        $this->db->from('reservas');
+        $this->db->join('usuarios', 'usuarios.usuario_id = reservas.usuario_id');
+        $this->db->where('reservas.estado_pago', $estado);
+        return $this->db->get()->result();
     }
     public function get_reserva_by_id($reserva_id)
     {
@@ -59,12 +66,7 @@ class Reservas_model extends CI_Model
         $query = $this->db->get('Reservas');
         return $query->row();
     }
-    public function get_reservas_by_estado($estado)
-    {
-        $this->db->where('estado_pago', $estado);
-        $query = $this->db->get('reservas');
-        return $query->result();
-    }
+    
     public function update_estado_reserva($reserva_id, $nuevo_estado, $usuario_id_aprobador = null)
     {
         $data = array(

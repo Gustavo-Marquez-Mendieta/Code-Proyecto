@@ -443,6 +443,11 @@
     <!-- Después tus scripts locales -->
     <script src="<?php echo base_url(); ?>assets/js/material.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/ripples.min.js"></script>
+    <script type="text/javascript">
+        const container = document.getElementById('reservation-handler');
+        const root = ReactDOM.createRoot(container);
+        root.render(React.createElement(ReservationHandler));
+    </script>
     <style>
         /* Reset de estilos que pueden interferir */
         .swal2-container {
@@ -494,247 +499,190 @@
     </style>
     <script>
         $(document).ready(function () {
-            $('.modal-backdrop').remove();
-            $('.btn-proceed').click(function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open');
-                $('#reservationModal')
-                    .addClass('show')
-                    .css('display', 'block')
-                    .attr('aria-hidden', 'false');
-                $('body')
-                    .addClass('modal-open')
-                    .append('<div class="modal-backdrop fade show"></div>');
-            });
-            $('.close, .btn-secondary').click(function () {
-                $('#reservationModal')
-                    .removeClass('show')
-                    .css('display', 'none')
-                    .attr('aria-hidden', 'true');
+            // Constantes globales
+            const costoGarzon = 150;
+            let totalCarrito = parseFloat(<?php echo $total_carrito; ?>);
 
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open');
-            });
-            $('.btn-proceed').on('click', function () {
-                console.log('Botón clickeado');
-            });
+            // Configuración inicial de la fecha
+            const fechaInput = document.getElementById('fecha_reserva');
+            const hoy = new Date();
+            const formatoFecha = hoy.toISOString().split('T')[0];
+            fechaInput.min = formatoFecha;
 
-            $('#reservationModal').on('show.bs.modal', function () {
-                console.log('Modal mostrándose');
-            });
-
-            $('#reservationModal').on('shown.bs.modal', function () {
-                console.log('Modal mostrado');
-            });
-        });
-        const costoGarzon = 150;
-        let totalCarrito = <?php echo $total_carrito; ?>;
-
-        function mostrarCantidadGarzones() {
-            document.getElementById('cantidad_garzones_div').style.display = 'block';
-        }
-
-        function ocultarCantidadGarzones() {
-            document.getElementById('cantidad_garzones_div').style.display = 'none';
-            document.getElementById('cantidad_garzones').value = '';
-            calcularTotal();
-        }
-
-        function calcularTotal() {
-            let cantidadGarzones = document.getElementById('cantidad_garzones').value;
-            let totalGarzones = cantidadGarzones ? cantidadGarzones * costoGarzon : 0;
-            let totalServicio = totalCarrito + totalGarzones;
-
-            document.getElementById('total_servicio').innerText = totalServicio.toFixed(2);
-            document.getElementById('monto_total').value = totalServicio.toFixed(2);
-        }
-        function submitReservation() {
-            const form = document.getElementById('reservationForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // Guardar los datos del formulario antes de cualquier operación
-            const formData = new FormData(form);
-            const serializedData = $(form).serialize();
-
-            // Cerrar el modal Bootstrap
-            $('#reservationModal').modal('hide');
-            $('body').removeClass('modal-open');
-            $('.modal-backdrop').remove();
-
-            // Mostrar loading
-            Swal.fire({
-                title: 'Procesando...',
-                text: 'Por favor espere',
-                didOpen: () => {
-                    Swal.showLoading();
+            // Funciones de manejo del modal
+            const modalHandler = {
+                show: function () {
+                    $('.modal-backdrop').remove();
+                    $('body')
+                        .removeClass('modal-open')
+                        .addClass('modal-open')
+                        .append('<div class="modal-backdrop fade show"></div>');
+                    $('#reservationModal')
+                        .addClass('show')
+                        .css('display', 'block')
+                        .attr('aria-hidden', 'false');
                 },
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                allowEnterKey: false,
-                showConfirmButton: false
-            });
 
-            // Realizar la petición AJAX
-            $.ajax({
-                url: '<?= site_url('Welcome/guardar_reserva'); ?>',
-                type: 'POST',
-                data: serializedData,
-                dataType: 'json',
-                success: function (response) {
-                    Swal.close();
+                hide: function () {
+                    $('#reservationModal')
+                        .removeClass('show')
+                        .css('display', 'none')
+                        .attr('aria-hidden', 'true');
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                },
 
-                    if (response.success) {
-                        // Crear funciones para manejar las acciones
-                        function descargarPDF() {
-                            const tempForm = document.createElement('form');
-                            tempForm.method = 'POST';
-                            tempForm.action = '<?= site_url('Welcome/generar_pdf_reserva'); ?>';
-                            tempForm.target = '_blank';
+                init: function () {
+                    $('.btn-proceed').on('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        modalHandler.show();
+                    });
 
-                            for (let [key, value] of formData.entries()) {
-                                const input = document.createElement('input');
-                                input.type = 'hidden';
-                                input.name = key;
-                                input.value = value;
-                                tempForm.appendChild(input);
-                            }
+                    $('.close, .btn-secondary').on('click', modalHandler.hide);
+                    $('#reservationModal').on('hidden.bs.modal', modalHandler.hide);
+                }
+            };
+            const garzonHandler = {
+                mostrar: function () {
+                    $('#cantidad_garzones_div').show();
+                },
 
-                            document.body.appendChild(tempForm);
-                            tempForm.submit();
-                            document.body.removeChild(tempForm);
-                        }
+                ocultar: function () {
+                    $('#cantidad_garzones_div').hide();
+                    $('#cantidad_garzones').val('');
+                    this.calcularTotal();
+                },
 
-                        function redirigir() {
-                            window.location.href = '<?= site_url('Welcome/carrito'); ?>';
-                        }
+                calcularTotal: function () {
+                    const cantidadGarzones = $('#cantidad_garzones').val();
+                    const totalGarzones = cantidadGarzones ? cantidadGarzones * costoGarzon : 0;
+                    const totalServicio = totalCarrito + totalGarzones;
 
-                        // Mostrar el mensaje de éxito con botones personalizados
-                        const swalWithBootstrapButtons = Swal.mixin({
-                            customClass: {
-                                confirmButton: 'btn btn-success m-2',
-                                cancelButton: 'btn btn-secondary m-2'
-                            },
-                            buttonsStyling: false
-                        });
+                    $('#total_servicio').text(totalServicio.toFixed(2));
+                    $('#monto_total').val(totalServicio.toFixed(2));
+                }
+            };
 
-                        swalWithBootstrapButtons.fire({
-                            title: '¡Reserva Exitosa!',
-                            text: response.message,
-                            icon: 'success',
-                            showCancelButton: true,
-                            confirmButtonText: 'Descargar PDF',
-                            cancelButtonText: 'Cerrar',
-                            reverseButtons: true,
-                            allowOutsideClick: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                descargarPDF();
-                                setTimeout(redirigir, 1000);
+            // Manejador de reservas
+            const reservationHandler = {
+                descargarPDF: function (formData) {
+                    const tempForm = document.createElement('form');
+                    tempForm.method = 'POST';
+                    tempForm.action = '<?= site_url('Welcome/generar_pdf_reserva'); ?>';
+                    tempForm.target = '_blank';
+
+                    for (let [key, value] of formData.entries()) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        tempForm.appendChild(input);
+                    }
+
+                    document.body.appendChild(tempForm);
+                    tempForm.submit();
+                    document.body.removeChild(tempForm);
+                },
+
+                submit: function (e) {
+                    e.preventDefault();
+                    const form = document.getElementById('reservationForm');
+
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+
+                    const formData = new FormData(form);
+                    const serializedData = $(form).serialize();
+
+                    modalHandler.hide();
+
+                    // Realizar la petición AJAX
+                    $.ajax({
+                        url: '<?= site_url('Welcome/guardar_reserva'); ?>',
+                        type: 'POST',
+                        data: serializedData,
+                        dataType: 'json',
+                        success: (response) => {
+                            if (response.success) {
+                                this.descargarPDF(formData);
+                                Swal.fire({
+                                    title: '¡Reserva Exitosa!',
+                                    text: 'Su reserva se ha guardado y el PDF se está descargando',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false,
+                                    timerProgressBar: true
+                                }).then(() => {
+                                    window.location.href = '<?= site_url('Welcome/user'); ?>';
+                                });
                             } else {
-                                redirigir();
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: response.message || 'Error al procesar la reserva',
+                                    icon: 'error'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
                             }
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: response.message || 'Error al procesar la reserva',
-                            icon: 'error'
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Error de conexión con el servidor',
-                        icon: 'error'
-                    }).then(() => {
-                        window.location.reload();
+                        },
+                        error: () => {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error de conexión con el servidor',
+                                icon: 'error'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        }
                     });
                 }
-            });
-        }
+            };
 
-        // Inicialización
-        $(document).ready(function () {
-            // Limpiar cualquier modal residual
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open');
-
-            // Configurar el botón de confirmar reserva
-            $('#btnConfirmarReserva').off('click').on('click', function (e) {
-                e.preventDefault();
-                submitReservation();
-            });
-
-            // Asegurar que el modal se cierre correctamente
-            $('#reservationModal').on('hidden.bs.modal', function () {
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open');
-            });
-        });
-        const fechaInput = document.getElementById('fecha_reserva');
-        const hoy = new Date();
-        const formatoFecha = hoy.toISOString().split('T')[0];
-        fechaInput.min = formatoFecha;
-        $(document).ready(function () {
-            $('#btnConfirmarReserva').off('click').on('click', function (e) {
-                e.preventDefault();
-                submitReservation();
-            });
-        });
-
-        function eliminarProducto(id, tipo, cantidad) {
-            $.ajax({
-                url: '<?= site_url('Welcome/eliminar_producto_carrito'); ?>',
-                type: 'POST',
-                data: {
-                    id: id,
-                    tipo: tipo,
-                    cantidad: cantidad
-                },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        Swal.fire({
-                            title: 'Producto Eliminado',
-                            text: response.message,
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 1500,
-                            timerProgressBar: true
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: response.message,
-                            icon: 'error',
-                            showConfirmButton: false,
-                            timer: 1500,
-                            timerProgressBar: true
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Error de conexión',
-                        icon: 'error',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true
+            // Manejador de eliminación de productos
+            const productHandler = {
+                eliminar: function (id, tipo, cantidad) {
+                    $.ajax({
+                        url: '<?= site_url('Welcome/eliminar_producto_carrito'); ?>',
+                        type: 'POST',
+                        data: { id, tipo, cantidad },
+                        dataType: 'json',
+                        success: function (response) {
+                            Swal.fire({
+                                title: response.success ? 'Producto Eliminado' : 'Error',
+                                text: response.message,
+                                icon: response.success ? 'success' : 'error',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            }).then(() => {
+                                if (response.success) location.reload();
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error de conexión',
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            });
+                        }
                     });
                 }
-            });
-        }
+            };
+
+            // Inicialización y event listeners
+            modalHandler.init();
+            $('#garzones_si').on('click', () => garzonHandler.mostrar());
+            $('#garzones_no').on('click', () => garzonHandler.ocultar());
+            $('#cantidad_garzones').on('input', () => garzonHandler.calcularTotal());
+            $('#btnConfirmarReserva').on('click', (e) => reservationHandler.submit(e));
+            window.eliminarProducto = (id, tipo, cantidad) => productHandler.eliminar(id, tipo, cantidad);
+        });
     </script>
 
 </body>

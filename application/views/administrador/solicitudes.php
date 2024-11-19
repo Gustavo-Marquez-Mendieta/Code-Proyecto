@@ -250,7 +250,7 @@
                             <?php if (!empty($reservas)): ?>
                                 <?php foreach ($reservas as $reserva): ?>
                                     <tr>
-                                        <td><?= $reserva->usuario_id; ?></td>
+                                        <td><?= $reserva->nombre_completo; ?></td>
                                         <td><?= $reserva->fecha_reserva; ?></td>
                                         <td><?= $reserva->tipo_evento; ?></td>
                                         <td><?= $reserva->dias; ?></td>

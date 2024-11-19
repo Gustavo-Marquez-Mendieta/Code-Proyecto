@@ -10,6 +10,7 @@
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/tabla.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/formulary.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -74,7 +75,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                
+
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -136,6 +137,8 @@
                                     <option value="Plato">Plato</option>
                                     <option value="Cubierto">Cubierto</option>
                                 </select>
+                                <i class="fas fa-chevron-down"
+                                    style="position: absolute; right: 10px; top: 38px; pointer-events: none; color: white;"></i>
                             </div>
                             <div class="form-group">
                                 <label for="precio">Precio (Bs.)</label>

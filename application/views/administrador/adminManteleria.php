@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/main.css">
     <link href="<?php echo base_url(); ?>assets/css/cambios.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/css/formulary.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <!-- Vendor CSS Files -->
@@ -19,7 +22,6 @@
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
 
     <style>
-        /* Estilos adicionales que puedas necesitar */
         .dashboard-sideBar {
             /* Estilos de la barra lateral */
             left: 0;
@@ -162,7 +164,7 @@
                         <img src="../../assets/img/copa-con-vino.png" alt="Vajilla"> Vajilla
                     </a>
                 </li>
-                
+
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
                         <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
@@ -192,7 +194,6 @@
         </div>
     </section>
 
-    <!-- Content page -->
     <section class="full-box dashboard-contentPage" id="inicio">
         <div class="container-fluid">
             <div class="row">
@@ -215,15 +216,19 @@
 
                     <form action="<?php echo site_url('Welcome/agregarManteleria'); ?>" method="post"
                         enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="nombre">Nombre</label>
+                        <div class="form-group" style="position: relative;">
+                            <label for="nombre" style="color: white;">Nombre</label>
                             <select class="form-control" id="nombre" name="nombre" required>
                                 <option value="">Selecciona un tipo</option>
                                 <option value="Manteleria">Manteleria</option>
                                 <option value="Decoracion">Decoracion</option>
                             </select>
+                            <i class="fas fa-chevron-down"
+                                style="position: absolute; right: 10px; top: 38px; pointer-events: none; color: white;"></i>
                         </div>
-                        <div class="form-group">
+
+
+                        <div class="form-group" style="position: relative;">
                             <label for="tipo">Tipo</label>
                             <select class="form-control" id="tipo" name="tipo" required>
                                 <option value="">Seleccione Plan</option>
@@ -231,9 +236,11 @@
                                 <option value="Intermedio">Intermedio</option>
                                 <option value="Premium">Premium</option>
                             </select>
+                            <i class="fas fa-chevron-down"
+                                style="position: absolute; right: 10px; top: 38px; pointer-events: none; color: white;"></i>
                         </div>
                         <div class="form-group">
-                            <label for="precio">Precio</label>
+                            <label for="precio">Precio (Bs.)</label>
                             <input type="number" class="form-control" id="precio" name="precio" step="0.01" required>
                         </div>
                         <div class="form-group">

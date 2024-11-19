@@ -1,81 +1,98 @@
 /* Agregar estos estilos en la sección <style> o en tu archivo CSS */
 
 .dashboard-contentPage .titulo {
-    color: #ff6b6b;  /* Color rosa similar al título "Agregar Empleado" */
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+	color: #ff6b6b; /* Color rosa similar al título "Agregar Empleado" */
+	font-size: 2.5rem;
+	margin-bottom: 30px;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .form-group {
-    margin-bottom: 25px;
+	margin-bottom: 25px;
 }
 
 .form-group label {
-    color: #ffffff;  /* Color blanco para las etiquetas */
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: block;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	color: #ffffff; /* Color blanco para las etiquetas */
+	font-size: 1.1rem;
+	font-weight: 500;
+	margin-bottom: 8px;
+	display: block;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .form-control {
-    background-color: rgba(255, 255, 255, 0.1);  /* Fondo semi-transparente */
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    color: #ffffff;  /* Color del texto de input */
-    padding: 12px 15px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+	background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+	border: 2px solid rgba(255, 255, 255, 0.2);
+	border-radius: 5px;
+	color: #ffffff; /* Color del texto de input */
+	padding: 12px 15px;
+	font-size: 1rem;
+	transition: all 0.3s ease;
 }
 
 .form-control:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-color: #ff6b6b;  /* Color rosa al enfocar */
-    box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
-    color: #ffffff;
+	background-color: rgba(255, 255, 255, 0.15);
+	border-color: #ff6b6b; /* Color rosa al enfocar */
+	box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+	color: #ffffff;
 }
 
 .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.5);
 }
 
 /* Estilo para el botón guardar */
 .btn-success {
-    background-color: #28a745;
-    border: none;
-    padding: 12px 30px;
-    font-size: 1.1rem;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    font-weight: 500;
-    letter-spacing: 1px;
+	background-color: #28a745;
+	border: none;
+	padding: 12px 30px;
+	font-size: 1.1rem;
+	border-radius: 5px;
+	transition: all 0.3s ease;
+	text-transform: uppercase;
+	font-weight: 500;
+	letter-spacing: 1px;
 }
 
 .btn-success:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	background-color: #218838;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Contenedor del formulario */
 .col-md-6 {
-    background-color: rgba(0, 0, 0, 0.4);  /* Fondo semi-transparente para el formulario */
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+	background-color: rgba(
+		0,
+		0,
+		0,
+		0.4
+	); /* Fondo semi-transparente para el formulario */
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
 /* Estilo para validación */
 .form-control:invalid {
-    border-color: #dc3545;
+	border-color: #dc3545;
 }
 
 .form-control:valid {
-    border-color: #28a745;
+	border-color: #28a745;
 }
-label{
-    color: white;
+label {
+	color: white;
+}
+select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"%3E%3Cpath fill="none" stroke="%23ffffff" stroke-width="2" d="M1 1l5 5 5-5"/%3E%3C/svg%3E')
+		no-repeat right 10px center;
+	background-size: 12px;
+	padding-right: 30px;
+	border: 1px solid #0ea5f7;
+	border-radius: 4px;
+	color: white; /* Texto blanco */
 }

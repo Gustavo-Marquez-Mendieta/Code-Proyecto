@@ -16,6 +16,7 @@
     <link href="<?php echo base_url(); ?>assets/vendor/venobox/venobox.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="<?php echo base_url(); ?>assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         .dashboard-sideBar {
@@ -145,7 +146,7 @@
 
                 <li>
                     <a href="<?php echo site_url('Welcome/adminManteleria'); ?>">
-                        <img src="../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
+                        <img src="../../../assets/img/mesa.png" alt="Mantelería y Decoración"> Mantelería
                     </a>
                 </li>
                 <li>
@@ -165,7 +166,7 @@
                 </li>
                 <li>
                     <a href="<?php echo site_url('Welcome/reportes'); ?>">
-                        <img src="../../assets/image/reportes.png" alt="Reportes"> Reportes
+                        <img src="../../../assets/image/reportes.png" alt="Reportes"> Reportes
                     </a>
                 </li>
             </ul>
@@ -230,6 +231,8 @@
                                 <option value="1" <?php echo $usuario->estado ? 'selected' : ''; ?>>Activo</option>
                                 <option value="0" <?php echo !$usuario->estado ? 'selected' : ''; ?>>Inactivo</option>
                             </select>
+                            <i class="fas fa-chevron-down"
+                                style="position: absolute; right: 10px; top: 38px; pointer-events: none; color: white;"></i>
                         </div>
 
                         <div class="form-group">
@@ -240,6 +243,8 @@
                                     Cliente</option>
                                 <option value="administrador" <?php echo $usuario->rol == 'administrador' ? 'selected' : ''; ?>>Administrador</option>
                             </select>
+                            <i class="fas fa-chevron-down"
+                                style="position: absolute; right: 10px; top: 38px; pointer-events: none; color: white;"></i>
                         </div>
 
                         <button type="submit" class="btn btn-primary" style="color:white">Guardar Cambios</button>

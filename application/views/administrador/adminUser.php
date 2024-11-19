@@ -124,7 +124,6 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Nombre</th>
                                 <th>Primer Apellido</th>
                                 <th>Segundo Apellido</th>
@@ -140,7 +139,6 @@
                         <tbody>
                             <?php foreach ($usuarios as $usuario): ?>
                                 <tr>
-                                    <td><?php echo $usuario->usuario_id; ?></td>
                                     <td><?php echo $usuario->nombre; ?></td>
                                     <td><?php echo $usuario->primerApellido; ?></td>
                                     <td><?php echo $usuario->segundoApellido; ?></td>
