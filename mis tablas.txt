@@ -1,0 +1,92 @@
+mis tablas
+-- Tabla de mi proyecto
+CREATE TABLE Usuarios (
+    usuario_id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    primerApellido VARCHAR(255) NOT NULL,
+    segundoApellido VARCHAR(255) NOT NULL,
+    usuario VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    celular VARCHAR(15) NOT NULL,
+    estado TINYINT,
+    rol VARCHAR(50) NOT NULL,
+    fechaCreacionUsuario DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaActualizacionUsuario DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Bebidas (
+    bebida_id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    ingredientes VARCHAR(6500) NOT NULL,
+	detalles VARCHAR(1000) NOT NULL,
+    imagen VARCHAR(255)
+);
+
+CREATE TABLE Manteleria (
+    manteleria_id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    precio  INT NOT NULL,
+    stock INT NOT NULL,
+    imagen VARCHAR(255)
+);
+
+CREATE TABLE Vajilla (
+    vajilla_id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    precio  INT NOT NULL,
+    cantidad INT NOT NULL,
+    stock_cajas INT NOT NULL,
+    imagen VARCHAR(255)
+);
+
+CREATE TABLE Reservas (
+    reserva_id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    fecha_reserva DATE NOT NULL,
+    tipo_evento VARCHAR(200),
+    dias INT NOT NULL,
+    monto_total DECIMAL(10, 2) NOT NULL,
+    estado_pago VARCHAR(50) NOT NULL,
+    garzones VARCHAR(20),
+    detalle_evento VARCHAR(500) NOT NULL,
+    aprobado_por INT DEFAULT NULL,
+    fecha_entrega_vajilla DATETIME DEFAULT NULL,
+    entregado_por INT DEFAULT NULL,
+    fecha_recogida_vajilla DATETIME DEFAULT NULL,
+    recogido_por INT DEFAULT NULL,
+    detalles VARCHAR(1800) NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES Usuarios(usuario_id),
+    FOREIGN KEY (aprobado_por) REFERENCES Usuarios(usuario_id),
+    FOREIGN KEY (entregado_por) REFERENCES Usuarios(usuario_id),
+    FOREIGN KEY (recogido_por) REFERENCES Usuarios(usuario_id)
+);
+CREATE TABLE Reserva_Detalles (
+    detalle_id INT AUTO_INCREMENT PRIMARY KEY,
+    reserva_id INT NOT NULL,
+    vajilla_id INT DEFAULT NULL,
+    manteleria_id INT DEFAULT NULL,
+    cantidad INT NOT NULL,
+    precio DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (reserva_id) REFERENCES Reservas(reserva_id),
+    FOREIGN KEY (vajilla_id) REFERENCES Vajilla(vajilla_id),
+    FOREIGN KEY (manteleria_id) REFERENCES Manteleria(manteleria_id)
+);
+CREATE TABLE Empleados (
+    empleado_id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido_paterno VARCHAR(100) NOT NULL,
+    apellido_materno VARCHAR(100) NOT NULL,
+    celular VARCHAR(15),
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+	estado tinyint
+);
+CREATE TABLE garzones_reservas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reserva_id int,
+	empleado_id int,
+	FOREIGN KEY (reserva_id) REFERENCES Reservas(reserva_id),
+    FOREIGN KEY (empleado_id) REFERENCES Empleados(empleado_id)
+);
