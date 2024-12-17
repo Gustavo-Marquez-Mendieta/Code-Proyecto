@@ -428,7 +428,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btnConfirmarReserva">
+                    <button type="button" class="btn btn-primary" id="btnConfirmarReserva" style="color:white">
                         Confirmar Reserva
                     </button>
                 </div>
